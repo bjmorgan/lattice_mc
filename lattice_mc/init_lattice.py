@@ -12,7 +12,7 @@ def square_lattice( a, b, spacing ):
                        np.roll( grid, -1, axis=0 )[x,y],
                        np.roll( grid, +1, axis=1 )[x,y],
                        np.roll( grid, -1, axis=1 )[x,y] ]
-        sites.append( lattice_site.Site( int( it[0] ), r, neighbours, 0.0 ) )
+        sites.append( lattice_site.Site( int( it[0] ), r, neighbours, 0.0, 'L' ) )
         it.iternext()
     return lattice.Lattice( sites, cell_lengths = np.array( [ a, b, 0.0 ] ) * spacing )
 
@@ -29,7 +29,7 @@ def cubic_lattice( a, b, c, spacing ):
                        np.roll( grid, -1, axis=1 )[x,y,z],
                        np.roll( grid, +1, axis=2 )[x,y,z],
                        np.roll( grid, -1, axis=2 )[x,y,z] ]
-        sites.append( lattice_site.Site( int( it[0] ), r, neighbours, 0.0 ) )
+        sites.append( lattice_site.Site( int( it[0] ), r, neighbours, 0.0, 'L' ) )
         it.iternext()
     return lattice.Lattice( sites, cell_lengths = np.array( [ a, b, c ] ) * spacing )
 
@@ -43,5 +43,6 @@ def lattice_from_sites_file( site_file, cell_lengths ):
             r = np.array( [ float( s ) for s in f.readline().split()[1:4] ] )
             f.readline() # ignore vertices
             neighbours = [ int( s ) for s in f.readline().split()[1:] ]
-            sites.append( lattice_site.Site( number, r, neighbours, 0.0 ) )
+            label = f.readline().split()[1]
+            sites.append( lattice_site.Site( number, r, neighbours, 0.0, label ) )
         return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
