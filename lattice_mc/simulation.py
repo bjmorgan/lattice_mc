@@ -36,7 +36,7 @@ class Simulation:
         if site_energies:
             self.lattice.set_site_energies( site_energies )
 
-    def run( self ):
+    def run( self, for_time = None ):
         assert( self.lattice )
         assert( self.atoms )
         assert( self.number_of_jumps )
@@ -44,8 +44,14 @@ class Simulation:
             for step in range( self.number_of_equilibration_jumps ):
                 self.lattice.jump()
             self.reset()
-        for step in range( self.number_of_jumps ):
-            self.lattice.jump()
+        if for_time:
+           self.number_of_jumps = 0
+           while self.lattice.time < for_time:
+               self.lattice.jump()
+               self.number_of_jumps += 1
+        else: 
+            for step in range( self.number_of_jumps ):
+                self.lattice.jump()
         self.has_run = True
 
     def tracer_correlation( self ):
