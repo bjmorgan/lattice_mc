@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import sys
 
 from lattice_mc import atom, jump, transitions
 from collections import Counter
@@ -15,6 +16,7 @@ class Lattice:
         self.enforce_periodic_boundary_conditions()
         self.initialise_site_lookup_table()
         self.nn_energy = False
+        self.cn_energies = False
         self.site_energies = False
         self.jump_lookup_table = False
         for site in self.sites:
@@ -61,12 +63,12 @@ class Lattice:
             for occupied_site in self.occupied_sites():
                 unoccupied_neighbours = [ site for site in [ self.site_with_id( n ) for n in occupied_site.neighbours ] if not site.is_occupied ]
                 for vacant_site in unoccupied_neighbours:
-                    jumps.append( jump.Jump( occupied_site, vacant_site, self.nn_energy, self.jump_lookup_table ) )
+                    jumps.append( jump.Jump( occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table ) )
         else:
             for vacant_site in self.vacant_sites():
                 occupied_neighbours = [ site for site in [ self.site_with_id( n ) for n in vacant_site.neighbours ] if site.is_occupied ]
                 for occupied_site in occupied_neighbours:
-                    jumps.append( jump.Jump( occupied_site, vacant_site, self.nn_energy, self.jump_lookup_table ) )
+                    jumps.append( jump.Jump( occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table ) )
         return jumps
 
     def update( self, jump ):
@@ -121,12 +123,25 @@ class Lattice:
     def set_nn_energy( self, delta_E ):
         self.nn_energy = delta_E
 
+    def set_cn_energies( self, cn_energies ):
+        for site in self.sites:
+            site.set_cn_occupation_energies( cn_energies[ site.label ] )
+        self.cn_energies = cn_energies
+
     def site_coordination_numbers( self ):
         coordination_numbers = {}
         for site in self.sites:
             if site.label not in coordination_numbers:
                 coordination_numbers[ site.label ] = len( site.neighbours )
         return coordination_numbers 
+
+    def site_specific_coordination_numbers( self ):
+        specific_coordination_numbers = {}
+        for site in self.sites:
+            if site.label not in specific_coordination_numbers:
+                specific_coordination_numbers[ site.label ] = site.site_specific_neighbours()
+        return specific_coordination_numbers
+
 
     def connected_site_pairs( self ):
         site_connections = {}

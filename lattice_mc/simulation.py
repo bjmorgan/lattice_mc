@@ -32,6 +32,10 @@ class Simulation:
         if nn_energy:
             self.lattice.set_nn_energy( nn_energy )
 
+    def set_cn_energies( self, cn_energies ):
+        if cn_energies:
+            self.lattice.set_cn_energies( cn_energies )
+
     def set_site_energies( self, site_energies ):
         if site_energies:
             self.lattice.set_site_energies( site_energies )
@@ -77,5 +81,7 @@ class Simulation:
     def average_site_occupations( self ):
         return self.lattice.site_occupation_statistics()
 
-    def setup_lookup_table( self ):
-        self.lattice.jump_lookup_table = lookup_table.LookupTable( self.lattice )
+    def setup_lookup_table( self, hamiltonian = 'nearest-neighbour' ):
+        expected_hamiltonian_values = [ 'nearest-neighbour', 'coordination_number' ]
+        assert( hamiltonian in expected_hamiltonian_values )
+        self.lattice.jump_lookup_table = lookup_table.LookupTable( self.lattice, hamiltonian )

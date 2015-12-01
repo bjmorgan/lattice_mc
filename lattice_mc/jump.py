@@ -7,10 +7,11 @@ rate_prefactor = 1e13 # standard vibrational frequency
 
 class Jump:
 
-    def __init__( self, initial_site, final_site, nearest_neighbour_energy = False, jump_lookup_table = False ):
+    def __init__( self, initial_site, final_site, nearest_neighbour_energy = False, coordination_number_energy = False, jump_lookup_table = False ):
         self.initial_site = initial_site
         self.final_site = final_site
         self.nearest_neighbour_energy = nearest_neighbour_energy
+        self.coordination_number_energy = coordination_number_energy
         if jump_lookup_table:
             self.relative_probability = self.relative_probability_from_lookup_table( jump_lookup_table )
         else:
@@ -28,16 +29,25 @@ class Jump:
     def delta_E( self ):
         site_delta_E = self.final_site.energy - self.initial_site.energy
         if self.nearest_neighbour_energy:
-            delta_nn = self.final_site.nn_occupation() - self.initial_site.nn_occupation() -1 # -1 because the hopping ion is not counted in the final site occupation number
-            site_delta_E += delta_nn * self.nearest_neighbour_energy
-        # HARD CODED: penalise octahedral sites having both neighbours occupied
-        #if self.final_site.label in [ 'T1', 'T2', 'T3' ]:
-        #    for n_site in self.final_site.p_neighbours:
-        #        if n_site is not self.initial_site:
-        #            if n_site.is_occupied and n_site.nn_occupation() == 1:
-        #                return site_delta_E + 10 * kT
-        # END
+            site_delta_E += self.nearest_neighbour_delta_E()
+        if self.coordination_number_energy:
+            site_delta_E += self.coordination_number_delta_E()
         return site_delta_E
+
+    def nearest_neighbour_delta_E( self ):
+        delta_nn = self.final_site.nn_occupation() - self.initial_site.nn_occupation() - 1 # -1 because the hopping ion is not counted in the final site occupation number
+        return ( delta_nn * self.nearest_neighbour_energy )
+    
+    def coordination_number_delta_E( self ):
+        initial_site_neighbours = [ s for s in self.initial_site.p_neighbours if s.is_occupied ] # excludes final site, since this is always uncocupied
+        final_site_neighbours = [ s for s in self.final_site.p_neighbours if s.is_occupied and s is not self.initial_site ] # excludes initial site
+        initial_cn_occupation_energy = ( self.initial_site.cn_occupation_energy() + 
+            sum( [ site.cn_occupation_energy() for site in initial_site_neighbours ] ) +
+            sum( [ site.cn_occupation_energy() for site in final_site_neighbours ] ) )
+        final_cn_occupation_energy = ( self.final_site.cn_occupation_energy( delta_occupation = { self.initial_site.label : -1 } ) +
+            sum( [ site.cn_occupation_energy( delta_occupation = { self.initial_site.label : -1 } ) for site in initial_site_neighbours ] ) +
+            sum( [ site.cn_occupation_energy( delta_occupation = { self.final_site.label : +1 } ) for site in final_site_neighbours ] ) )
+        return ( final_cn_occupation_energy - initial_cn_occupation_energy )
 
     def dr( self, cell_lengths ):
         half_cell_lengths = cell_lengths / 2.0
