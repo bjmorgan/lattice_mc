@@ -64,7 +64,7 @@ class Simulation:
 
     def new_tracer_correlation( self ):
         assert( self.has_run )
-        return self.atoms.sum_dr_squared() / self.atoms.summed_dr2
+        return self.atoms.sum_dr_squared() / self.atoms.summed_dr2()
 
     def tracer_diffusion_coefficient( self ):
         assert( self.has_run )
