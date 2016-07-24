@@ -81,6 +81,7 @@ class Lattice:
         jump.initial_site.occupation = 0
         jump.initial_site.atom = None
         jump.initial_site.is_occupied = False
+        # TODO: updating atom counters could be contained in an atom.move_to( site ) method
         atom.site = jump.final_site
         atom.number_of_hops += 1
         atom.dr += dr

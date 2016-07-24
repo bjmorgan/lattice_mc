@@ -55,7 +55,3 @@ class Atom:
         """
         return np.dot( self.dr, self.dr )
 
-#    def correlation_factor( self ):
-#        rk_2 = np.sum( self.dr * self.dr )
-#        return rk_2 / self.summed_dr2
-
