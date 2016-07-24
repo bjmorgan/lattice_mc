@@ -24,4 +24,4 @@ class Species:
         return self.sum_dr_squared() / self.summed_dr2()
 
     def collective_correlation( self ):
-        return self.collective_dr_squared / self.summed_dr2()
+        return self.collective_dr_squared() / self.summed_dr2()
