@@ -19,3 +19,9 @@ class Species:
 
     def summed_dr2( self ):
         return sum( [ atom.summed_dr2 for atom in self.atoms ] )
+
+    def tracer_correlation( self ):
+        return self.sum_dr_squared() / self.summed_dr2()
+
+    def collective_correlation( self ):
+        return self.collective_dr_squared / self.summed_dr2()

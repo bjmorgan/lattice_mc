@@ -64,7 +64,7 @@ class Simulation:
 
     def new_tracer_correlation( self ):
         assert( self.has_run )
-        return self.atoms.sum_dr_squared() / self.atoms.summed_dr2()
+        return self.atoms.tracer_correlation()
 
     def tracer_diffusion_coefficient( self ):
         assert( self.has_run )
@@ -73,6 +73,10 @@ class Simulation:
     def collective_correlation( self ):
         assert( self.has_run )
         return self.atoms.collective_dr_squared() / float( self.number_of_jumps )
+
+    def new_collective_correlation( self ):
+        assert( self.has_run )
+        return self.atoms.collective_correlation()
 
     def collective_diffusion_coefficient( self ):
         assert( self.has_run )
