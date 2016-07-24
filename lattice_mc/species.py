@@ -17,3 +17,5 @@ class Species:
     def occupations( self, site_label ):
         return sum( atom.site.label == site_label for atom in self.atoms )
 
+    def summed_dr2( self ):
+        return sum( [ atom.summed_dr2 for atom in self.atoms ] )

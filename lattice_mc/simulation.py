@@ -62,6 +62,10 @@ class Simulation:
         assert( self.has_run )
         return self.atoms.sum_dr_squared() / float( self.number_of_jumps )
 
+    def new_tracer_correlation( self ):
+        assert( self.has_run )
+        return self.atoms.sum_dr_squared() / self.atoms.summed_dr2
+
     def tracer_diffusion_coefficient( self ):
         assert( self.has_run )
         return self.atoms.sum_dr_squared() / ( 6.0 * float( self.number_of_atoms ) * self.lattice.time )
