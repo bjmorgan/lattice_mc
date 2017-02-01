@@ -65,3 +65,7 @@ class Jump:
         c1 = self.initial_site.nn_occupation()
         c2 = self.final_site.nn_occupation()
         return jump_lookup_table.jump_probability[ l1 ][ l2 ][ c1 ][ c2 ]
+
+    @property
+    def relative_probability( self ):
+        return self.relative_probability
