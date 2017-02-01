@@ -55,3 +55,6 @@ class Atom:
         """
         return np.dot( self.dr, self.dr )
 
+    @property
+    def site( self ):
+        return self.site
