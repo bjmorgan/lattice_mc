@@ -15,15 +15,17 @@ class TranstitionsTestCase( unittest.TestCase ):
         self.assertEqual( self.transitions.jumps, self.jumps )
         np.testing.assert_array_equal( self.transitions.p, np.array( [ 0.25, 0.25, 0.25, 0.25 ] ) )
 
-    def test_cumulative_probabilities2( self ):
-        self.transitions.p = np.array( [ 0.1, 0.2, 0.3, 0.4 ] )
-        np.testing.assert_allclose( self.transitions.cumulative_probabilities(), np.array( [ 0.1, 0.3, 0.6, 1.0 ] ) )
-  
     @patch( 'random.random' )
     def test_random( self, mock_random ):
-        self.transitions.cumulative_probabilities = Mock( return_value=np.array( [ 0.1, 0.3, 0.6, 1.0 ] ) )
+        self.transitions.p = np.array( [ 0.1, 0.2, 0.3, 0.4 ] )
+        mock_random.return_value = 0.05
+        self.assertIs( self.transitions.random(), self.jumps[0] )
         mock_random.return_value = 0.15
         self.assertIs( self.transitions.random(), self.jumps[1] )
+        mock_random.return_value = 0.60
+        self.assertIs( self.transitions.random(), self.jumps[2] )
+        mock_random.return_value = 0.75
+        self.assertIs( self.transitions.random(), self.jumps[3] )
 
     @patch( 'random.random' )
     def test_time_to_jump( self, mock_random ):
