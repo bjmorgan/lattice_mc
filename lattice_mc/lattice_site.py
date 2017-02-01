@@ -20,6 +20,12 @@ class Site:
         self.cn_occupation_energies = cn_energies
 
     def nn_occupation( self ):
+        """The number of occupied nearest-neighbour sites
+
+        Arguments: None
+
+        Returns (int): The number of occupied nearest-neighbour sites
+        """
         return sum( [ site.is_occupied for site in self.p_neighbours ] )
 
     def site_specific_nn_occupation( self ):
