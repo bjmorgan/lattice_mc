@@ -18,14 +18,14 @@ class Atom:
         """
         Atom.atom_number += 1
         self.number = Atom.atom_number
-        self.site = initial_site
+        self._site = initial_site
         # check this site is not already occupied
-        if self.site.occupation == 0:
-            self.site.occupation = self.number
-            self.site.is_occupied = True
-            self.site.atom = self
+        if self._site.occupation == 0:
+            self._site.occupation = self.number
+            self._site.is_occupied = True
+            self._site.atom = self
         else:
-            print( "Error: this site is already occupied" ) 
+            raise ValueError( "This site is already occupied by atom {}".format( initial_site.occupation ) ) 
         self.reset()
 
     def reset( self ):
@@ -41,7 +41,7 @@ class Atom:
         self.number_of_hops = 0
         self.dr = np.array( [ 0.0, 0.0, 0.0 ] )
         self.summed_dr2 = 0.0
-        self.sites_visited = [ self.site.number ] 
+        self.sites_visited = [ self._site.number ] 
 
     def dr_squared( self ):
         """
@@ -57,4 +57,8 @@ class Atom:
 
     @property
     def site( self ):
-        return self.site
+        return self._site
+
+    @site.setter
+    def site( self, value ):
+        self._site = value
