@@ -2,3 +2,5 @@
 lattice_mc/__pycache__
 lattice_mc/*.pyc
 tests/*.pyc
+tests/__pycache__
+*coverage*
