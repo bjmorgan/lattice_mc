@@ -25,6 +25,10 @@ class OptionsTestCase( unittest.TestCase ):
         self.options.set_cn_energies( 10.0 )
         self.assertEqual( self.options.cn_energies, 10.0 )
 
+    def test_cn_energy_scaling( self ):
+        self.options.set_cn_energy_scaling( 10.0 )
+        self.assertEqual( self.options.cn_energy_scaling, 10.0 )
+
     def test_set_site_energies( self ):
         self.options.set_site_energies( { 'O' : 0.0 } )
         self.assertEqual( self.options.site_energies, { 'O' : 0.0 } )
