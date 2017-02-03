@@ -5,6 +5,8 @@ temperature = 298.0
 kT = k_boltzmann * temperature
 rate_prefactor = 1e13 # standard vibrational frequency
 
+# TODO (maybe) does it make more sense to subclass Jump (and other classes) depending on the type of Hamiltonian?
+
 class Jump:
 
     def __init__( self, initial_site, final_site, nearest_neighbour_energy = False, coordination_number_energy = False, jump_lookup_table = False ):
@@ -13,9 +15,9 @@ class Jump:
         self.nearest_neighbour_energy = nearest_neighbour_energy
         self.coordination_number_energy = coordination_number_energy
         if jump_lookup_table:
-            self.relative_probability = self.relative_probability_from_lookup_table( jump_lookup_table )
+            self._relative_probability = self.relative_probability_from_lookup_table( jump_lookup_table )
         else:
-            self.relative_probability = self.boltzmann_factor()
+            self._relative_probability = self.boltzmann_factor()
         
     def rate( self ):
         return rate_prefactor * self.relative_probability
@@ -39,7 +41,7 @@ class Jump:
         return ( delta_nn * self.nearest_neighbour_energy )
     
     def coordination_number_delta_E( self ):
-        initial_site_neighbours = [ s for s in self.initial_site.p_neighbours if s.is_occupied ] # excludes final site, since this is always uncocupied
+        initial_site_neighbours = [ s for s in self.initial_site.p_neighbours if s.is_occupied ] # excludes final site, since this is always unoccupied
         final_site_neighbours = [ s for s in self.final_site.p_neighbours if s.is_occupied and s is not self.initial_site ] # excludes initial site
         initial_cn_occupation_energy = ( self.initial_site.cn_occupation_energy() + 
             sum( [ site.cn_occupation_energy() for site in initial_site_neighbours ] ) +
@@ -68,4 +70,9 @@ class Jump:
 
     @property
     def relative_probability( self ):
-        return self.relative_probability
+        return self._relative_probability
+
+    @relative_probability.setter
+    def relative_probability( self, value ):
+        self._relative_probability = value
+
