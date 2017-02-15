@@ -41,9 +41,12 @@ class Simulation:
             self.lattice.set_site_energies( site_energies )
 
     def run( self, for_time = None ):
-        assert( self.lattice )
-        assert( self.atoms )
-        assert( self.number_of_jumps )
+        if not self.lattice:
+            raise AttributeError('Running a simulation needs the lattice to be initialised')
+        if not self.atoms:
+            raise AttributeError('Running a simulation needs the atoms to be initialised')
+        if not ( self.number_of_jumps or for_time):
+            raise AttributeError('Running a simulation needs number_of_jumps or for_time to be set')
         if self.number_of_equilibration_jumps > 0:
             for step in range( self.number_of_equilibration_jumps ):
                 self.lattice.jump()
