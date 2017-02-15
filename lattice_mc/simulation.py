@@ -99,7 +99,7 @@ class Simulation:
 
     def collective_diffusion_coefficient_per_atom( self ):
         if self.has_run:
-            return return self.collective_diffusion_coefficient() / float( self.number_of_atoms )
+            return self.collective_diffusion_coefficient() / float( self.number_of_atoms )
         else:
             return None
 
