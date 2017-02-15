@@ -62,32 +62,46 @@ class Simulation:
         self.has_run = True
 
     def tracer_correlation( self ):
-        assert( self.has_run )
-        return self.atoms.sum_dr_squared() / float( self.number_of_jumps )
+        if self.has_run:
+            return self.atoms.sum_dr_squared() / float( self.number_of_jumps )
+        else:
+            return None
 
     def new_tracer_correlation( self ):
-        assert( self.has_run )
-        return self.atoms.tracer_correlation()
+        if self.has_run:
+            return self.atoms.tracer_correlation()
+        else:
+            return None
 
     def tracer_diffusion_coefficient( self ):
-        assert( self.has_run )
-        return self.atoms.sum_dr_squared() / ( 6.0 * float( self.number_of_atoms ) * self.lattice.time )
+        if self.has_run:
+            return self.atoms.sum_dr_squared() / ( 6.0 * float( self.number_of_atoms ) * self.lattice.time )
+        else:
+            return None
 
     def collective_correlation( self ):
-        assert( self.has_run )
-        return self.atoms.collective_dr_squared() / float( self.number_of_jumps )
+        if self.has_run:
+            return self.atoms.collective_dr_squared() / float( self.number_of_jumps )
+        else:
+            return None
 
     def new_collective_correlation( self ):
-        assert( self.has_run )
-        return self.atoms.collective_correlation()
+        if self.has_run:
+            return self.atoms.collective_correlation()
+        else:
+            return None
 
     def collective_diffusion_coefficient( self ):
-        assert( self.has_run )
-        return self.atoms.collective_dr_squared() / ( 6.0 * self.lattice.time )
+        if self.has_run:
+            return self.atoms.collective_dr_squared() / ( 6.0 * self.lattice.time )
+        else:
+            return None
 
     def collective_diffusion_coefficient_per_atom( self ):
-        assert( self.has_run )
-        return self.collective_diffusion_coefficient() / float( self.number_of_atoms )
+        if self.has_run:
+            return return self.collective_diffusion_coefficient() / float( self.number_of_atoms )
+        else:
+            return None
 
     def average_site_occupations( self ):
         return self.lattice.site_occupation_statistics()
