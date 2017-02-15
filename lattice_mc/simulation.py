@@ -106,7 +106,7 @@ class Simulation:
     @property
     def collective_diffusion_coefficient_per_atom( self ):
         if self.has_run:
-            return self.collective_diffusion_coefficient() / float( self.number_of_atoms )
+            return self.collective_diffusion_coefficient / float( self.number_of_atoms )
         else:
             return None
 
@@ -116,5 +116,7 @@ class Simulation:
 
     def setup_lookup_table( self, hamiltonian = 'nearest-neighbour' ):
         expected_hamiltonian_values = [ 'nearest-neighbour', 'coordination_number' ]
-        assert( hamiltonian in expected_hamiltonian_values )
+        if hamiltonian not in expected_hamiltonian_values:
+            raise ValueError
         self.lattice.jump_lookup_table = lookup_table.LookupTable( self.lattice, hamiltonian )
+
