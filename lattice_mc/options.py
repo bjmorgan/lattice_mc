@@ -1,4 +1,5 @@
 class Options:
+    """Object for storing options for setting up and running a simulation."""
 
     def __init__( self ):
         self.site_energies = None
@@ -6,6 +7,15 @@ class Options:
         self.number_of_equilibration_jumps = 0
 
     def set_number_of_atoms( self, number_of_atoms ):
+        """Set the number of atoms present in the simulation.
+
+        Args:
+            number_of_atoms (int):  The number of atoms.
+
+        Returns:
+            None
+
+        """
         self.number_of_atoms = number_of_atoms
 
     def set_nn_energy_scaling( self, energy_scaling ):
