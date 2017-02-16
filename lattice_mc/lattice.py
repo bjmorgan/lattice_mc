@@ -88,7 +88,8 @@ class Lattice:
         atom.summed_dr2 += np.dot( dr, dr )
 
     def populate_sites( self, number_of_atoms ):
-        assert( number_of_atoms <= self.number_of_sites )
+        if number_of_atoms > self.number_of_sites:
+            raise ValueError
         atoms = [ atom.Atom( initial_site = site ) for site in random.sample( self.sites, number_of_atoms ) ]
         self.number_of_occupied_sites = number_of_atoms
         return atoms
@@ -130,26 +131,23 @@ class Lattice:
         self.cn_energies = cn_energies
 
     def site_coordination_numbers( self ):
-        coordination_numbers = {}
-        for site in self.sites:
-            if site.label not in coordination_numbers:
-                coordination_numbers[ site.label ] = len( site.neighbours )
-        return coordination_numbers 
+        cn_set = set( ( s.label, len( s.neighbours ) ) for s in self.sites )
+        labels = [ l for l, cn in cn_set ] 
+        if len( set( labels ) ) != len( labels ):
+            raise ValueError
+        return { k : v for k, v in cn_set }
 
     def site_specific_coordination_numbers( self ):
-        specific_coordination_numbers = {}
-        for site in self.sites:
-            if site.label not in specific_coordination_numbers:
-                specific_coordination_numbers[ site.label ] = site.site_specific_neighbours()
-        return specific_coordination_numbers
-
+        cn_set = set( ( s.label, s.site_specific_neighbours() ) for s in self.sites )
+        labels = [ l for l, cn in cn_set ]
+        if len( set( labels ) ) != len( labels ):
+            raise ValueError
+        return { k : v for k, v in cn_set }
 
     def connected_site_pairs( self ):
-        site_connections = {}
-        for initial_site in self.sites:
-            if initial_site.label not in site_connections:
-                site_connections[ initial_site.label ] = []
-            for final_site in initial_site.p_neighbours:
-                if final_site.label not in site_connections[ initial_site.label ]:
-                    site_connections[ initial_site.label ].append( final_site.label )
-        return site_connections
+        site_pairs_set = set( ( s1.label, ( s2.label for s2 in s1.p_neighbours ) ) for s1 in self.sites )
+        labels = [ l for l, sp in site_pairs_set ]
+        if len( set( labels ) ) != len( labels ):
+            raise ValueError
+        return { k : list(v) for k, v in site_pairs_set } 
+
