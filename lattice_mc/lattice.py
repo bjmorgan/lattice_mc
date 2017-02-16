@@ -131,23 +131,36 @@ class Lattice:
         self.cn_energies = cn_energies
 
     def site_coordination_numbers( self ):
-        cn_set = set( ( s.label, len( s.neighbours ) ) for s in self.sites )
-        labels = [ l for l, cn in cn_set ] 
-        if len( set( labels ) ) != len( labels ):
-            raise ValueError
-        return { k : v for k, v in cn_set }
+        coordination_numbers = {}
+        for site in self.sites:
+            if site.label in coordination_numbers:
+                if coordination_numbers[ site.label ] != len( site.neighbours ):
+                    raise ValueError
+            else:
+                coordination_numbers[ site.label ] = len( site.neighbours )
+        return coordination_numbers 
 
     def site_specific_coordination_numbers( self ):
-        cn_set = set( ( s.label, s.site_specific_neighbours() ) for s in self.sites )
-        labels = [ l for l, cn in cn_set ]
-        if len( set( labels ) ) != len( labels ):
-            raise ValueError
-        return { k : v for k, v in cn_set }
+        specific_coordination_numbers = {}
+        for site in self.sites:
+            if site.label in specific_coordination_numbers:
+                if specific_coordination_numbers[ site.label ] != site.site_specific_neighbours():
+                    raise ValueError
+            else:
+                specific_coordination_numbers[ site.label ] = site.site_specific_neighbours()
+        return specific_coordination_numbers
 
     def connected_site_pairs( self ):
-        site_pairs_set = set( ( s1.label, ( s2.label for s2 in s1.p_neighbours ) ) for s1 in self.sites )
-        labels = [ l for l, sp in site_pairs_set ]
-        if len( set( labels ) ) != len( labels ):
-            raise ValueError
-        return { k : list(v) for k, v in site_pairs_set } 
+        site_connections = {}
+        for initial_site in self.sites:
+            if initial_site.label in site_connections:
+                for final_site in initial_site.p_neighbours:
+                    if final_site.label not in site_connections[ initial_site.label ]:
+                        raise ValueError
+            else:
+                site_connections[ initial_site.label ] = []
+            for final_site in initial_site.p_neighbours:
+                if final_site.label not in site_connections[ initial_site.label ]:
+                    site_connections[ initial_site.label ].append( final_site.label )
+        return site_connections
 
