@@ -52,10 +52,10 @@ class Simulation:
                 self.lattice.jump()
             self.reset()
         if for_time:
-           self.number_of_jumps = 0
-           while self.lattice.time < for_time:
-               self.lattice.jump()
-               self.number_of_jumps += 1
+            self.number_of_jumps = 0
+            while self.lattice.time < for_time:
+                self.lattice.jump()
+                self.number_of_jumps += 1
         else: 
             for step in range( self.number_of_jumps ):
                 self.lattice.jump()

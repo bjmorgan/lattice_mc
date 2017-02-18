@@ -36,7 +36,7 @@ class Site:
         return to_return
 
     def site_specific_neighbours( self ):
-        return( Counter( ( site.label for site in self.p_neighbours ) ) )
+        return dict( Counter( ( site.label for site in self.p_neighbours ) ) )
         
     def set_cn_occupation_energies( self, cn_energies ):
         self.cn_occupation_energies = cn_energies
