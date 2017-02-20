@@ -4,3 +4,6 @@ lattice_mc/*.pyc
 tests/*.pyc
 tests/__pycache__
 *coverage*
+build
+dist
+lattice_mc.egg-info
