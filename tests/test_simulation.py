@@ -38,7 +38,17 @@ class SimulationTestCase( unittest.TestCase ):
             self.assertEqual( simulation.number_of_atoms, 3 )
             self.assertEqual( simulation.atoms, 'some atoms' )
             mock_Species.assert_called_with( mock_atoms )
-    
+   
+    def test_set_number_of_atoms_with_specific_sites( self ):
+        simulation = Simulation()
+        simulation.lattice = Mock( spec=Lattice )
+        mock_atoms = [ Mock( spec=Atom ), Mock( spec=Atom ) ]
+        simulation.lattice.populate_sites = Mock( return_value = mock_atoms )
+        with patch( 'lattice_mc.species.Species' ) as mock_Species:
+            mock_Species.return_value = 'some atoms'
+            simulation.set_number_of_atoms( 3, select_sites=[ 'A' ] )
+            self.assertEqual( simulation.lattice.populate_sites.call_args[1]['select_sites'], [ 'A' ] )
+
     def test_set_number_of_jumps( self ):
         simulation = Simulation()
         simulation.set_number_of_jumps( 32 )

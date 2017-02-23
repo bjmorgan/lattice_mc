@@ -177,6 +177,17 @@ class LatticeTestCase( unittest.TestCase ):
                 self.assertEqual( mock_Atom.mock_calls[1][2]['initial_site'], mock_sites[1] ) 
                 self.assertEqual( self.lattice.number_of_occupied_sites, number_of_atoms )           
 
+    def test_populate_sites_with_select_sites( self ):
+        number_of_atoms = 2
+        with patch( 'random.sample' ) as mock_random_sample:
+            with patch( 'lattice_mc.atom.Atom' )as mock_Atom:
+                mock_sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+                mock_random_sample.return_value = mock_sites
+                mock_Atom.return_value = [ Mock( spec=Atom ), Mock( spec=Atom ) ]
+                self.lattice.populate_sites( 2, selected_sites=[ 'A' ] )
+                for site in mock_random_sample.call_args[0][0]:
+                    self.assertEqual( site.label, 'A' )
+
     @patch( 'lattice_mc.transitions.Transitions' )
     def test_jump( self, mock_Transitions ):
         potential_jumps = [ Mock( spec=Jump ), Mock( spec=Jump ) ] 

@@ -87,10 +87,13 @@ class Lattice:
         atom.dr += dr
         atom.summed_dr2 += np.dot( dr, dr )
 
-    def populate_sites( self, number_of_atoms ):
+    def populate_sites( self, number_of_atoms, selected_sites=None ):
         if number_of_atoms > self.number_of_sites:
             raise ValueError
-        atoms = [ atom.Atom( initial_site = site ) for site in random.sample( self.sites, number_of_atoms ) ]
+        if selected_sites:
+            atoms = [ atom.Atom( initial_site = site ) for site in random.sample( [ s for s in self.sites if s.label in selected_sites ], number_of_atoms ) ]
+        else:
+            atoms = [ atom.Atom( initial_site = site ) for site in random.sample( self.sites, number_of_atoms ) ]
         self.number_of_occupied_sites = number_of_atoms
         return atoms
 
