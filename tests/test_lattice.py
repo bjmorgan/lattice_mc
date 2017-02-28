@@ -177,7 +177,7 @@ class LatticeTestCase( unittest.TestCase ):
                 self.assertEqual( mock_Atom.mock_calls[1][2]['initial_site'], mock_sites[1] ) 
                 self.assertEqual( self.lattice.number_of_occupied_sites, number_of_atoms )           
 
-    def test_populate_sites_with_select_sites( self ):
+    def test_populate_sites_with_selected_sites( self ):
         number_of_atoms = 2
         with patch( 'random.sample' ) as mock_random_sample:
             with patch( 'lattice_mc.atom.Atom' )as mock_Atom:
@@ -263,16 +263,6 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : 4, 'B' : 6 } )
 
-    def test_mixed_site_coordination_numbers_raises_ValueError( self ):
-        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
-        sites[0].label = 'A'
-        sites[1].label = 'A'
-        sites[0].neighbours = [ 1,2,3,4 ]
-        sites[1].neighbours = [ 1,2,3,4,5,6 ]
-        self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.site_coordination_numbers()
-
     def test_site_specific_coordination_numbers( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
@@ -281,16 +271,6 @@ class LatticeTestCase( unittest.TestCase ):
         sites[1].site_specific_neighbours = Mock( return_value='bar' )
         self.lattice.sites = sites
         self.assertEqual( self.lattice.site_specific_coordination_numbers(), { 'A' : 'foo', 'B' : 'bar' } ) 
-
-    def test_mixed_site_specific_coordination_numbers_raises_ValueError( self ):
-        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
-        sites[0].label = 'A'
-        sites[1].label = 'A'
-        sites[0].site_specific_neighbours = Mock( return_value='foo' )
-        sites[1].site_specific_neighbours = Mock( return_value='bar' )
-        self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.site_specific_coordination_numbers()
 
     def test_connected_site_pairs( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
@@ -301,17 +281,15 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.connected_site_pairs(), { 'A' : [ 'B' ], 'B' : [ 'A' ] } )
 
-    def test_conflicting_connected_site_pairs_raises_ValueError( self ):
-        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+    def test_transmute_sites( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
         sites[1].label = 'A'
-        sites[2].label = 'B'
-        sites[0].p_neighbours = [ sites[2] ]
-        sites[1].p_neighbours = [ sites[2], sites[0] ]
-        sites[2].p_neighbours = [ sites[1] ]
         self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.connected_site_pairs()
-
+        self.lattice.site_labels = set( [ s.label for s in self.lattice.sites ] )
+        self.lattice.transmute_sites( 'A', 'B', 1 )
+        self.assertEqual( set( [ s.label for s in self.lattice.sites ] ), set( [ 'A', 'B' ] ) )       
+        self.assertEqual( self.lattice.site_labels, set( [ 'A', 'B' ] ) ) 
+ 
 if __name__ == '__main__':
     unittest.main()

@@ -46,8 +46,8 @@ class SimulationTestCase( unittest.TestCase ):
         simulation.lattice.populate_sites = Mock( return_value = mock_atoms )
         with patch( 'lattice_mc.species.Species' ) as mock_Species:
             mock_Species.return_value = 'some atoms'
-            simulation.set_number_of_atoms( 3, select_sites=[ 'A' ] )
-            self.assertEqual( simulation.lattice.populate_sites.call_args[1]['select_sites'], [ 'A' ] )
+            simulation.set_number_of_atoms( 3, selected_sites=[ 'A' ] )
+            self.assertEqual( simulation.lattice.populate_sites.call_args[1]['selected_sites'], [ 'A' ] )
 
     def test_set_number_of_jumps( self ):
         simulation = Simulation()
