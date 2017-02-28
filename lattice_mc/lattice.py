@@ -157,6 +157,17 @@ class Lattice:
         return site_connections
 
     def transmute_sites( self, old_site_label, new_site_label, n_sites_to_change ):
+        """
+        Selects a random subset of sites with a specific label and gives them a different label.
+
+        Args:
+            old_site_label (String): Site label of the sites to be modified..
+            new_site_label (String): Site label to be applied to the modified sites.
+            n_sites_to_change (Int): Number of sites to modify.
+
+        Returns:
+            None
+        """
         for site in random.sample( self.sites, n_sites_to_change ):
             site.label = new_site_label
         self.site_labels.add( new_site_label )
