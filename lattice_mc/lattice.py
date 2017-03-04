@@ -148,9 +148,22 @@ class Lattice:
         return specific_coordination_numbers
 
     def connected_site_pairs( self ):
+        """
+        Returns a dictionary of all connections between pair of sites (by site label).
+        e.g. for a linear lattice A-B-C will return:
+            { 'A' : [ 'B' ], 'B' : [ 'A', 'C' ], 'C' : [ 'B' ] }
+
+        Args:
+            none
+
+        Returns:
+            site_connections (Dict(Str:List(Str))): dictionary of neighbouring site
+                                                    types in the lattice.
+        """
         site_connections = {}
         for initial_site in self.sites:
-            site_connections[ initial_site.label ] = []
+            if not initial_site.label in site_connections:
+                site_connections[ initial_site.label ] = []
             for final_site in initial_site.p_neighbours:
                 if final_site.label not in site_connections[ initial_site.label ]:
                     site_connections[ initial_site.label ].append( final_site.label )

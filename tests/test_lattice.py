@@ -281,6 +281,17 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.connected_site_pairs(), { 'A' : [ 'B' ], 'B' : [ 'A' ] } )
 
+    def test_connected_site_pairs_combines_all_connections( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        for s, l in zip( sites, [ 'A', 'A', 'B', 'C' ] ):
+            s.label = l
+        sites[0].p_neighbours = [ sites[1], sites[2] ]
+        sites[1].p_neighbours = [ sites[0], sites[3] ]
+        sites[2].p_neighbours = [ sites[0] ]
+        sites[3].p_neighbours = [ sites[1] ]
+        self.lattice.sites = sites
+        self.assertEqual( self.lattice.connected_site_pairs()[ 'A' ], [ 'A', 'B', 'C' ] )
+
     def test_transmute_sites( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
