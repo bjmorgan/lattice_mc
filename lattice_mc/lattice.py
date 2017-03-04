@@ -181,7 +181,7 @@ class Lattice:
         Returns:
             None
         """
-        for site in random.sample( self.sites, n_sites_to_change ):
+        for site in random.sample( [ s for s in self.sites if s.label in old_site_label ], n_sites_to_change ):
             site.label = new_site_label
-        self.site_labels.add( new_site_label )
+        self.site_labels = set( [ site.label for site in self.sites ] )
  

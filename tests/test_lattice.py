@@ -292,8 +292,10 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.connected_site_pairs()[ 'A' ], [ 'A', 'B', 'C' ] )
 
-    def test_transmute_sites( self ):
+    @patch( 'random.sample' )
+    def test_transmute_sites( self, mock_random_sample ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        mock_random_sample.return_value = [ sites[1] ]
         sites[0].label = 'A'
         sites[1].label = 'A'
         self.lattice.sites = sites
@@ -301,6 +303,34 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.transmute_sites( 'A', 'B', 1 )
         self.assertEqual( set( [ s.label for s in self.lattice.sites ] ), set( [ 'A', 'B' ] ) )       
         self.assertEqual( self.lattice.site_labels, set( [ 'A', 'B' ] ) ) 
- 
+        mock_random_sample.assert_called_with( sites, 1 )
+
+    @patch( 'random.sample' )
+    def test_transmute_sites_selects_from_old_site_label( self, mock_random_sample ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        mock_random_sample.return_value = [ sites[1] ]
+        sites[0].label = 'A'
+        sites[1].label = 'B'
+        self.lattice.sites = sites
+        self.lattice.site_labels = set( [ s.label for s in self.lattice.sites ] )
+        self.lattice.transmute_sites( 'B', 'C', 1 )
+        self.assertEqual( set( [ s.label for s in self.lattice.sites ] ), set( [ 'A', 'C' ] ) )
+        self.assertEqual( self.lattice.site_labels, set( [ 'A', 'C' ] ) )
+        mock_random_sample.assert_called_with( [ sites[1] ], 1 )
+     
+    @patch( 'random.sample' )
+    def test_transmute_sites_selects_from_old_site_label_list( self, mock_random_sample ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        mock_random_sample.return_value = [ sites[0] ]
+        sites[0].label = 'A'
+        sites[1].label = 'B'
+        sites[2].label = 'C'
+        self.lattice.sites = sites
+        self.lattice.site_labels = set( [ s.label for s in self.lattice.sites ] )
+        self.lattice.transmute_sites( [ 'A', 'B' ], 'D', 1 )
+        self.assertEqual( set( [ s.label for s in self.lattice.sites ] ), set( [ 'B', 'C', 'D' ] ) )
+        self.assertEqual( self.lattice.site_labels, set( [ 'B', 'C', 'D' ] ) )
+        mock_random_sample.assert_called_with( [ sites[0], sites[1] ], 1 )
+
 if __name__ == '__main__':
     unittest.main()
