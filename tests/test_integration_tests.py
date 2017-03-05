@@ -35,8 +35,6 @@ class IntegrationTestCase( unittest.TestCase ):
         site_data = [ [ 1, np.array( [ 0.0, 0.0, 0.0 ] ), [ 2 ],    0.0, 'A' ],
                       [ 2, np.array( [ 1.0, 0.0, 0.0 ] ), [ 1, 3 ], 0.0, 'A' ],
                       [ 3, np.array( [ 2.0, 1.0, 1.0 ] ), [ 2 ],    0.0, 'A' ] ]
-        for d in site_data:
-            print( *d )
         sites = [ lattice_mc.lattice_site.Site( *d ) for d in site_data ]
         s.lattice = lattice_mc.lattice.Lattice( sites, cell_lengths=np.array( [ 10.0, 10.0, 10.0 ] ) )
         s.set_number_of_atoms( 1 )
