@@ -174,9 +174,9 @@ class Lattice:
         Selects a random subset of sites with a specific label and gives them a different label.
 
         Args:
-            old_site_label (String): Site label of the sites to be modified..
-            new_site_label (String): Site label to be applied to the modified sites.
-            n_sites_to_change (Int): Number of sites to modify.
+            old_site_label (String or List(String)): Site label(s) of the sites to be modified..
+            new_site_label (String):                 Site label to be applied to the modified sites.
+            n_sites_to_change (Int):                 Number of sites to modify.
 
         Returns:
             None
