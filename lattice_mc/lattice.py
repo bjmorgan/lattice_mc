@@ -136,11 +136,36 @@ class Lattice:
         self.cn_energies = cn_energies
 
     def site_coordination_numbers( self ):
+        """
+        Returns a dictionary of the coordination numbers for each site label.
+        e.g. { 'A' : { 4 }, 'B' : { 2, 4 } }
+ 
+        Args:
+            none
+
+        Returns:
+            coordination_numbers (Dict(Str:Set(Int))): dictionary of coordination
+                                                       numbers for each site label.
+        """
         coordination_numbers = {}
-        for site in self.sites:
-            coordination_numbers[ site.label ] = len( site.neighbours )
+        for l in self.site_labels:
+            coordination_numbers[ l ] = set( [ len( site.neighbours ) for site in self.sites if site.label is l ] ) 
         return coordination_numbers 
 
+    def max_site_coordination_numbers( self ):
+        """
+        Returns a dictionary of the maximum coordination number for each site label.
+        e.g. { 'A' : 4, 'B' : 4 }
+
+        Args:
+            none
+
+        Returns:
+            max_coordination_numbers (Dict(Str:Int)): dictionary of maxmimum coordination
+                                                      number for each site label.
+        """
+        return { l : max( c ) for l, c in self.site_coordination_numbers().items() }
+       
     def site_specific_coordination_numbers( self ):
         specific_coordination_numbers = {}
         for site in self.sites:

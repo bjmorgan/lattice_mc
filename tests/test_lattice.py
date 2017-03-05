@@ -261,7 +261,23 @@ class LatticeTestCase( unittest.TestCase ):
         sites[0].neighbours = [ 1,2,3,4 ]
         sites[1].neighbours = [ 1,2,3,4,5,6 ]
         self.lattice.sites = sites
-        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : 4, 'B' : 6 } )
+        self.lattice.site_labels = ( 'A', 'B' )
+        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : {4}, 'B' : {6} } )
+
+    def test_site_coordination_numbers_for_varied_coordination_numbers( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].label = 'A'
+        sites[1].label = 'A'
+        sites[0].neighbours = [ 1, 2, 3, 4 ]
+        sites[1].neighbours = [ 1, 2 ]
+        self.lattice.sites = sites
+        self.lattice.site_labels = { 'A' }
+        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : { 2, 4 } } ) 
+
+    def test_max_site_coordination_numbers( self ):
+        with patch( 'lattice_mc.lattice.Lattice.site_coordination_numbers' ) as mock_site_coordination_numbers:
+            mock_site_coordination_numbers.return_value = { 'A' : { 4 }, 'B' : { 2, 4 } }
+            self.assertEqual( self.lattice.max_site_coordination_numbers(), { 'A' : 4, 'B' : 4 } )
 
     def test_site_specific_coordination_numbers( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]

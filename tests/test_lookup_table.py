@@ -22,6 +22,7 @@ class LookupTableTestCase( unittest.TestCase ):
         self.lattice.nn_energy = 'bar'
         self.lattice.cn_energies = 'baz'
         self.lattice.connected_site_pairs = Mock( return_value='qux' )
+        self.lattice.max_site_coordination_numbers = Mock( return_value={ 'A' : 2 } )
         self.lattice.site_specific_coordination_numbers = Mock( return_value='quux' )
         hamiltonian = 'nearest-neighbour'
         self.table = LookupTable( self.lattice, hamiltonian )
