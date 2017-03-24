@@ -2,7 +2,7 @@ import numpy as np
 import random
 import sys
 
-from lattice_mc import atom, jump, transitions
+from lattice_mc import atom, jump, transitions, cluster
 from collections import Counter
 
 class Lattice:
@@ -209,4 +209,19 @@ class Lattice:
         for site in random.sample( [ s for s in self.sites if s.label in old_site_label ], n_sites_to_change ):
             site.label = new_site_label
         self.site_labels = set( [ site.label for site in self.sites ] )
- 
+
+    def connected_sites( self, site_labels = None ):
+        if not site_labels:
+            site_labels = self.site_labels
+        initial_clusters = [ cluster.Cluster( [ site ] ) for site in self.sites if site.label in site_labels ]
+        final_clusters = []
+        while initial_clusters: # loop until initial_clusters is empty
+            this_cluster = initial_clusters.pop(0)
+            while this_cluster.neighbours:
+                neighbouring_clusters = [ c for c in initial_clusters if this_cluster.is_neighbouring( c ) ] 
+                for nc in neighbouring_clusters:
+                    initial_clusters.remove( nc )
+                    this_cluster = this_cluster.merge( nc ) 
+            final_clusters.append( this_cluster )
+        return final_clusters
+

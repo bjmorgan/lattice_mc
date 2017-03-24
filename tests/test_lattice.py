@@ -4,7 +4,8 @@ from lattice_mc.lattice_site import Site
 from lattice_mc.atom import Atom
 from lattice_mc.jump import Jump
 from lattice_mc.transitions import Transitions
-from unittest.mock import Mock, patch, call
+from lattice_mc.cluster import Cluster
+from unittest.mock import Mock, MagicMock, patch, call
 import numpy as np
 
 class LatticeTestCase( unittest.TestCase ):
@@ -348,5 +349,24 @@ class LatticeTestCase( unittest.TestCase ):
         self.assertEqual( self.lattice.site_labels, set( [ 'B', 'C', 'D' ] ) )
         mock_random_sample.assert_called_with( [ sites[0], sites[1] ], 1 )
 
+    @patch( 'lattice_mc.cluster.Cluster' )
+    def test_connected_sites( self, mock_cluster ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].label = 'A'
+        sites[1].label = 'A'
+        self.lattice.site_labels = [ 'A' ]
+        initial_clusters = [ Mock( spec=Cluster ), Mock( spec=Cluster ) ]
+        initial_clusters[0].sites = ( sites[0] )
+        initial_clusters[1].sites = ( sites[1] )
+        initial_clusters[0].neighbours = ( sites[0] )
+        initial_clusters[1].neighbours = ( sites[1] )
+        merged_cluster  = Mock( spec=Cluster )
+        merged_cluster.neighbours = ()
+        mock_cluster.side_effect = initial_clusters
+        self.lattice.sites = sites
+        initial_clusters[0].is_neighbouring.return_value = True
+        initial_clusters[0].merge.return_value = merged_cluster
+        self.assertEqual( self.lattice.connected_sites(), [ merged_cluster ] )
+        
 if __name__ == '__main__':
     unittest.main()
