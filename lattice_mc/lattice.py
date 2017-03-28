@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import itertools
 import sys
 
 from lattice_mc import atom, jump, transitions, cluster
@@ -206,14 +207,21 @@ class Lattice:
         Returns:
             None
         """
-        for site in random.sample( [ s for s in self.sites if s.label in old_site_label ], n_sites_to_change ):
+        selected_sites = self.select_sites( old_site_label )
+        for site in random.sample( selected_sites, n_sites_to_change ):
             site.label = new_site_label
         self.site_labels = set( [ site.label for site in self.sites ] )
 
-    def connected_sites( self, site_labels = None ):
-        if not site_labels:
-            site_labels = self.site_labels
-        initial_clusters = [ cluster.Cluster( [ site ] ) for site in self.sites if site.label in site_labels ]
+    def connected_sites( self, site_labels=None ):
+        if site_labels:
+           selected_sites = self.select_sites( site_labels )
+        else:
+           selected_sites = self.sites
+        initial_clusters = [ cluster.Cluster( [ site ] ) for site in selected_sites ]
+        if site_labels:
+            blocking_sites = self.site_labels - set( site_labels )
+            for c in initial_clusters:
+                c.remove_sites_from_neighbours( blocking_sites )
         final_clusters = []
         while initial_clusters: # loop until initial_clusters is empty
             this_cluster = initial_clusters.pop(0)
@@ -225,3 +233,28 @@ class Lattice:
             final_clusters.append( this_cluster )
         return final_clusters
 
+    def select_sites( self, site_labels ):
+        if type( site_labels ) in ( list, set ):
+            selected_sites = [ s for s in self.sites if s.label in site_labels ]
+        elif type( site_labels ) is str:
+            selected_sites = [ s for s in self.sites if s.label is site_labels ]
+        else:
+            raise ValueError( str( site_labels ) )
+        return selected_sites
+
+    def detached_sites( self, site_labels=None ):
+        """
+        Returns all sites in the lattice (optionally from the set of sites with specific labels)
+        that are not part of a percolating network.
+        This is determined from clusters of connected sites that do not wrap round to
+        themselves through a periodic boundary.
+
+        Args:
+            site_labels (String or List(String)): Lables of sites to be considered.
+
+        Returns:
+            (List(Site)): List of sites not in a periodic percolating network.
+        """
+        clusters = self.connected_sites( site_labels=site_labels )
+        island_clusters = [ c for c in clusters if not any( c.is_periodically_contiguous() ) ]
+        return list( itertools.chain.from_iterable( ( c.sites for c in island_clusters ) ) )

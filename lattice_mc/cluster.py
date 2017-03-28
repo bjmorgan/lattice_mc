@@ -8,7 +8,9 @@ class Cluster:
         self.neighbours = self.neighbours.difference( self.sites )
 
     def merge( self, other_cluster ):
-        return Cluster( self.sites | other_cluster.sites )        
+        new_cluster = Cluster( self.sites | other_cluster.sites )
+        new_cluster.neighbours = ( self.neighbours | other_cluster.neighbours ).difference( new_cluster.sites )
+        return new_cluster
 
     def is_neighbouring( self, other_cluster ):
         """
@@ -61,3 +63,18 @@ class Cluster:
         along_y = any( [ s2 in s1.p_neighbours for s1 in edges[2] for s2 in edges[3] ] )
         along_z = any( [ s2 in s1.p_neighbours for s1 in edges[4] for s2 in edges[5] ] )
         return ( along_x, along_y, along_z )
+
+    def remove_sites_from_neighbours( self, remove_labels ):
+        """
+        Removes sites from the set of neighbouring sites if these have labels in remove_labels.
+
+        Args:
+            Remove_labels (List) or (Str): List of Site labels to be removed from the cluster neighbour set.
+
+        Returns:
+            None
+        """
+        if type( remove_labels ) is str:
+            remove_labels = [ remove_labels ]
+        self.neighbours = set( n for n in self.neighbours if n.label not in remove_labels ) 
+

@@ -16,7 +16,7 @@ class ClusterTestCase( unittest.TestCase ):
         cluster = Cluster( cluster_sites )
         self.assertEqual( cluster.sites, set( cluster_sites ) )
         self.assertEqual( cluster.neighbours, set( neighbour_sites ) )
-    
+   
     def test_cluster_merge( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].p_neighbours = [ sites[1], sites[2] ]
@@ -26,6 +26,17 @@ class ClusterTestCase( unittest.TestCase ):
         combined_cluster = cluster1.merge( cluster2 )
         self.assertEqual( combined_cluster.sites, set( [ sites[0], sites[2] ] ) )
         self.assertEqual( combined_cluster.neighbours, set( [ sites[1], sites[3] ] ) )
+
+    def test_cluster_merge_with_blocked_neighbour( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].p_neighbours = [ sites[1], sites[2] ]
+        sites[2].p_neighbours = [ sites[0], sites[3] ]
+        cluster1 = Cluster( [ sites[0] ] )
+        cluster2 = Cluster( [ sites[2] ] )
+        cluster1.neighbours = cluster1.neighbours - set( [ sites[1] ] )
+        combined_cluster = cluster1.merge( cluster2 )
+        self.assertEqual( combined_cluster.sites, set( [ sites[0], sites[2] ] ) )
+        self.assertEqual( combined_cluster.neighbours, set( [ sites[3] ] ) )
 
     def test_cluster_is_neighbouring( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
@@ -101,6 +112,17 @@ class ClusterTestCase( unittest.TestCase ):
         sites[2].p_neighbours = [ sites[1] ]
         cluster = Cluster( sites )
         self.assertEqual( cluster.is_periodically_contiguous()[0], False )
+
+    def test_cluster_remove_sites_from_neighbours( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].p_neighbours = [ sites[1], sites[2] ]
+        sites[1].label = 'A'
+        sites[2].label = 'B'
+        cluster = Cluster( [ sites[0] ] )
+        cluster.remove_sites_from_neighbours( 'A' )
+        self.assertEqual( cluster.neighbours, set( [ sites[2] ] ) )
+        cluster.remove_sites_from_neighbours( [ 'B' ] )
+        self.assertEqual( cluster.neighbours, set() )
 
 if __name__ == '__main__':
     unittest.main()
