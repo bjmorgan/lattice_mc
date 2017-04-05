@@ -1,9 +1,5 @@
 import math
-
-k_boltzmann = 8.6173324e-5
-temperature = 298.0
-kT = k_boltzmann * temperature
-rate_prefactor = 1e13 # standard vibrational frequency
+from lattice_mc.global_vars import kT, rate_prefactor
 
 # TODO (maybe) does it make more sense to subclass Jump (and other classes) depending on the type of Hamiltonian?
 

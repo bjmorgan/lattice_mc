@@ -10,7 +10,7 @@ class LookupTableSupportFunctionsTestCase( unittest.TestCase ):
         self.assertEqual( metropolis( -0.02 ), 1.0 )
 
     def test_metropolis_returns_boltzmann_factor_for_positive_delta_E( self ):
-        self.assertAlmostEqual( metropolis( +0.02 ), 0.45894412999 )
+        self.assertAlmostEqual( metropolis( +0.02 ), 0.4589440428831954 )
 
 class LookupTableTestCase( unittest.TestCase ):
     """Tests for LookupTable class"""
