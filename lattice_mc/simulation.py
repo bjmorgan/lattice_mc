@@ -62,14 +62,14 @@ class Simulation:
         self.has_run = True
 
     @property
-    def tracer_correlation( self ):
+    def old_tracer_correlation( self ):
         if self.has_run:
             return self.atoms.sum_dr_squared() / float( self.number_of_jumps )
         else:
             return None
     
     @property
-    def new_tracer_correlation( self ):
+    def tracer_correlation( self ):
         if self.has_run:
             return self.atoms.tracer_correlation()
         else:
@@ -83,14 +83,39 @@ class Simulation:
             return None
 
     @property
-    def collective_correlation( self ):
+    def old_collective_correlation( self ):
+        """
+        Returns the collective correlation factor, f_I
+
+        Args:
+            None
+
+        Returns:
+            collective_correlation (float)
+
+        Notes:
+            This function assumes that the jump distance between sites has
+            been normalised to a=1. If the jumps distance is not equal to 1
+            then the value returned by this function should be divided by a^2.
+            Even better, use self.collective_correlation
+        """
+
         if self.has_run:
             return self.atoms.collective_dr_squared() / float( self.number_of_jumps )
         else:
             return None
 
     @property
-    def new_collective_correlation( self ):
+    def collective_correlation( self ):
+        """
+        Returns the collective correlation factor, f_I
+
+        Args: 
+            None
+
+        Returns: 
+            collective_correlation (float)
+        """
         if self.has_run:
             return self.atoms.collective_correlation()
         else:

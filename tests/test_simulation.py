@@ -152,18 +152,18 @@ class SimulationResultsTestCase( unittest.TestCase ):
         self.simulation = Simulation()
         self.simulation.has_run = True
 
-    def test_tracer_correlation( self ):
+    def test_old_tracer_correlation( self ):
         s = self.simulation
         s.atoms = Mock()
         s.atoms.sum_dr_squared = PropertyMock( return_value=10.0 )
         s.number_of_jumps = 5
-        self.assertEqual( s.tracer_correlation, 2.0 )
+        self.assertEqual( s.old_tracer_correlation, 2.0 )
 
-    def test_new_tracer_correlation( self ):
+    def test_tracer_correlation( self ):
         s = self.simulation
         s.atoms = Mock( spec=Species )
         s.atoms.tracer_correlation = Mock( return_value=3.3 )
-        self.assertEqual( s.new_tracer_correlation, 3.3 )
+        self.assertEqual( s.tracer_correlation, 3.3 )
 
     def test_tracer_diffusion_coefficient( self ):
         s = self.simulation
@@ -174,18 +174,18 @@ class SimulationResultsTestCase( unittest.TestCase ):
         s.lattice.time = 12.0
         self.assertEqual( s.tracer_diffusion_coefficient, 15.0 / ( 6.0 * 5.0 * 12.0 ) )
 
-    def test_collective_correlation( self ):
+    def test_old_collective_correlation( self ):
         s = self.simulation
         s.atoms = Mock( spec=Species )
         s.atoms.collective_dr_squared = Mock( return_value=12.0 )
         s.number_of_jumps = 4
-        self.assertEqual( s.collective_correlation, 3.0 )
+        self.assertEqual( s.old_collective_correlation, 3.0 )
 
-    def test_new_collective_correlation( self ):
+    def test_collective_correlation( self ):
         s = self.simulation
         s.atoms = Mock( spec=Species )
         s.atoms.collective_correlation = Mock( return_value=3.0 )
-        self.assertEqual( s.new_collective_correlation, 3.0 )
+        self.assertEqual( s.collective_correlation, 3.0 )
 
     def test_collective_diffusion_coefficient( self ):
         s = self.simulation
@@ -233,13 +233,13 @@ class SimulationResultsTestCase( unittest.TestCase ):
 
 class SimulationNoResultsTestCase( unittest.TestCase ):
 
+    def test_old_tracer_correlation( self ):
+        s = Simulation()
+        self.assertEqual( s.old_tracer_correlation, None )
+    
     def test_tracer_correlation( self ):
         s = Simulation()
         self.assertEqual( s.tracer_correlation, None )
-    
-    def test_new_tracer_correlation( self ):
-        s = Simulation()
-        self.assertEqual( s.new_tracer_correlation, None )
 
     def test_tracer_diffusion_coefficient( self ):
         s = Simulation()
@@ -249,9 +249,9 @@ class SimulationNoResultsTestCase( unittest.TestCase ):
         s = Simulation()
         self.assertEqual( s.collective_correlation, None )
 
-    def test_new_collective_correlation( self ):
+    def test_collective_correlation( self ):
         s = Simulation()
-        self.assertEqual( s.new_collective_correlation, None )
+        self.assertEqual( s.collective_correlation, None )
 
     def test_collective_diffusion_coefficient( self ):
         s = Simulation()
