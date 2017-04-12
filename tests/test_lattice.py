@@ -4,7 +4,8 @@ from lattice_mc.lattice_site import Site
 from lattice_mc.atom import Atom
 from lattice_mc.jump import Jump
 from lattice_mc.transitions import Transitions
-from unittest.mock import Mock, patch, call
+from lattice_mc.cluster import Cluster
+from unittest.mock import Mock, MagicMock, patch, call
 import numpy as np
 
 class LatticeTestCase( unittest.TestCase ):
@@ -177,6 +178,17 @@ class LatticeTestCase( unittest.TestCase ):
                 self.assertEqual( mock_Atom.mock_calls[1][2]['initial_site'], mock_sites[1] ) 
                 self.assertEqual( self.lattice.number_of_occupied_sites, number_of_atoms )           
 
+    def test_populate_sites_with_selected_sites( self ):
+        number_of_atoms = 2
+        with patch( 'random.sample' ) as mock_random_sample:
+            with patch( 'lattice_mc.atom.Atom' )as mock_Atom:
+                mock_sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+                mock_random_sample.return_value = mock_sites
+                mock_Atom.return_value = [ Mock( spec=Atom ), Mock( spec=Atom ) ]
+                self.lattice.populate_sites( 2, selected_sites=[ 'A' ] )
+                for site in mock_random_sample.call_args[0][0]:
+                    self.assertEqual( site.label, 'A' )
+
     @patch( 'lattice_mc.transitions.Transitions' )
     def test_jump( self, mock_Transitions ):
         potential_jumps = [ Mock( spec=Jump ), Mock( spec=Jump ) ] 
@@ -250,17 +262,23 @@ class LatticeTestCase( unittest.TestCase ):
         sites[0].neighbours = [ 1,2,3,4 ]
         sites[1].neighbours = [ 1,2,3,4,5,6 ]
         self.lattice.sites = sites
-        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : 4, 'B' : 6 } )
+        self.lattice.site_labels = ( 'A', 'B' )
+        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : {4}, 'B' : {6} } )
 
-    def test_mixed_site_coordination_numbers_raises_ValueError( self ):
+    def test_site_coordination_numbers_for_varied_coordination_numbers( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
         sites[1].label = 'A'
-        sites[0].neighbours = [ 1,2,3,4 ]
-        sites[1].neighbours = [ 1,2,3,4,5,6 ]
+        sites[0].neighbours = [ 1, 2, 3, 4 ]
+        sites[1].neighbours = [ 1, 2 ]
         self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.site_coordination_numbers()
+        self.lattice.site_labels = { 'A' }
+        self.assertEqual( self.lattice.site_coordination_numbers(), { 'A' : { 2, 4 } } ) 
+
+    def test_max_site_coordination_numbers( self ):
+        with patch( 'lattice_mc.lattice.Lattice.site_coordination_numbers' ) as mock_site_coordination_numbers:
+            mock_site_coordination_numbers.return_value = { 'A' : { 4 }, 'B' : { 2, 4 } }
+            self.assertEqual( self.lattice.max_site_coordination_numbers(), { 'A' : 4, 'B' : 4 } )
 
     def test_site_specific_coordination_numbers( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
@@ -271,16 +289,6 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.site_specific_coordination_numbers(), { 'A' : 'foo', 'B' : 'bar' } ) 
 
-    def test_mixed_site_specific_coordination_numbers_raises_ValueError( self ):
-        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
-        sites[0].label = 'A'
-        sites[1].label = 'A'
-        sites[0].site_specific_neighbours = Mock( return_value='foo' )
-        sites[1].site_specific_neighbours = Mock( return_value='bar' )
-        self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.site_specific_coordination_numbers()
-
     def test_connected_site_pairs( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
@@ -290,17 +298,91 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.sites = sites
         self.assertEqual( self.lattice.connected_site_pairs(), { 'A' : [ 'B' ], 'B' : [ 'A' ] } )
 
-    def test_conflicting_connected_site_pairs_raises_ValueError( self ):
-        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+    def test_connected_site_pairs_combines_all_connections( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        for s, l in zip( sites, [ 'A', 'A', 'B', 'C' ] ):
+            s.label = l
+        sites[0].p_neighbours = [ sites[1], sites[2] ]
+        sites[1].p_neighbours = [ sites[0], sites[3] ]
+        sites[2].p_neighbours = [ sites[0] ]
+        sites[3].p_neighbours = [ sites[1] ]
+        self.lattice.sites = sites
+        self.assertEqual( self.lattice.connected_site_pairs()[ 'A' ], [ 'A', 'B', 'C' ] )
+
+    @patch( 'random.sample' )
+    def test_transmute_sites_selects_from_old_site_label( self, mock_random_sample ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        mock_random_sample.return_value = [ sites[1] ]
+        sites[0].label = 'A'
+        sites[1].label = 'B'
+        self.lattice.sites = sites
+        self.lattice.site_labels = set( [ s.label for s in self.lattice.sites ] )
+        self.lattice.select_sites = Mock( return_value=[ sites[1] ] )
+        self.lattice.transmute_sites( 'B', 'C', 1 )
+        self.assertEqual( set( [ s.label for s in self.lattice.sites ] ), set( [ 'A', 'C' ] ) )
+        self.assertEqual( self.lattice.site_labels, set( [ 'A', 'C' ] ) )
+        mock_random_sample.assert_called_with( [ sites[1] ], 1 )
+     
+    @patch( 'lattice_mc.cluster.Cluster' )
+    def test_connected_sites( self, mock_cluster ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].label = 'A'
         sites[1].label = 'A'
-        sites[2].label = 'B'
-        sites[0].p_neighbours = [ sites[2] ]
-        sites[1].p_neighbours = [ sites[2], sites[0] ]
-        sites[2].p_neighbours = [ sites[1] ]
+        self.lattice.site_labels = set( [ s.label for s in sites ] )
+        initial_clusters = [ Mock( spec=Cluster ), Mock( spec=Cluster ) ]
+        initial_clusters[0].sites = ( sites[0] )
+        initial_clusters[1].sites = ( sites[1] )
+        initial_clusters[0].neighbours = ( sites[0] )
+        initial_clusters[1].neighbours = ( sites[1] )
+        merged_cluster = Mock( spec=Cluster )
+        merged_cluster.neighbours = ()
+        mock_cluster.side_effect = initial_clusters
         self.lattice.sites = sites
-        with self.assertRaises( ValueError ):
-            self.lattice.connected_site_pairs()
+        initial_clusters[0].is_neighbouring.return_value = True
+        initial_clusters[0].merge.return_value = merged_cluster
+        self.assertEqual( self.lattice.connected_sites(), [ merged_cluster ] )
+
+    @patch( 'lattice_mc.cluster.Cluster' )
+    def test_connected_sites_with_site_labels( self, mock_cluster ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].label = 'A'
+        sites[1].label = 'B'
+        self.lattice.site_labels = set( [ s.label for s in sites ] )
+        initial_clusters = [ Mock( spec=Cluster ) ]
+        initial_clusters[0].sites = ( sites[0] )
+        initial_clusters[0].neighbours = ()
+        mock_cluster.side_effect = initial_clusters
+        self.lattice.sites = sites
+        self.lattice.select_sites = Mock( return_value=[ sites[0] ] )
+        initial_clusters[0].is_neighbouring.return_value = False
+        site_labels = 'B'
+        self.assertEqual( self.lattice.connected_sites( site_labels ), initial_clusters ) 
+        self.lattice.select_sites.assert_called_with( site_labels ) 
+
+    def test_select_sites( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].label = 'A'
+        sites[1].label = 'AA'
+        sites[2].label = 'B'
+        self.lattice.site_labels = set( [ s.label for s in sites ] )
+        self.lattice.sites = sites
+        self.assertEqual( self.lattice.select_sites( 'A' ),  [ sites[0] ] )
+        self.assertEqual( self.lattice.select_sites( 'AA' ), [ sites[1] ] )
+        self.assertEqual( self.lattice.select_sites( [ 'A', 'B' ] ), [ sites[0], sites[2] ] )
+
+    def test_detached_sites( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        clusters = [ Mock( spec=Cluster ), Mock( spec=Cluster ) ]
+        clusters[0].is_periodically_contiguous.return_value = ( True, True, True )
+        clusters[1].is_periodically_contiguous.return_value = ( False, False, False )
+        clusters[0].sites = set( [ sites[0] ] )
+        clusters[1].sites = set( [ sites[1] ] )
+        sites[0].label = 'A'
+        sites[1].label = 'B'
+        self.lattice.site_labels = set( [ s.label for s in sites ] )
+        self.lattice.connected_sites = Mock( return_value=clusters )
+        self.lattice.sites = sites
+        self.assertEqual( self.lattice.detached_sites(), [ sites[1] ] )
 
 if __name__ == '__main__':
     unittest.main()

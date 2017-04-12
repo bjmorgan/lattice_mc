@@ -15,9 +15,9 @@ class Simulation:
         for atom in self.atoms.atoms:
             atom.reset()
  
-    def set_number_of_atoms( self, n ):
+    def set_number_of_atoms( self, n, selected_sites=None ):
         self.number_of_atoms = n
-        self.atoms = species.Species( self.lattice.populate_sites( self.number_of_atoms ) )
+        self.atoms = species.Species( self.lattice.populate_sites( self.number_of_atoms, selected_sites=selected_sites ) )
 
     def set_number_of_jumps( self, n ):
         self.number_of_jumps = n 

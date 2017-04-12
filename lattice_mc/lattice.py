@@ -1,8 +1,9 @@
 import numpy as np
 import random
+import itertools
 import sys
 
-from lattice_mc import atom, jump, transitions
+from lattice_mc import atom, jump, transitions, cluster
 from collections import Counter
 
 class Lattice:
@@ -87,10 +88,13 @@ class Lattice:
         atom.dr += dr
         atom.summed_dr2 += np.dot( dr, dr )
 
-    def populate_sites( self, number_of_atoms ):
+    def populate_sites( self, number_of_atoms, selected_sites=None ):
         if number_of_atoms > self.number_of_sites:
             raise ValueError
-        atoms = [ atom.Atom( initial_site = site ) for site in random.sample( self.sites, number_of_atoms ) ]
+        if selected_sites:
+            atoms = [ atom.Atom( initial_site = site ) for site in random.sample( [ s for s in self.sites if s.label in selected_sites ], number_of_atoms ) ]
+        else:
+            atoms = [ atom.Atom( initial_site = site ) for site in random.sample( self.sites, number_of_atoms ) ]
         self.number_of_occupied_sites = number_of_atoms
         return atoms
 
@@ -108,6 +112,8 @@ class Lattice:
             site.time_occupied += delta_t
 
     def site_occupation_statistics( self ):
+        if self.time == 0.0:
+            return None
         occupation_stats = { label : 0.0 for label in self.site_labels }
         for site in self.sites:
             occupation_stats[ site.label ] += site.time_occupied
@@ -131,36 +137,124 @@ class Lattice:
         self.cn_energies = cn_energies
 
     def site_coordination_numbers( self ):
+        """
+        Returns a dictionary of the coordination numbers for each site label.
+        e.g. { 'A' : { 4 }, 'B' : { 2, 4 } }
+ 
+        Args:
+            none
+
+        Returns:
+            coordination_numbers (Dict(Str:Set(Int))): dictionary of coordination
+                                                       numbers for each site label.
+        """
         coordination_numbers = {}
-        for site in self.sites:
-            if site.label in coordination_numbers:
-                if coordination_numbers[ site.label ] != len( site.neighbours ):
-                    raise ValueError
-            else:
-                coordination_numbers[ site.label ] = len( site.neighbours )
+        for l in self.site_labels:
+            coordination_numbers[ l ] = set( [ len( site.neighbours ) for site in self.sites if site.label is l ] ) 
         return coordination_numbers 
 
+    def max_site_coordination_numbers( self ):
+        """
+        Returns a dictionary of the maximum coordination number for each site label.
+        e.g. { 'A' : 4, 'B' : 4 }
+
+        Args:
+            none
+
+        Returns:
+            max_coordination_numbers (Dict(Str:Int)): dictionary of maxmimum coordination
+                                                      number for each site label.
+        """
+        return { l : max( c ) for l, c in self.site_coordination_numbers().items() }
+       
     def site_specific_coordination_numbers( self ):
         specific_coordination_numbers = {}
         for site in self.sites:
-            if site.label in specific_coordination_numbers:
-                if specific_coordination_numbers[ site.label ] != site.site_specific_neighbours():
-                    raise ValueError
-            else:
-                specific_coordination_numbers[ site.label ] = site.site_specific_neighbours()
+            specific_coordination_numbers[ site.label ] = site.site_specific_neighbours()
         return specific_coordination_numbers
 
     def connected_site_pairs( self ):
+        """
+        Returns a dictionary of all connections between pair of sites (by site label).
+        e.g. for a linear lattice A-B-C will return:
+            { 'A' : [ 'B' ], 'B' : [ 'A', 'C' ], 'C' : [ 'B' ] }
+
+        Args:
+            none
+
+        Returns:
+            site_connections (Dict(Str:List(Str))): dictionary of neighbouring site
+                                                    types in the lattice.
+        """
         site_connections = {}
         for initial_site in self.sites:
-            if initial_site.label in site_connections:
-                for final_site in initial_site.p_neighbours:
-                    if final_site.label not in site_connections[ initial_site.label ]:
-                        raise ValueError
-            else:
+            if not initial_site.label in site_connections:
                 site_connections[ initial_site.label ] = []
             for final_site in initial_site.p_neighbours:
                 if final_site.label not in site_connections[ initial_site.label ]:
                     site_connections[ initial_site.label ].append( final_site.label )
         return site_connections
 
+    def transmute_sites( self, old_site_label, new_site_label, n_sites_to_change ):
+        """
+        Selects a random subset of sites with a specific label and gives them a different label.
+
+        Args:
+            old_site_label (String or List(String)): Site label(s) of the sites to be modified..
+            new_site_label (String):                 Site label to be applied to the modified sites.
+            n_sites_to_change (Int):                 Number of sites to modify.
+
+        Returns:
+            None
+        """
+        selected_sites = self.select_sites( old_site_label )
+        for site in random.sample( selected_sites, n_sites_to_change ):
+            site.label = new_site_label
+        self.site_labels = set( [ site.label for site in self.sites ] )
+
+    def connected_sites( self, site_labels=None ):
+        if site_labels:
+           selected_sites = self.select_sites( site_labels )
+        else:
+           selected_sites = self.sites
+        initial_clusters = [ cluster.Cluster( [ site ] ) for site in selected_sites ]
+        if site_labels:
+            blocking_sites = self.site_labels - set( site_labels )
+            for c in initial_clusters:
+                c.remove_sites_from_neighbours( blocking_sites )
+        final_clusters = []
+        while initial_clusters: # loop until initial_clusters is empty
+            this_cluster = initial_clusters.pop(0)
+            while this_cluster.neighbours:
+                neighbouring_clusters = [ c for c in initial_clusters if this_cluster.is_neighbouring( c ) ] 
+                for nc in neighbouring_clusters:
+                    initial_clusters.remove( nc )
+                    this_cluster = this_cluster.merge( nc ) 
+            final_clusters.append( this_cluster )
+        return final_clusters
+
+    def select_sites( self, site_labels ):
+        if type( site_labels ) in ( list, set ):
+            selected_sites = [ s for s in self.sites if s.label in site_labels ]
+        elif type( site_labels ) is str:
+            selected_sites = [ s for s in self.sites if s.label is site_labels ]
+        else:
+            raise ValueError( str( site_labels ) )
+        return selected_sites
+
+    def detached_sites( self, site_labels=None ):
+        """
+        Returns all sites in the lattice (optionally from the set of sites with specific labels)
+        that are not part of a percolating network.
+        This is determined from clusters of connected sites that do not wrap round to
+        themselves through a periodic boundary.
+
+        Args:
+            site_labels (String or List(String)): Lables of sites to be considered.
+
+        Returns:
+            (List(Site)): List of sites not in a periodic percolating network.
+        """
+        clusters = self.connected_sites( site_labels=site_labels )
+        island_clusters = [ c for c in clusters if not any( c.is_periodically_contiguous() ) ]
+        return list( itertools.chain.from_iterable( ( c.sites for c in island_clusters ) ) )

@@ -70,7 +70,7 @@ class JumpTestCase( unittest.TestCase ):
  
     def test_boltzmann_factor_gt_0( self ):
         self.jump.delta_E = Mock( return_value=0.2 )
-        self.assertEqual( self.jump.boltzmann_factor(), 0.00041457030869331024 )
+        self.assertEqual( self.jump.boltzmann_factor(), 0.000414569521855495 )
 
     def test_delta_E_non_interacting( self ):
         initial_energy = 1.5

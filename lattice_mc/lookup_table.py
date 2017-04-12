@@ -1,11 +1,7 @@
 import math
 import sys
 import itertools as it
-
-k_boltzmann = 8.6173324e-5
-temperature = 298.0
-kT = k_boltzmann * temperature
-rate_prefactor = 1e13 # standard vibrational frequency
+from lattice_mc.global_vars import kT, rate_prefactor
 
 def metropolis( delta_E ):
     if delta_E <= 0.0:
@@ -23,7 +19,7 @@ class LookupTable: #TODO if nearest-neighbour and coordination number dependent 
         self.nn_energy = lattice.nn_energy
         self.cn_energy = lattice.cn_energies
         self.connected_site_pairs = lattice.connected_site_pairs()
-        self.max_coordination_per_site = lattice.site_coordination_numbers()
+        self.max_coordination_per_site = lattice.max_site_coordination_numbers()
         self.site_specific_coordination_per_site = lattice.site_specific_coordination_numbers()
         if hamiltonian == 'nearest-neighbour':
             self.generate_nearest_neighbour_lookup_table()
