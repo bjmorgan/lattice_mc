@@ -1,0 +1,2882 @@
+576
+
+site: 5
+centre: 21.4669 -1.37099999975e-05 6.133405
+neighbours: -2 -3 -4 -309
+label: T
+
+site: 10
+centre: 21.4669 -1.37099999975e-05 30.667
+neighbours: -6 -7 -8 -311
+label: T
+
+site: 15
+centre: 21.4669 24.5336 6.133405
+neighbours: -10 -11 -12 -305
+label: T
+
+site: 20
+centre: 21.4669 24.5336 30.667
+neighbours: -14 -15 -16 -307
+label: T
+
+site: 25
+centre: 46.0005 -1.37099999975e-05 6.133405
+neighbours: -18 -19 -20 -317
+label: T
+
+site: 30
+centre: 46.0005 -1.37099999975e-05 30.667
+neighbours: -22 -23 -24 -319
+label: T
+
+site: 35
+centre: 46.0005 24.5336 6.133405
+neighbours: -26 -27 -28 -313
+label: T
+
+site: 40
+centre: 46.0005 24.5336 30.667
+neighbours: -30 -31 -32 -315
+label: T
+
+site: 45
+centre: 3.066704 24.5336 18.4002
+neighbours: -33 -34 -35 -293
+label: T
+
+site: 50
+centre: 3.066704 24.5336 42.9338
+neighbours: -36 -37 -38 -295
+label: T
+
+site: 55
+centre: 3.066704 -1.37099999975e-05 18.4002
+neighbours: -39 -40 -41 -289
+label: T
+
+site: 60
+centre: 3.066704 -1.37099999975e-05 42.9338
+neighbours: -42 -43 -44 -291
+label: T
+
+site: 65
+centre: 27.6003 24.5336 18.4002
+neighbours: -45 -46 -47 -301
+label: T
+
+site: 70
+centre: 27.6003 24.5336 42.9338
+neighbours: -48 -49 -50 -303
+label: T
+
+site: 75
+centre: 27.6003 -1.37099999975e-05 18.4002
+neighbours: -51 -52 -53 -297
+label: T
+
+site: 80
+centre: 27.6003 -1.37099999975e-05 42.9338
+neighbours: -54 -55 -56 -299
+label: T
+
+site: 85
+centre: 15.3335 24.5336 18.4002
+neighbours: -58 -59 -60 -245
+label: T
+
+site: 90
+centre: 15.3335 24.5336 42.9338
+neighbours: -62 -63 -64 -247
+label: T
+
+site: 95
+centre: 15.3335 -1.37099999975e-05 18.4002
+neighbours: -66 -67 -68 -241
+label: T
+
+site: 100
+centre: 15.3335 -1.37099999975e-05 42.9338
+neighbours: -70 -71 -72 -243
+label: T
+
+site: 105
+centre: 39.8671 24.5336 18.4002
+neighbours: -74 -75 -76 -253
+label: T
+
+site: 110
+centre: 39.8671 24.5336 42.9338
+neighbours: -78 -79 -80 -255
+label: T
+
+site: 115
+centre: 39.8671 -1.37099999975e-05 18.4002
+neighbours: -82 -83 -84 -249
+label: T
+
+site: 120
+centre: 39.8671 -1.37099999975e-05 42.9338
+neighbours: -86 -87 -88 -251
+label: T
+
+site: 125
+centre: 9.2001 -1.37099999975e-05 6.133405
+neighbours: -89 -90 -91 -229
+label: T
+
+site: 130
+centre: 9.2001 -1.37099999975e-05 30.667
+neighbours: -92 -93 -94 -231
+label: T
+
+site: 135
+centre: 9.2001 24.5336 6.133405
+neighbours: -95 -96 -97 -225
+label: T
+
+site: 140
+centre: 9.2001 24.5336 30.667
+neighbours: -98 -99 -100 -227
+label: T
+
+site: 145
+centre: 33.7337 -1.37099999975e-05 6.133405
+neighbours: -101 -102 -103 -237
+label: T
+
+site: 150
+centre: 33.7337 -1.37099999975e-05 30.667
+neighbours: -104 -105 -106 -239
+label: T
+
+site: 155
+centre: 33.7337 24.5336 6.133405
+neighbours: -107 -108 -109 -233
+label: T
+
+site: 160
+centre: 33.7337 24.5336 30.667
+neighbours: -110 -111 -112 -235
+label: T
+
+site: 165
+centre: 3.066704 12.2668 6.133405
+neighbours: -114 -115 -116 -273
+label: T
+
+site: 170
+centre: 3.066704 12.2668 30.667
+neighbours: -118 -119 -120 -275
+label: T
+
+site: 175
+centre: 3.066704 36.8004 6.133405
+neighbours: -122 -123 -124 -277
+label: T
+
+site: 180
+centre: 3.066704 36.8004 30.667
+neighbours: -126 -127 -128 -279
+label: T
+
+site: 185
+centre: 27.6003 12.2668 6.133405
+neighbours: -130 -131 -132 -281
+label: T
+
+site: 190
+centre: 27.6003 12.2668 30.667
+neighbours: -134 -135 -136 -283
+label: T
+
+site: 195
+centre: 27.6003 36.8004 6.133405
+neighbours: -138 -139 -140 -285
+label: T
+
+site: 200
+centre: 27.6003 36.8004 30.667
+neighbours: -142 -143 -144 -287
+label: T
+
+site: 205
+centre: 21.4669 12.2668 18.4002
+neighbours: -145 -146 -147 -257
+label: T
+
+site: 210
+centre: 21.4669 12.2668 42.9338
+neighbours: -148 -149 -150 -259
+label: T
+
+site: 215
+centre: 21.4669 36.8004 18.4002
+neighbours: -151 -152 -153 -261
+label: T
+
+site: 220
+centre: 21.4669 36.8004 42.9338
+neighbours: -154 -155 -156 -263
+label: T
+
+site: 225
+centre: 46.0005 12.2668 18.4002
+neighbours: -157 -158 -159 -265
+label: T
+
+site: 230
+centre: 46.0005 12.2668 42.9338
+neighbours: -160 -161 -162 -267
+label: T
+
+site: 235
+centre: 46.0005 36.8004 18.4002
+neighbours: -163 -164 -165 -269
+label: T
+
+site: 240
+centre: 46.0005 36.8004 42.9338
+neighbours: -166 -167 -168 -271
+label: T
+
+site: 245
+centre: 9.2001 12.2668 18.4002
+neighbours: -170 -171 -172 -337
+label: T
+
+site: 250
+centre: 9.2001 12.2668 42.9338
+neighbours: -174 -175 -176 -339
+label: T
+
+site: 255
+centre: 9.2001 36.8004 18.4002
+neighbours: -178 -179 -180 -341
+label: T
+
+site: 260
+centre: 9.2001 36.8004 42.9338
+neighbours: -182 -183 -184 -343
+label: T
+
+site: 265
+centre: 33.7337 12.2668 18.4002
+neighbours: -186 -187 -188 -345
+label: T
+
+site: 270
+centre: 33.7337 12.2668 42.9338
+neighbours: -190 -191 -192 -347
+label: T
+
+site: 275
+centre: 33.7337 36.8004 18.4002
+neighbours: -194 -195 -196 -349
+label: T
+
+site: 280
+centre: 33.7337 36.8004 42.9338
+neighbours: -198 -199 -200 -351
+label: T
+
+site: 285
+centre: 15.3335 12.2668 6.133405
+neighbours: -201 -202 -203 -321
+label: T
+
+site: 290
+centre: 15.3335 12.2668 30.667
+neighbours: -204 -205 -206 -323
+label: T
+
+site: 295
+centre: 15.3335 36.8004 6.133405
+neighbours: -207 -208 -209 -325
+label: T
+
+site: 300
+centre: 15.3335 36.8004 30.667
+neighbours: -210 -211 -212 -327
+label: T
+
+site: 305
+centre: 39.8671 12.2668 6.133405
+neighbours: -213 -214 -215 -329
+label: T
+
+site: 310
+centre: 39.8671 12.2668 30.667
+neighbours: -216 -217 -218 -331
+label: T
+
+site: 315
+centre: 39.8671 36.8004 6.133405
+neighbours: -219 -220 -221 -333
+label: T
+
+site: 320
+centre: 39.8671 36.8004 30.667
+neighbours: -222 -223 -224 -335
+label: T
+
+site: 321
+centre: 6.133405 21.4669 -1.37099999975e-05
+neighbours: -36 -225 -226 -394
+label: T
+
+site: 323
+centre: 6.133405 21.4669 24.5336
+neighbours: -33 -227 -228 -393
+label: T
+
+site: 325
+centre: 6.133405 46.0005 -1.37099999975e-05
+neighbours: -42 -229 -230 -396
+label: T
+
+site: 327
+centre: 6.133405 46.0005 24.5336
+neighbours: -39 -231 -232 -395
+label: T
+
+site: 329
+centre: 30.667 21.4669 -1.37099999975e-05
+neighbours: -48 -233 -234 -398
+label: T
+
+site: 331
+centre: 30.667 21.4669 24.5336
+neighbours: -45 -235 -236 -397
+label: T
+
+site: 333
+centre: 30.667 46.0005 -1.37099999975e-05
+neighbours: -54 -237 -238 -400
+label: T
+
+site: 335
+centre: 30.667 46.0005 24.5336
+neighbours: -51 -239 -240 -399
+label: T
+
+site: 337
+centre: 18.4002 3.066704 24.5336
+neighbours: -6 -241 -242 -386
+label: T
+
+site: 339
+centre: 18.4002 3.066704 -1.37099999975e-05
+neighbours: -2 -243 -244 -385
+label: T
+
+site: 341
+centre: 18.4002 27.6003 24.5336
+neighbours: -14 -245 -246 -388
+label: T
+
+site: 343
+centre: 18.4002 27.6003 -1.37099999975e-05
+neighbours: -10 -247 -248 -387
+label: T
+
+site: 345
+centre: 42.9338 3.066704 24.5336
+neighbours: -22 -249 -250 -390
+label: T
+
+site: 347
+centre: 42.9338 3.066704 -1.37099999975e-05
+neighbours: -18 -251 -252 -389
+label: T
+
+site: 349
+centre: 42.9338 27.6003 24.5336
+neighbours: -30 -253 -254 -392
+label: T
+
+site: 351
+centre: 42.9338 27.6003 -1.37099999975e-05
+neighbours: -26 -255 -256 -391
+label: T
+
+site: 353
+centre: 18.4002 15.3335 24.5336
+neighbours: -204 -257 -258 -362
+label: T
+
+site: 355
+centre: 18.4002 15.3335 -1.37099999975e-05
+neighbours: -201 -259 -260 -361
+label: T
+
+site: 357
+centre: 18.4002 39.8671 24.5336
+neighbours: -210 -261 -262 -364
+label: T
+
+site: 359
+centre: 18.4002 39.8671 -1.37099999975e-05
+neighbours: -207 -263 -264 -363
+label: T
+
+site: 361
+centre: 42.9338 15.3335 24.5336
+neighbours: -216 -265 -266 -366
+label: T
+
+site: 363
+centre: 42.9338 15.3335 -1.37099999975e-05
+neighbours: -213 -267 -268 -365
+label: T
+
+site: 365
+centre: 42.9338 39.8671 24.5336
+neighbours: -222 -269 -270 -368
+label: T
+
+site: 367
+centre: 42.9338 39.8671 -1.37099999975e-05
+neighbours: -219 -271 -272 -367
+label: T
+
+site: 369
+centre: 6.133405 9.2001 -1.37099999975e-05
+neighbours: -174 -273 -274 -354
+label: T
+
+site: 371
+centre: 6.133405 9.2001 24.5336
+neighbours: -170 -275 -276 -353
+label: T
+
+site: 373
+centre: 6.133405 33.7337 -1.37099999975e-05
+neighbours: -182 -277 -278 -356
+label: T
+
+site: 375
+centre: 6.133405 33.7337 24.5336
+neighbours: -178 -279 -280 -355
+label: T
+
+site: 377
+centre: 30.667 9.2001 -1.37099999975e-05
+neighbours: -190 -281 -282 -358
+label: T
+
+site: 379
+centre: 30.667 9.2001 24.5336
+neighbours: -186 -283 -284 -357
+label: T
+
+site: 381
+centre: 30.667 33.7337 -1.37099999975e-05
+neighbours: -198 -285 -286 -360
+label: T
+
+site: 383
+centre: 30.667 33.7337 24.5336
+neighbours: -194 -287 -288 -359
+label: T
+
+site: 385
+centre: 6.133405 3.066704 12.2668
+neighbours: -89 -289 -290 -377
+label: T
+
+site: 387
+centre: 6.133405 3.066704 36.8004
+neighbours: -92 -291 -292 -378
+label: T
+
+site: 389
+centre: 6.133405 27.6003 12.2668
+neighbours: -95 -293 -294 -379
+label: T
+
+site: 391
+centre: 6.133405 27.6003 36.8004
+neighbours: -98 -295 -296 -380
+label: T
+
+site: 393
+centre: 30.667 3.066704 12.2668
+neighbours: -101 -297 -298 -381
+label: T
+
+site: 395
+centre: 30.667 3.066704 36.8004
+neighbours: -104 -299 -300 -382
+label: T
+
+site: 397
+centre: 30.667 27.6003 12.2668
+neighbours: -107 -301 -302 -383
+label: T
+
+site: 399
+centre: 30.667 27.6003 36.8004
+neighbours: -110 -303 -304 -384
+label: T
+
+site: 401
+centre: 18.4002 21.4669 12.2668
+neighbours: -58 -305 -306 -369
+label: T
+
+site: 403
+centre: 18.4002 21.4669 36.8004
+neighbours: -62 -307 -308 -370
+label: T
+
+site: 405
+centre: 18.4002 46.0005 12.2668
+neighbours: -66 -309 -310 -371
+label: T
+
+site: 407
+centre: 18.4002 46.0005 36.8004
+neighbours: -70 -311 -312 -372
+label: T
+
+site: 409
+centre: 42.9338 21.4669 12.2668
+neighbours: -74 -313 -314 -373
+label: T
+
+site: 411
+centre: 42.9338 21.4669 36.8004
+neighbours: -78 -315 -316 -374
+label: T
+
+site: 413
+centre: 42.9338 46.0005 12.2668
+neighbours: -82 -317 -318 -375
+label: T
+
+site: 415
+centre: 42.9338 46.0005 36.8004
+neighbours: -86 -319 -320 -376
+label: T
+
+site: 417
+centre: 18.4002 9.2001 12.2668
+neighbours: -145 -321 -322 -409
+label: T
+
+site: 419
+centre: 18.4002 9.2001 36.8004
+neighbours: -148 -323 -324 -410
+label: T
+
+site: 421
+centre: 18.4002 33.7337 12.2668
+neighbours: -151 -325 -326 -411
+label: T
+
+site: 423
+centre: 18.4002 33.7337 36.8004
+neighbours: -154 -327 -328 -412
+label: T
+
+site: 425
+centre: 42.9338 9.2001 12.2668
+neighbours: -157 -329 -330 -413
+label: T
+
+site: 427
+centre: 42.9338 9.2001 36.8004
+neighbours: -160 -331 -332 -414
+label: T
+
+site: 429
+centre: 42.9338 33.7337 12.2668
+neighbours: -163 -333 -334 -415
+label: T
+
+site: 431
+centre: 42.9338 33.7337 36.8004
+neighbours: -166 -335 -336 -416
+label: T
+
+site: 433
+centre: 6.133405 15.3335 12.2668
+neighbours: -114 -337 -338 -401
+label: T
+
+site: 435
+centre: 6.133405 15.3335 36.8004
+neighbours: -118 -339 -340 -402
+label: T
+
+site: 437
+centre: 6.133405 39.8671 12.2668
+neighbours: -122 -341 -342 -403
+label: T
+
+site: 439
+centre: 6.133405 39.8671 36.8004
+neighbours: -126 -343 -344 -404
+label: T
+
+site: 441
+centre: 30.667 15.3335 12.2668
+neighbours: -130 -345 -346 -405
+label: T
+
+site: 443
+centre: 30.667 15.3335 36.8004
+neighbours: -134 -347 -348 -406
+label: T
+
+site: 445
+centre: 30.667 39.8671 12.2668
+neighbours: -138 -349 -350 -407
+label: T
+
+site: 447
+centre: 30.667 39.8671 36.8004
+neighbours: -142 -351 -352 -408
+label: T
+
+site: 450
+centre: -1.37099999975e-05 6.133405 21.4669
+neighbours: -41 -158 -250 -353
+label: T
+
+site: 452
+centre: -1.37099999975e-05 6.133405 46.0005
+neighbours: -44 -161 -252 -354
+label: T
+
+site: 454
+centre: -1.37099999975e-05 30.667 21.4669
+neighbours: -35 -164 -254 -355
+label: T
+
+site: 456
+centre: -1.37099999975e-05 30.667 46.0005
+neighbours: -38 -167 -256 -356
+label: T
+
+site: 458
+centre: 24.5336 6.133405 21.4669
+neighbours: -53 -146 -242 -357
+label: T
+
+site: 460
+centre: 24.5336 6.133405 46.0005
+neighbours: -56 -149 -244 -358
+label: T
+
+site: 462
+centre: 24.5336 30.667 21.4669
+neighbours: -47 -152 -246 -359
+label: T
+
+site: 464
+centre: 24.5336 30.667 46.0005
+neighbours: -50 -155 -248 -360
+label: T
+
+site: 466
+centre: 24.5336 18.4002 3.066704
+neighbours: -12 -131 -234 -361
+label: T
+
+site: 468
+centre: 24.5336 18.4002 27.6003
+neighbours: -16 -135 -236 -362
+label: T
+
+site: 470
+centre: 24.5336 42.9338 3.066704
+neighbours: -4 -139 -238 -363
+label: T
+
+site: 472
+centre: 24.5336 42.9338 27.6003
+neighbours: -8 -143 -240 -364
+label: T
+
+site: 474
+centre: -1.37099999975e-05 18.4002 3.066704
+neighbours: -28 -115 -226 -365
+label: T
+
+site: 476
+centre: -1.37099999975e-05 18.4002 27.6003
+neighbours: -32 -119 -228 -366
+label: T
+
+site: 478
+centre: -1.37099999975e-05 42.9338 3.066704
+neighbours: -20 -123 -230 -367
+label: T
+
+site: 480
+centre: -1.37099999975e-05 42.9338 27.6003
+neighbours: -24 -127 -232 -368
+label: T
+
+site: 482
+centre: 24.5336 18.4002 15.3335
+neighbours: -46 -147 -346 -369
+label: T
+
+site: 484
+centre: 24.5336 18.4002 39.8671
+neighbours: -49 -150 -348 -370
+label: T
+
+site: 486
+centre: 24.5336 42.9338 15.3335
+neighbours: -52 -153 -350 -371
+label: T
+
+site: 488
+centre: 24.5336 42.9338 39.8671
+neighbours: -55 -156 -352 -372
+label: T
+
+site: 490
+centre: -1.37099999975e-05 18.4002 15.3335
+neighbours: -34 -159 -338 -373
+label: T
+
+site: 492
+centre: -1.37099999975e-05 18.4002 39.8671
+neighbours: -37 -162 -340 -374
+label: T
+
+site: 494
+centre: -1.37099999975e-05 42.9338 15.3335
+neighbours: -40 -165 -342 -375
+label: T
+
+site: 496
+centre: -1.37099999975e-05 42.9338 39.8671
+neighbours: -43 -168 -344 -376
+label: T
+
+site: 498
+centre: -1.37099999975e-05 6.133405 9.2001
+neighbours: -19 -116 -330 -377
+label: T
+
+site: 500
+centre: -1.37099999975e-05 6.133405 33.7337
+neighbours: -23 -120 -332 -378
+label: T
+
+site: 502
+centre: -1.37099999975e-05 30.667 9.2001
+neighbours: -27 -124 -334 -379
+label: T
+
+site: 504
+centre: -1.37099999975e-05 30.667 33.7337
+neighbours: -31 -128 -336 -380
+label: T
+
+site: 506
+centre: 24.5336 6.133405 9.2001
+neighbours: -3 -132 -322 -381
+label: T
+
+site: 508
+centre: 24.5336 6.133405 33.7337
+neighbours: -7 -136 -324 -382
+label: T
+
+site: 510
+centre: 24.5336 30.667 9.2001
+neighbours: -11 -140 -326 -383
+label: T
+
+site: 512
+centre: 24.5336 30.667 33.7337
+neighbours: -15 -144 -328 -384
+label: T
+
+site: 514
+centre: 12.2668 6.133405 3.066704
+neighbours: -90 -203 -274 -385
+label: T
+
+site: 516
+centre: 12.2668 6.133405 27.6003
+neighbours: -93 -206 -276 -386
+label: T
+
+site: 518
+centre: 12.2668 30.667 3.066704
+neighbours: -96 -209 -278 -387
+label: T
+
+site: 520
+centre: 12.2668 30.667 27.6003
+neighbours: -99 -212 -280 -388
+label: T
+
+site: 522
+centre: 36.8004 6.133405 3.066704
+neighbours: -102 -215 -282 -389
+label: T
+
+site: 524
+centre: 36.8004 6.133405 27.6003
+neighbours: -105 -218 -284 -390
+label: T
+
+site: 526
+centre: 36.8004 30.667 3.066704
+neighbours: -108 -221 -286 -391
+label: T
+
+site: 528
+centre: 36.8004 30.667 27.6003
+neighbours: -111 -224 -288 -392
+label: T
+
+site: 530
+centre: 12.2668 18.4002 21.4669
+neighbours: -59 -172 -258 -393
+label: T
+
+site: 532
+centre: 12.2668 18.4002 46.0005
+neighbours: -63 -176 -260 -394
+label: T
+
+site: 534
+centre: 12.2668 42.9338 21.4669
+neighbours: -67 -180 -262 -395
+label: T
+
+site: 536
+centre: 12.2668 42.9338 46.0005
+neighbours: -71 -184 -264 -396
+label: T
+
+site: 538
+centre: 36.8004 18.4002 21.4669
+neighbours: -75 -188 -266 -397
+label: T
+
+site: 540
+centre: 36.8004 18.4002 46.0005
+neighbours: -79 -192 -268 -398
+label: T
+
+site: 542
+centre: 36.8004 42.9338 21.4669
+neighbours: -83 -196 -270 -399
+label: T
+
+site: 544
+centre: 36.8004 42.9338 46.0005
+neighbours: -87 -200 -272 -400
+label: T
+
+site: 546
+centre: 12.2668 18.4002 9.2001
+neighbours: -97 -202 -306 -401
+label: T
+
+site: 548
+centre: 12.2668 18.4002 33.7337
+neighbours: -100 -205 -308 -402
+label: T
+
+site: 550
+centre: 12.2668 42.9338 9.2001
+neighbours: -91 -208 -310 -403
+label: T
+
+site: 552
+centre: 12.2668 42.9338 33.7337
+neighbours: -94 -211 -312 -404
+label: T
+
+site: 554
+centre: 36.8004 18.4002 9.2001
+neighbours: -109 -214 -314 -405
+label: T
+
+site: 556
+centre: 36.8004 18.4002 33.7337
+neighbours: -112 -217 -316 -406
+label: T
+
+site: 558
+centre: 36.8004 42.9338 9.2001
+neighbours: -103 -220 -318 -407
+label: T
+
+site: 560
+centre: 36.8004 42.9338 33.7337
+neighbours: -106 -223 -320 -408
+label: T
+
+site: 562
+centre: 12.2668 6.133405 15.3335
+neighbours: -68 -171 -290 -409
+label: T
+
+site: 564
+centre: 12.2668 6.133405 39.8671
+neighbours: -72 -175 -292 -410
+label: T
+
+site: 566
+centre: 12.2668 30.667 15.3335
+neighbours: -60 -179 -294 -411
+label: T
+
+site: 568
+centre: 12.2668 30.667 39.8671
+neighbours: -64 -183 -296 -412
+label: T
+
+site: 570
+centre: 36.8004 6.133405 15.3335
+neighbours: -84 -187 -298 -413
+label: T
+
+site: 572
+centre: 36.8004 6.133405 39.8671
+neighbours: -88 -191 -300 -414
+label: T
+
+site: 574
+centre: 36.8004 30.667 15.3335
+neighbours: -76 -195 -302 -415
+label: T
+
+site: 576
+centre: 36.8004 30.667 39.8671
+neighbours: -80 -199 -304 -416
+label: T
+
+site: -2
+centre: 19.77175 1.37154809667 3.06669876333
+neighbours: 5 339
+label: O
+
+site: -3
+centre: 23.16205 3.06669876333 7.50495333333
+neighbours: 5 506
+label: O
+
+site: -4
+centre: 23.16205 -3.06672951667 4.76185466667
+neighbours: 5 470
+label: O
+
+site: -6
+centre: 19.77175 1.37154809667 27.6003
+neighbours: 10 337
+label: O
+
+site: -7
+centre: 23.16205 3.06669876333 32.03855
+neighbours: 10 508
+label: O
+
+site: -8
+centre: 23.16205 -3.06672951667 29.29545
+neighbours: 10 472
+label: O
+
+site: -10
+centre: 19.77175 25.90515 3.06669876333
+neighbours: 15 343
+label: O
+
+site: -11
+centre: 23.16205 27.6003 7.50495333333
+neighbours: 15 510
+label: O
+
+site: -12
+centre: 23.16205 21.4669 4.76185466667
+neighbours: 15 466
+label: O
+
+site: -14
+centre: 19.77175 25.90515 27.6003
+neighbours: 20 341
+label: O
+
+site: -15
+centre: 23.16205 27.6003 32.03855
+neighbours: 20 512
+label: O
+
+site: -16
+centre: 23.16205 21.4669 29.29545
+neighbours: 20 468
+label: O
+
+site: -18
+centre: 44.30535 1.37154809667 3.06669876333
+neighbours: 25 347
+label: O
+
+site: -19
+centre: -1.37157951667 3.06669876333 7.50495333333
+neighbours: 25 498
+label: O
+
+site: -20
+centre: -1.37157951667 -3.06672951667 4.76185466667
+neighbours: 25 478
+label: O
+
+site: -22
+centre: 44.30535 1.37154809667 27.6003
+neighbours: 30 345
+label: O
+
+site: -23
+centre: -1.37157951667 3.06669876333 32.03855
+neighbours: 30 500
+label: O
+
+site: -24
+centre: -1.37157951667 -3.06672951667 29.29545
+neighbours: 30 480
+label: O
+
+site: -26
+centre: 44.30535 25.90515 3.06669876333
+neighbours: 35 351
+label: O
+
+site: -27
+centre: -1.37157951667 27.6003 7.50495333333
+neighbours: 35 502
+label: O
+
+site: -28
+centre: -1.37157951667 21.4669 4.76185466667
+neighbours: 35 474
+label: O
+
+site: -30
+centre: 44.30535 25.90515 27.6003
+neighbours: 40 349
+label: O
+
+site: -31
+centre: -1.37157951667 27.6003 32.03855
+neighbours: 40 504
+label: O
+
+site: -32
+centre: -1.37157951667 21.4669 29.29545
+neighbours: 40 476
+label: O
+
+site: -33
+centre: 4.76185466667 23.16205 21.4669
+neighbours: 45 323
+label: O
+
+site: -34
+centre: 1.37154809667 21.4669 17.02865
+neighbours: 45 490
+label: O
+
+site: -35
+centre: 1.37154809667 27.6003 19.77175
+neighbours: 45 454
+label: O
+
+site: -36
+centre: 4.76185466667 23.16205 -3.06672951667
+neighbours: 50 321
+label: O
+
+site: -37
+centre: 1.37154809667 21.4669 41.56225
+neighbours: 50 492
+label: O
+
+site: -38
+centre: 1.37154809667 27.6003 44.30535
+neighbours: 50 456
+label: O
+
+site: -39
+centre: 4.76185466667 -1.37157951667 21.4669
+neighbours: 55 327
+label: O
+
+site: -40
+centre: 1.37154809667 -3.06672951667 17.02865
+neighbours: 55 494
+label: O
+
+site: -41
+centre: 1.37154809667 3.06669876333 19.77175
+neighbours: 55 450
+label: O
+
+site: -42
+centre: 4.76185466667 -1.37157951667 -3.06672951667
+neighbours: 60 325
+label: O
+
+site: -43
+centre: 1.37154809667 -3.06672951667 41.56225
+neighbours: 60 496
+label: O
+
+site: -44
+centre: 1.37154809667 3.06669876333 44.30535
+neighbours: 60 452
+label: O
+
+site: -45
+centre: 29.29545 23.16205 21.4669
+neighbours: 65 331
+label: O
+
+site: -46
+centre: 25.90515 21.4669 17.02865
+neighbours: 65 482
+label: O
+
+site: -47
+centre: 25.90515 27.6003 19.77175
+neighbours: 65 462
+label: O
+
+site: -48
+centre: 29.29545 23.16205 -3.06672951667
+neighbours: 70 329
+label: O
+
+site: -49
+centre: 25.90515 21.4669 41.56225
+neighbours: 70 484
+label: O
+
+site: -50
+centre: 25.90515 27.6003 44.30535
+neighbours: 70 464
+label: O
+
+site: -51
+centre: 29.29545 -1.37157951667 21.4669
+neighbours: 75 335
+label: O
+
+site: -52
+centre: 25.90515 -3.06672951667 17.02865
+neighbours: 75 486
+label: O
+
+site: -53
+centre: 25.90515 3.06669876333 19.77175
+neighbours: 75 458
+label: O
+
+site: -54
+centre: 29.29545 -1.37157951667 -3.06672951667
+neighbours: 80 333
+label: O
+
+site: -55
+centre: 25.90515 -3.06672951667 41.56225
+neighbours: 80 488
+label: O
+
+site: -56
+centre: 25.90515 3.06669876333 44.30535
+neighbours: 80 460
+label: O
+
+site: -58
+centre: 17.02865 23.16205 15.3335
+neighbours: 85 401
+label: O
+
+site: -59
+centre: 13.63835 21.4669 19.77175
+neighbours: 85 530
+label: O
+
+site: -60
+centre: 13.63835 27.6003 17.02865
+neighbours: 85 566
+label: O
+
+site: -62
+centre: 17.02865 23.16205 39.8671
+neighbours: 90 403
+label: O
+
+site: -63
+centre: 13.63835 21.4669 44.30535
+neighbours: 90 532
+label: O
+
+site: -64
+centre: 13.63835 27.6003 41.56225
+neighbours: 90 568
+label: O
+
+site: -66
+centre: 17.02865 -1.37157951667 15.3335
+neighbours: 95 405
+label: O
+
+site: -67
+centre: 13.63835 -3.06672951667 19.77175
+neighbours: 95 534
+label: O
+
+site: -68
+centre: 13.63835 3.06669876333 17.02865
+neighbours: 95 562
+label: O
+
+site: -70
+centre: 17.02865 -1.37157951667 39.8671
+neighbours: 100 407
+label: O
+
+site: -71
+centre: 13.63835 -3.06672951667 44.30535
+neighbours: 100 536
+label: O
+
+site: -72
+centre: 13.63835 3.06669876333 41.56225
+neighbours: 100 564
+label: O
+
+site: -74
+centre: 41.56225 23.16205 15.3335
+neighbours: 105 409
+label: O
+
+site: -75
+centre: 38.17195 21.4669 19.77175
+neighbours: 105 538
+label: O
+
+site: -76
+centre: 38.17195 27.6003 17.02865
+neighbours: 105 574
+label: O
+
+site: -78
+centre: 41.56225 23.16205 39.8671
+neighbours: 110 411
+label: O
+
+site: -79
+centre: 38.17195 21.4669 44.30535
+neighbours: 110 540
+label: O
+
+site: -80
+centre: 38.17195 27.6003 41.56225
+neighbours: 110 576
+label: O
+
+site: -82
+centre: 41.56225 -1.37157951667 15.3335
+neighbours: 115 413
+label: O
+
+site: -83
+centre: 38.17195 -3.06672951667 19.77175
+neighbours: 115 542
+label: O
+
+site: -84
+centre: 38.17195 3.06669876333 17.02865
+neighbours: 115 570
+label: O
+
+site: -86
+centre: 41.56225 -1.37157951667 39.8671
+neighbours: 120 415
+label: O
+
+site: -87
+centre: 38.17195 -3.06672951667 44.30535
+neighbours: 120 544
+label: O
+
+site: -88
+centre: 38.17195 3.06669876333 41.56225
+neighbours: 120 572
+label: O
+
+site: -89
+centre: 7.50495333333 1.37154809667 9.20010333333
+neighbours: 125 385
+label: O
+
+site: -90
+centre: 10.89525 3.06669876333 4.76185466667
+neighbours: 125 514
+label: O
+
+site: -91
+centre: 10.89525 -3.06672951667 7.50495333333
+neighbours: 125 550
+label: O
+
+site: -92
+centre: 7.50495333333 1.37154809667 33.7337
+neighbours: 130 387
+label: O
+
+site: -93
+centre: 10.89525 3.06669876333 29.29545
+neighbours: 130 516
+label: O
+
+site: -94
+centre: 10.89525 -3.06672951667 32.03855
+neighbours: 130 552
+label: O
+
+site: -95
+centre: 7.50495333333 25.90515 9.20010333333
+neighbours: 135 389
+label: O
+
+site: -96
+centre: 10.89525 27.6003 4.76185466667
+neighbours: 135 518
+label: O
+
+site: -97
+centre: 10.89525 21.4669 7.50495333333
+neighbours: 135 546
+label: O
+
+site: -98
+centre: 7.50495333333 25.90515 33.7337
+neighbours: 140 391
+label: O
+
+site: -99
+centre: 10.89525 27.6003 29.29545
+neighbours: 140 520
+label: O
+
+site: -100
+centre: 10.89525 21.4669 32.03855
+neighbours: 140 548
+label: O
+
+site: -101
+centre: 32.03855 1.37154809667 9.20010333333
+neighbours: 145 393
+label: O
+
+site: -102
+centre: 35.42885 3.06669876333 4.76185466667
+neighbours: 145 522
+label: O
+
+site: -103
+centre: 35.42885 -3.06672951667 7.50495333333
+neighbours: 145 558
+label: O
+
+site: -104
+centre: 32.03855 1.37154809667 33.7337
+neighbours: 150 395
+label: O
+
+site: -105
+centre: 35.42885 3.06669876333 29.29545
+neighbours: 150 524
+label: O
+
+site: -106
+centre: 35.42885 -3.06672951667 32.03855
+neighbours: 150 560
+label: O
+
+site: -107
+centre: 32.03855 25.90515 9.20010333333
+neighbours: 155 397
+label: O
+
+site: -108
+centre: 35.42885 27.6003 4.76185466667
+neighbours: 155 526
+label: O
+
+site: -109
+centre: 35.42885 21.4669 7.50495333333
+neighbours: 155 554
+label: O
+
+site: -110
+centre: 32.03855 25.90515 33.7337
+neighbours: 160 399
+label: O
+
+site: -111
+centre: 35.42885 27.6003 29.29545
+neighbours: 160 528
+label: O
+
+site: -112
+centre: 35.42885 21.4669 32.03855
+neighbours: 160 556
+label: O
+
+site: -114
+centre: 4.76185466667 13.63835 9.20010333333
+neighbours: 165 433
+label: O
+
+site: -115
+centre: 1.37154809667 15.3335 4.76185466667
+neighbours: 165 474
+label: O
+
+site: -116
+centre: 1.37154809667 9.20010333333 7.50495333333
+neighbours: 165 498
+label: O
+
+site: -118
+centre: 4.76185466667 13.63835 33.7337
+neighbours: 170 435
+label: O
+
+site: -119
+centre: 1.37154809667 15.3335 29.29545
+neighbours: 170 476
+label: O
+
+site: -120
+centre: 1.37154809667 9.20010333333 32.03855
+neighbours: 170 500
+label: O
+
+site: -122
+centre: 4.76185466667 38.17195 9.20010333333
+neighbours: 175 437
+label: O
+
+site: -123
+centre: 1.37154809667 39.8671 4.76185466667
+neighbours: 175 478
+label: O
+
+site: -124
+centre: 1.37154809667 33.7337 7.50495333333
+neighbours: 175 502
+label: O
+
+site: -126
+centre: 4.76185466667 38.17195 33.7337
+neighbours: 180 439
+label: O
+
+site: -127
+centre: 1.37154809667 39.8671 29.29545
+neighbours: 180 480
+label: O
+
+site: -128
+centre: 1.37154809667 33.7337 32.03855
+neighbours: 180 504
+label: O
+
+site: -130
+centre: 29.29545 13.63835 9.20010333333
+neighbours: 185 441
+label: O
+
+site: -131
+centre: 25.90515 15.3335 4.76185466667
+neighbours: 185 466
+label: O
+
+site: -132
+centre: 25.90515 9.20010333333 7.50495333333
+neighbours: 185 506
+label: O
+
+site: -134
+centre: 29.29545 13.63835 33.7337
+neighbours: 190 443
+label: O
+
+site: -135
+centre: 25.90515 15.3335 29.29545
+neighbours: 190 468
+label: O
+
+site: -136
+centre: 25.90515 9.20010333333 32.03855
+neighbours: 190 508
+label: O
+
+site: -138
+centre: 29.29545 38.17195 9.20010333333
+neighbours: 195 445
+label: O
+
+site: -139
+centre: 25.90515 39.8671 4.76185466667
+neighbours: 195 470
+label: O
+
+site: -140
+centre: 25.90515 33.7337 7.50495333333
+neighbours: 195 510
+label: O
+
+site: -142
+centre: 29.29545 38.17195 33.7337
+neighbours: 200 447
+label: O
+
+site: -143
+centre: 25.90515 39.8671 29.29545
+neighbours: 200 472
+label: O
+
+site: -144
+centre: 25.90515 33.7337 32.03855
+neighbours: 200 512
+label: O
+
+site: -145
+centre: 19.77175 10.89525 15.3335
+neighbours: 205 417
+label: O
+
+site: -146
+centre: 23.16205 9.20010333333 19.77175
+neighbours: 205 458
+label: O
+
+site: -147
+centre: 23.16205 15.3335 17.02865
+neighbours: 205 482
+label: O
+
+site: -148
+centre: 19.77175 10.89525 39.8671
+neighbours: 210 419
+label: O
+
+site: -149
+centre: 23.16205 9.20010333333 44.30535
+neighbours: 210 460
+label: O
+
+site: -150
+centre: 23.16205 15.3335 41.56225
+neighbours: 210 484
+label: O
+
+site: -151
+centre: 19.77175 35.42885 15.3335
+neighbours: 215 421
+label: O
+
+site: -152
+centre: 23.16205 33.7337 19.77175
+neighbours: 215 462
+label: O
+
+site: -153
+centre: 23.16205 39.8671 17.02865
+neighbours: 215 486
+label: O
+
+site: -154
+centre: 19.77175 35.42885 39.8671
+neighbours: 220 423
+label: O
+
+site: -155
+centre: 23.16205 33.7337 44.30535
+neighbours: 220 464
+label: O
+
+site: -156
+centre: 23.16205 39.8671 41.56225
+neighbours: 220 488
+label: O
+
+site: -157
+centre: 44.30535 10.89525 15.3335
+neighbours: 225 425
+label: O
+
+site: -158
+centre: -1.37157951667 9.20010333333 19.77175
+neighbours: 225 450
+label: O
+
+site: -159
+centre: -1.37157951667 15.3335 17.02865
+neighbours: 225 490
+label: O
+
+site: -160
+centre: 44.30535 10.89525 39.8671
+neighbours: 230 427
+label: O
+
+site: -161
+centre: -1.37157951667 9.20010333333 44.30535
+neighbours: 230 452
+label: O
+
+site: -162
+centre: -1.37157951667 15.3335 41.56225
+neighbours: 230 492
+label: O
+
+site: -163
+centre: 44.30535 35.42885 15.3335
+neighbours: 235 429
+label: O
+
+site: -164
+centre: -1.37157951667 33.7337 19.77175
+neighbours: 235 454
+label: O
+
+site: -165
+centre: -1.37157951667 39.8671 17.02865
+neighbours: 235 494
+label: O
+
+site: -166
+centre: 44.30535 35.42885 39.8671
+neighbours: 240 431
+label: O
+
+site: -167
+centre: -1.37157951667 33.7337 44.30535
+neighbours: 240 456
+label: O
+
+site: -168
+centre: -1.37157951667 39.8671 41.56225
+neighbours: 240 496
+label: O
+
+site: -170
+centre: 7.50495333333 10.89525 21.4669
+neighbours: 245 371
+label: O
+
+site: -171
+centre: 10.89525 9.20010333333 17.02865
+neighbours: 245 562
+label: O
+
+site: -172
+centre: 10.89525 15.3335 19.77175
+neighbours: 245 530
+label: O
+
+site: -174
+centre: 7.50495333333 10.89525 -3.06672951667
+neighbours: 250 369
+label: O
+
+site: -175
+centre: 10.89525 9.20010333333 41.56225
+neighbours: 250 564
+label: O
+
+site: -176
+centre: 10.89525 15.3335 44.30535
+neighbours: 250 532
+label: O
+
+site: -178
+centre: 7.50495333333 35.42885 21.4669
+neighbours: 255 375
+label: O
+
+site: -179
+centre: 10.89525 33.7337 17.02865
+neighbours: 255 566
+label: O
+
+site: -180
+centre: 10.89525 39.8671 19.77175
+neighbours: 255 534
+label: O
+
+site: -182
+centre: 7.50495333333 35.42885 -3.06672951667
+neighbours: 260 373
+label: O
+
+site: -183
+centre: 10.89525 33.7337 41.56225
+neighbours: 260 568
+label: O
+
+site: -184
+centre: 10.89525 39.8671 44.30535
+neighbours: 260 536
+label: O
+
+site: -186
+centre: 32.03855 10.89525 21.4669
+neighbours: 265 379
+label: O
+
+site: -187
+centre: 35.42885 9.20010333333 17.02865
+neighbours: 265 570
+label: O
+
+site: -188
+centre: 35.42885 15.3335 19.77175
+neighbours: 265 538
+label: O
+
+site: -190
+centre: 32.03855 10.89525 -3.06672951667
+neighbours: 270 377
+label: O
+
+site: -191
+centre: 35.42885 9.20010333333 41.56225
+neighbours: 270 572
+label: O
+
+site: -192
+centre: 35.42885 15.3335 44.30535
+neighbours: 270 540
+label: O
+
+site: -194
+centre: 32.03855 35.42885 21.4669
+neighbours: 275 383
+label: O
+
+site: -195
+centre: 35.42885 33.7337 17.02865
+neighbours: 275 574
+label: O
+
+site: -196
+centre: 35.42885 39.8671 19.77175
+neighbours: 275 542
+label: O
+
+site: -198
+centre: 32.03855 35.42885 -3.06672951667
+neighbours: 280 381
+label: O
+
+site: -199
+centre: 35.42885 33.7337 41.56225
+neighbours: 280 576
+label: O
+
+site: -200
+centre: 35.42885 39.8671 44.30535
+neighbours: 280 544
+label: O
+
+site: -201
+centre: 17.02865 13.63835 3.06669876333
+neighbours: 285 355
+label: O
+
+site: -202
+centre: 13.63835 15.3335 7.50495333333
+neighbours: 285 546
+label: O
+
+site: -203
+centre: 13.63835 9.20010333333 4.76185466667
+neighbours: 285 514
+label: O
+
+site: -204
+centre: 17.02865 13.63835 27.6003
+neighbours: 290 353
+label: O
+
+site: -205
+centre: 13.63835 15.3335 32.03855
+neighbours: 290 548
+label: O
+
+site: -206
+centre: 13.63835 9.20010333333 29.29545
+neighbours: 290 516
+label: O
+
+site: -207
+centre: 17.02865 38.17195 3.06669876333
+neighbours: 295 359
+label: O
+
+site: -208
+centre: 13.63835 39.8671 7.50495333333
+neighbours: 295 550
+label: O
+
+site: -209
+centre: 13.63835 33.7337 4.76185466667
+neighbours: 295 518
+label: O
+
+site: -210
+centre: 17.02865 38.17195 27.6003
+neighbours: 300 357
+label: O
+
+site: -211
+centre: 13.63835 39.8671 32.03855
+neighbours: 300 552
+label: O
+
+site: -212
+centre: 13.63835 33.7337 29.29545
+neighbours: 300 520
+label: O
+
+site: -213
+centre: 41.56225 13.63835 3.06669876333
+neighbours: 305 363
+label: O
+
+site: -214
+centre: 38.17195 15.3335 7.50495333333
+neighbours: 305 554
+label: O
+
+site: -215
+centre: 38.17195 9.20010333333 4.76185466667
+neighbours: 305 522
+label: O
+
+site: -216
+centre: 41.56225 13.63835 27.6003
+neighbours: 310 361
+label: O
+
+site: -217
+centre: 38.17195 15.3335 32.03855
+neighbours: 310 556
+label: O
+
+site: -218
+centre: 38.17195 9.20010333333 29.29545
+neighbours: 310 524
+label: O
+
+site: -219
+centre: 41.56225 38.17195 3.06669876333
+neighbours: 315 367
+label: O
+
+site: -220
+centre: 38.17195 39.8671 7.50495333333
+neighbours: 315 558
+label: O
+
+site: -221
+centre: 38.17195 33.7337 4.76185466667
+neighbours: 315 526
+label: O
+
+site: -222
+centre: 41.56225 38.17195 27.6003
+neighbours: 320 365
+label: O
+
+site: -223
+centre: 38.17195 39.8671 32.03855
+neighbours: 320 560
+label: O
+
+site: -224
+centre: 38.17195 33.7337 29.29545
+neighbours: 320 528
+label: O
+
+site: -225
+centre: 7.50495333333 23.16205 3.06669876333
+neighbours: 135 321
+label: O
+
+site: -226
+centre: 3.06669876333 19.77175 1.37154809667
+neighbours: 321 474
+label: O
+
+site: -227
+centre: 7.50495333333 23.16205 27.6003
+neighbours: 140 323
+label: O
+
+site: -228
+centre: 3.06669876333 19.77175 25.90515
+neighbours: 323 476
+label: O
+
+site: -229
+centre: 7.50495333333 -1.37157951667 3.06669876333
+neighbours: 125 325
+label: O
+
+site: -230
+centre: 3.06669876333 44.30535 1.37154809667
+neighbours: 325 478
+label: O
+
+site: -231
+centre: 7.50495333333 -1.37157951667 27.6003
+neighbours: 130 327
+label: O
+
+site: -232
+centre: 3.06669876333 44.30535 25.90515
+neighbours: 327 480
+label: O
+
+site: -233
+centre: 32.03855 23.16205 3.06669876333
+neighbours: 155 329
+label: O
+
+site: -234
+centre: 27.6003 19.77175 1.37154809667
+neighbours: 329 466
+label: O
+
+site: -235
+centre: 32.03855 23.16205 27.6003
+neighbours: 160 331
+label: O
+
+site: -236
+centre: 27.6003 19.77175 25.90515
+neighbours: 331 468
+label: O
+
+site: -237
+centre: 32.03855 -1.37157951667 3.06669876333
+neighbours: 145 333
+label: O
+
+site: -238
+centre: 27.6003 44.30535 1.37154809667
+neighbours: 333 470
+label: O
+
+site: -239
+centre: 32.03855 -1.37157951667 27.6003
+neighbours: 150 335
+label: O
+
+site: -240
+centre: 27.6003 44.30535 25.90515
+neighbours: 335 472
+label: O
+
+site: -241
+centre: 17.02865 1.37154809667 21.4669
+neighbours: 95 337
+label: O
+
+site: -242
+centre: 21.4669 4.76185466667 23.16205
+neighbours: 337 458
+label: O
+
+site: -243
+centre: 17.02865 1.37154809667 -3.06672951667
+neighbours: 100 339
+label: O
+
+site: -244
+centre: 21.4669 4.76185466667 -1.37157951667
+neighbours: 339 460
+label: O
+
+site: -245
+centre: 17.02865 25.90515 21.4669
+neighbours: 85 341
+label: O
+
+site: -246
+centre: 21.4669 29.29545 23.16205
+neighbours: 341 462
+label: O
+
+site: -247
+centre: 17.02865 25.90515 -3.06672951667
+neighbours: 90 343
+label: O
+
+site: -248
+centre: 21.4669 29.29545 -1.37157951667
+neighbours: 343 464
+label: O
+
+site: -249
+centre: 41.56225 1.37154809667 21.4669
+neighbours: 115 345
+label: O
+
+site: -250
+centre: -3.06672951667 4.76185466667 23.16205
+neighbours: 345 450
+label: O
+
+site: -251
+centre: 41.56225 1.37154809667 -3.06672951667
+neighbours: 120 347
+label: O
+
+site: -252
+centre: -3.06672951667 4.76185466667 -1.37157951667
+neighbours: 347 452
+label: O
+
+site: -253
+centre: 41.56225 25.90515 21.4669
+neighbours: 105 349
+label: O
+
+site: -254
+centre: -3.06672951667 29.29545 23.16205
+neighbours: 349 454
+label: O
+
+site: -255
+centre: 41.56225 25.90515 -3.06672951667
+neighbours: 110 351
+label: O
+
+site: -256
+centre: -3.06672951667 29.29545 -1.37157951667
+neighbours: 351 456
+label: O
+
+site: -257
+centre: 19.77175 13.63835 21.4669
+neighbours: 205 353
+label: O
+
+site: -258
+centre: 15.3335 17.02865 23.16205
+neighbours: 353 530
+label: O
+
+site: -259
+centre: 19.77175 13.63835 -3.06672951667
+neighbours: 210 355
+label: O
+
+site: -260
+centre: 15.3335 17.02865 -1.37157951667
+neighbours: 355 532
+label: O
+
+site: -261
+centre: 19.77175 38.17195 21.4669
+neighbours: 215 357
+label: O
+
+site: -262
+centre: 15.3335 41.56225 23.16205
+neighbours: 357 534
+label: O
+
+site: -263
+centre: 19.77175 38.17195 -3.06672951667
+neighbours: 220 359
+label: O
+
+site: -264
+centre: 15.3335 41.56225 -1.37157951667
+neighbours: 359 536
+label: O
+
+site: -265
+centre: 44.30535 13.63835 21.4669
+neighbours: 225 361
+label: O
+
+site: -266
+centre: 39.8671 17.02865 23.16205
+neighbours: 361 538
+label: O
+
+site: -267
+centre: 44.30535 13.63835 -3.06672951667
+neighbours: 230 363
+label: O
+
+site: -268
+centre: 39.8671 17.02865 -1.37157951667
+neighbours: 363 540
+label: O
+
+site: -269
+centre: 44.30535 38.17195 21.4669
+neighbours: 235 365
+label: O
+
+site: -270
+centre: 39.8671 41.56225 23.16205
+neighbours: 365 542
+label: O
+
+site: -271
+centre: 44.30535 38.17195 -3.06672951667
+neighbours: 240 367
+label: O
+
+site: -272
+centre: 39.8671 41.56225 -1.37157951667
+neighbours: 367 544
+label: O
+
+site: -273
+centre: 4.76185466667 10.89525 3.06669876333
+neighbours: 165 369
+label: O
+
+site: -274
+centre: 9.20010333333 7.50495333333 1.37154809667
+neighbours: 369 514
+label: O
+
+site: -275
+centre: 4.76185466667 10.89525 27.6003
+neighbours: 170 371
+label: O
+
+site: -276
+centre: 9.20010333333 7.50495333333 25.90515
+neighbours: 371 516
+label: O
+
+site: -277
+centre: 4.76185466667 35.42885 3.06669876333
+neighbours: 175 373
+label: O
+
+site: -278
+centre: 9.20010333333 32.03855 1.37154809667
+neighbours: 373 518
+label: O
+
+site: -279
+centre: 4.76185466667 35.42885 27.6003
+neighbours: 180 375
+label: O
+
+site: -280
+centre: 9.20010333333 32.03855 25.90515
+neighbours: 375 520
+label: O
+
+site: -281
+centre: 29.29545 10.89525 3.06669876333
+neighbours: 185 377
+label: O
+
+site: -282
+centre: 33.7337 7.50495333333 1.37154809667
+neighbours: 377 522
+label: O
+
+site: -283
+centre: 29.29545 10.89525 27.6003
+neighbours: 190 379
+label: O
+
+site: -284
+centre: 33.7337 7.50495333333 25.90515
+neighbours: 379 524
+label: O
+
+site: -285
+centre: 29.29545 35.42885 3.06669876333
+neighbours: 195 381
+label: O
+
+site: -286
+centre: 33.7337 32.03855 1.37154809667
+neighbours: 381 526
+label: O
+
+site: -287
+centre: 29.29545 35.42885 27.6003
+neighbours: 200 383
+label: O
+
+site: -288
+centre: 33.7337 32.03855 25.90515
+neighbours: 383 528
+label: O
+
+site: -289
+centre: 4.76185466667 1.37154809667 15.3335
+neighbours: 55 385
+label: O
+
+site: -290
+centre: 9.20010333333 4.76185466667 13.63835
+neighbours: 385 562
+label: O
+
+site: -291
+centre: 4.76185466667 1.37154809667 39.8671
+neighbours: 60 387
+label: O
+
+site: -292
+centre: 9.20010333333 4.76185466667 38.17195
+neighbours: 387 564
+label: O
+
+site: -293
+centre: 4.76185466667 25.90515 15.3335
+neighbours: 45 389
+label: O
+
+site: -294
+centre: 9.20010333333 29.29545 13.63835
+neighbours: 389 566
+label: O
+
+site: -295
+centre: 4.76185466667 25.90515 39.8671
+neighbours: 50 391
+label: O
+
+site: -296
+centre: 9.20010333333 29.29545 38.17195
+neighbours: 391 568
+label: O
+
+site: -297
+centre: 29.29545 1.37154809667 15.3335
+neighbours: 75 393
+label: O
+
+site: -298
+centre: 33.7337 4.76185466667 13.63835
+neighbours: 393 570
+label: O
+
+site: -299
+centre: 29.29545 1.37154809667 39.8671
+neighbours: 80 395
+label: O
+
+site: -300
+centre: 33.7337 4.76185466667 38.17195
+neighbours: 395 572
+label: O
+
+site: -301
+centre: 29.29545 25.90515 15.3335
+neighbours: 65 397
+label: O
+
+site: -302
+centre: 33.7337 29.29545 13.63835
+neighbours: 397 574
+label: O
+
+site: -303
+centre: 29.29545 25.90515 39.8671
+neighbours: 70 399
+label: O
+
+site: -304
+centre: 33.7337 29.29545 38.17195
+neighbours: 399 576
+label: O
+
+site: -305
+centre: 19.77175 23.16205 9.20010333333
+neighbours: 15 401
+label: O
+
+site: -306
+centre: 15.3335 19.77175 10.89525
+neighbours: 401 546
+label: O
+
+site: -307
+centre: 19.77175 23.16205 33.7337
+neighbours: 20 403
+label: O
+
+site: -308
+centre: 15.3335 19.77175 35.42885
+neighbours: 403 548
+label: O
+
+site: -309
+centre: 19.77175 -1.37157951667 9.20010333333
+neighbours: 5 405
+label: O
+
+site: -310
+centre: 15.3335 44.30535 10.89525
+neighbours: 405 550
+label: O
+
+site: -311
+centre: 19.77175 -1.37157951667 33.7337
+neighbours: 10 407
+label: O
+
+site: -312
+centre: 15.3335 44.30535 35.42885
+neighbours: 407 552
+label: O
+
+site: -313
+centre: 44.30535 23.16205 9.20010333333
+neighbours: 35 409
+label: O
+
+site: -314
+centre: 39.8671 19.77175 10.89525
+neighbours: 409 554
+label: O
+
+site: -315
+centre: 44.30535 23.16205 33.7337
+neighbours: 40 411
+label: O
+
+site: -316
+centre: 39.8671 19.77175 35.42885
+neighbours: 411 556
+label: O
+
+site: -317
+centre: 44.30535 -1.37157951667 9.20010333333
+neighbours: 25 413
+label: O
+
+site: -318
+centre: 39.8671 44.30535 10.89525
+neighbours: 413 558
+label: O
+
+site: -319
+centre: 44.30535 -1.37157951667 33.7337
+neighbours: 30 415
+label: O
+
+site: -320
+centre: 39.8671 44.30535 35.42885
+neighbours: 415 560
+label: O
+
+site: -321
+centre: 17.02865 10.89525 9.20010333333
+neighbours: 285 417
+label: O
+
+site: -322
+centre: 21.4669 7.50495333333 10.89525
+neighbours: 417 506
+label: O
+
+site: -323
+centre: 17.02865 10.89525 33.7337
+neighbours: 290 419
+label: O
+
+site: -324
+centre: 21.4669 7.50495333333 35.42885
+neighbours: 419 508
+label: O
+
+site: -325
+centre: 17.02865 35.42885 9.20010333333
+neighbours: 295 421
+label: O
+
+site: -326
+centre: 21.4669 32.03855 10.89525
+neighbours: 421 510
+label: O
+
+site: -327
+centre: 17.02865 35.42885 33.7337
+neighbours: 300 423
+label: O
+
+site: -328
+centre: 21.4669 32.03855 35.42885
+neighbours: 423 512
+label: O
+
+site: -329
+centre: 41.56225 10.89525 9.20010333333
+neighbours: 305 425
+label: O
+
+site: -330
+centre: -3.06672951667 7.50495333333 10.89525
+neighbours: 425 498
+label: O
+
+site: -331
+centre: 41.56225 10.89525 33.7337
+neighbours: 310 427
+label: O
+
+site: -332
+centre: -3.06672951667 7.50495333333 35.42885
+neighbours: 427 500
+label: O
+
+site: -333
+centre: 41.56225 35.42885 9.20010333333
+neighbours: 315 429
+label: O
+
+site: -334
+centre: -3.06672951667 32.03855 10.89525
+neighbours: 429 502
+label: O
+
+site: -335
+centre: 41.56225 35.42885 33.7337
+neighbours: 320 431
+label: O
+
+site: -336
+centre: -3.06672951667 32.03855 35.42885
+neighbours: 431 504
+label: O
+
+site: -337
+centre: 7.50495333333 13.63835 15.3335
+neighbours: 245 433
+label: O
+
+site: -338
+centre: 3.06669876333 17.02865 13.63835
+neighbours: 433 490
+label: O
+
+site: -339
+centre: 7.50495333333 13.63835 39.8671
+neighbours: 250 435
+label: O
+
+site: -340
+centre: 3.06669876333 17.02865 38.17195
+neighbours: 435 492
+label: O
+
+site: -341
+centre: 7.50495333333 38.17195 15.3335
+neighbours: 255 437
+label: O
+
+site: -342
+centre: 3.06669876333 41.56225 13.63835
+neighbours: 437 494
+label: O
+
+site: -343
+centre: 7.50495333333 38.17195 39.8671
+neighbours: 260 439
+label: O
+
+site: -344
+centre: 3.06669876333 41.56225 38.17195
+neighbours: 439 496
+label: O
+
+site: -345
+centre: 32.03855 13.63835 15.3335
+neighbours: 265 441
+label: O
+
+site: -346
+centre: 27.6003 17.02865 13.63835
+neighbours: 441 482
+label: O
+
+site: -347
+centre: 32.03855 13.63835 39.8671
+neighbours: 270 443
+label: O
+
+site: -348
+centre: 27.6003 17.02865 38.17195
+neighbours: 443 484
+label: O
+
+site: -349
+centre: 32.03855 38.17195 15.3335
+neighbours: 275 445
+label: O
+
+site: -350
+centre: 27.6003 41.56225 13.63835
+neighbours: 445 486
+label: O
+
+site: -351
+centre: 32.03855 38.17195 39.8671
+neighbours: 280 447
+label: O
+
+site: -352
+centre: 27.6003 41.56225 38.17195
+neighbours: 447 488
+label: O
+
+site: -353
+centre: 3.06669876333 7.50495333333 23.16205
+neighbours: 371 450
+label: O
+
+site: -354
+centre: 3.06669876333 7.50495333333 -1.37157951667
+neighbours: 369 452
+label: O
+
+site: -355
+centre: 3.06669876333 32.03855 23.16205
+neighbours: 375 454
+label: O
+
+site: -356
+centre: 3.06669876333 32.03855 -1.37157951667
+neighbours: 373 456
+label: O
+
+site: -357
+centre: 27.6003 7.50495333333 23.16205
+neighbours: 379 458
+label: O
+
+site: -358
+centre: 27.6003 7.50495333333 -1.37157951667
+neighbours: 377 460
+label: O
+
+site: -359
+centre: 27.6003 32.03855 23.16205
+neighbours: 383 462
+label: O
+
+site: -360
+centre: 27.6003 32.03855 -1.37157951667
+neighbours: 381 464
+label: O
+
+site: -361
+centre: 21.4669 17.02865 1.37154809667
+neighbours: 355 466
+label: O
+
+site: -362
+centre: 21.4669 17.02865 25.90515
+neighbours: 353 468
+label: O
+
+site: -363
+centre: 21.4669 41.56225 1.37154809667
+neighbours: 359 470
+label: O
+
+site: -364
+centre: 21.4669 41.56225 25.90515
+neighbours: 357 472
+label: O
+
+site: -365
+centre: -3.06672951667 17.02865 1.37154809667
+neighbours: 363 474
+label: O
+
+site: -366
+centre: -3.06672951667 17.02865 25.90515
+neighbours: 361 476
+label: O
+
+site: -367
+centre: -3.06672951667 41.56225 1.37154809667
+neighbours: 367 478
+label: O
+
+site: -368
+centre: -3.06672951667 41.56225 25.90515
+neighbours: 365 480
+label: O
+
+site: -369
+centre: 21.4669 19.77175 13.63835
+neighbours: 401 482
+label: O
+
+site: -370
+centre: 21.4669 19.77175 38.17195
+neighbours: 403 484
+label: O
+
+site: -371
+centre: 21.4669 44.30535 13.63835
+neighbours: 405 486
+label: O
+
+site: -372
+centre: 21.4669 44.30535 38.17195
+neighbours: 407 488
+label: O
+
+site: -373
+centre: -3.06672951667 19.77175 13.63835
+neighbours: 409 490
+label: O
+
+site: -374
+centre: -3.06672951667 19.77175 38.17195
+neighbours: 411 492
+label: O
+
+site: -375
+centre: -3.06672951667 44.30535 13.63835
+neighbours: 413 494
+label: O
+
+site: -376
+centre: -3.06672951667 44.30535 38.17195
+neighbours: 415 496
+label: O
+
+site: -377
+centre: 3.06669876333 4.76185466667 10.89525
+neighbours: 385 498
+label: O
+
+site: -378
+centre: 3.06669876333 4.76185466667 35.42885
+neighbours: 387 500
+label: O
+
+site: -379
+centre: 3.06669876333 29.29545 10.89525
+neighbours: 389 502
+label: O
+
+site: -380
+centre: 3.06669876333 29.29545 35.42885
+neighbours: 391 504
+label: O
+
+site: -381
+centre: 27.6003 4.76185466667 10.89525
+neighbours: 393 506
+label: O
+
+site: -382
+centre: 27.6003 4.76185466667 35.42885
+neighbours: 395 508
+label: O
+
+site: -383
+centre: 27.6003 29.29545 10.89525
+neighbours: 397 510
+label: O
+
+site: -384
+centre: 27.6003 29.29545 35.42885
+neighbours: 399 512
+label: O
+
+site: -385
+centre: 15.3335 4.76185466667 1.37154809667
+neighbours: 339 514
+label: O
+
+site: -386
+centre: 15.3335 4.76185466667 25.90515
+neighbours: 337 516
+label: O
+
+site: -387
+centre: 15.3335 29.29545 1.37154809667
+neighbours: 343 518
+label: O
+
+site: -388
+centre: 15.3335 29.29545 25.90515
+neighbours: 341 520
+label: O
+
+site: -389
+centre: 39.8671 4.76185466667 1.37154809667
+neighbours: 347 522
+label: O
+
+site: -390
+centre: 39.8671 4.76185466667 25.90515
+neighbours: 345 524
+label: O
+
+site: -391
+centre: 39.8671 29.29545 1.37154809667
+neighbours: 351 526
+label: O
+
+site: -392
+centre: 39.8671 29.29545 25.90515
+neighbours: 349 528
+label: O
+
+site: -393
+centre: 9.20010333333 19.77175 23.16205
+neighbours: 323 530
+label: O
+
+site: -394
+centre: 9.20010333333 19.77175 -1.37157951667
+neighbours: 321 532
+label: O
+
+site: -395
+centre: 9.20010333333 44.30535 23.16205
+neighbours: 327 534
+label: O
+
+site: -396
+centre: 9.20010333333 44.30535 -1.37157951667
+neighbours: 325 536
+label: O
+
+site: -397
+centre: 33.7337 19.77175 23.16205
+neighbours: 331 538
+label: O
+
+site: -398
+centre: 33.7337 19.77175 -1.37157951667
+neighbours: 329 540
+label: O
+
+site: -399
+centre: 33.7337 44.30535 23.16205
+neighbours: 335 542
+label: O
+
+site: -400
+centre: 33.7337 44.30535 -1.37157951667
+neighbours: 333 544
+label: O
+
+site: -401
+centre: 9.20010333333 17.02865 10.89525
+neighbours: 433 546
+label: O
+
+site: -402
+centre: 9.20010333333 17.02865 35.42885
+neighbours: 435 548
+label: O
+
+site: -403
+centre: 9.20010333333 41.56225 10.89525
+neighbours: 437 550
+label: O
+
+site: -404
+centre: 9.20010333333 41.56225 35.42885
+neighbours: 439 552
+label: O
+
+site: -405
+centre: 33.7337 17.02865 10.89525
+neighbours: 441 554
+label: O
+
+site: -406
+centre: 33.7337 17.02865 35.42885
+neighbours: 443 556
+label: O
+
+site: -407
+centre: 33.7337 41.56225 10.89525
+neighbours: 445 558
+label: O
+
+site: -408
+centre: 33.7337 41.56225 35.42885
+neighbours: 447 560
+label: O
+
+site: -409
+centre: 15.3335 7.50495333333 13.63835
+neighbours: 417 562
+label: O
+
+site: -410
+centre: 15.3335 7.50495333333 38.17195
+neighbours: 419 564
+label: O
+
+site: -411
+centre: 15.3335 32.03855 13.63835
+neighbours: 421 566
+label: O
+
+site: -412
+centre: 15.3335 32.03855 38.17195
+neighbours: 423 568
+label: O
+
+site: -413
+centre: 39.8671 7.50495333333 13.63835
+neighbours: 425 570
+label: O
+
+site: -414
+centre: 39.8671 7.50495333333 38.17195
+neighbours: 427 572
+label: O
+
+site: -415
+centre: 39.8671 32.03855 13.63835
+neighbours: 429 574
+label: O
+
+site: -416
+centre: 39.8671 32.03855 38.17195
+neighbours: 431 576
+label: O
+
