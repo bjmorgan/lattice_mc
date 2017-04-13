@@ -1,6 +1,7 @@
 import numpy as np
 from lattice_mc import lattice, lattice_site
 from math import sqrt
+import re
 
 def square_lattice( a, b, spacing ):
     grid = np.array( list( range( 1, a * b + 1 ) ) ).reshape( a, b, order='F' )
@@ -71,16 +72,40 @@ def cubic_lattice( a, b, c, spacing ):
         it.iternext()
     return lattice.Lattice( sites, cell_lengths = np.array( [ a, b, c ] ) * spacing )
 
+#def lattice_from_sites_file( site_file, cell_lengths ):
+#    sites = []
+#    with open( site_file ) as f:
+#        number_of_sites = int( f.readline() )
+#        for i in range( number_of_sites ):
+#            f.readline()
+#            number = int( f.readline().split()[1] )
+#            r = np.array( [ float( s ) for s in f.readline().split()[1:4] ] )
+#            f.readline() # ignore vertices
+#            neighbours = [ int( s ) for s in f.readline().split()[1:] ]
+#            label = f.readline().split()[1]
+#            sites.append( lattice_site.Site( number, r, neighbours, 0.0, label ) )
+#        return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
+
 def lattice_from_sites_file( site_file, cell_lengths ):
     sites = []
+    site_re = re.compile( 'site:\s+([-+]?\d+)' )
+    r_re = re.compile( 'cent(?:er|re):\s+([-\d\.e]+)\s+([-\d\.e]+)\s+([-\d\.e]+)' )
+    r_neighbours = re.compile( 'neighbou{0,1}rs:((\s+[-+]?\d+)+)' )
+    r_label = re.compile( 'label:\s+(\S+)' )
+    r_energy = re.compile( 'energy:\s([-+\d\.]+)' )
     with open( site_file ) as f:
-        number_of_sites = int( f.readline() )
-        for i in range( number_of_sites ):
-            f.readline()
-            number = int( f.readline().split()[1] )
-            r = np.array( [ float( s ) for s in f.readline().split()[1:4] ] )
-            f.readline() # ignore vertices
-            neighbours = [ int( s ) for s in f.readline().split()[1:] ]
-            label = f.readline().split()[1]
-            sites.append( lattice_site.Site( number, r, neighbours, 0.0, label ) )
-        return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
+        filein = f.read().split("\n\n")
+    number_of_sites = int( filein[0] )
+    for i in range( number_of_sites ):
+        block = filein[ i+1 ]
+        number = int( site_re.findall( block )[0] )
+        r = np.array( [ float(s) for s in r_re.findall( block )[0] ] )
+        neighbours = [ int( s ) for s in r_neighbours.findall( block )[0][0].split() ]
+        label = r_label.findall( block )[0]
+        energy = r_energy.findall( block )
+        if energy:
+            energy = float( energy[0] )
+        else:
+            energy = 0.0
+        sites.append( lattice_site.Site( number, r, neighbours, energy, label ) )
+    return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
