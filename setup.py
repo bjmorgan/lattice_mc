@@ -23,7 +23,7 @@ config = {
     'version': '1.0.0',
     'install_requires': ['numpy', 'matplotlib', 'pandas'],
     'license': 'MIT',
-    'packages': ['lattice-mc'],
+    'packages': ['lattice_mc'],
     'scripts': [],
     'name': 'lattice-mc'
 }
