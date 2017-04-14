@@ -3,7 +3,25 @@ from lattice_mc import lattice, lattice_site
 from math import sqrt
 import re
 
+"""
+Functions for constructing lattices.
+"""
+
 def square_lattice( a, b, spacing ):
+    """
+    Generate a square lattice.
+
+    Args:
+        a (Int):         Number of lattice repeat units along x.
+        b (Int):         Number of lattice repeat units along y.
+        spacing (Float): Distance between lattice sites.
+
+    Returns:
+        (Lattice): The new lattice
+
+    Notes:
+        The returned lattice is 3D periodic, but all sites and edges lie in the xy plane.
+    """
     grid = np.array( list( range( 1, a * b + 1 ) ) ).reshape( a, b, order='F' )
     it = np.nditer( grid, flags=['multi_index'] )
     sites = []
@@ -19,6 +37,21 @@ def square_lattice( a, b, spacing ):
     return lattice.Lattice( sites, cell_lengths = np.array( [ a, b, 0.0 ] ) * spacing )
 
 def honeycomb_lattice( a, b, spacing, alternating_sites=False ):
+    """
+    Generate a honeycomb lattice.
+
+    Args:
+        a (Int):         Number of lattice repeat units along x.
+        b (Int):         Number of lattice repeat units along y.
+        spacing (Float): Distance between lattice sites.
+        alternating_sites (Bool, optional): Label alternating sites with 'A' and 'B'. Defaults to False.
+
+    Returns:
+        (Lattice): The new lattice
+
+    Notes:
+        The returned lattice is 3D periodic, but all sites and edges lie in the xy plane.
+    """
     if alternating_sites:
         site_labels = [ 'A', 'B', 'A', 'B' ]
     else:
@@ -56,6 +89,18 @@ def honeycomb_lattice( a, b, spacing, alternating_sites=False ):
     return lattice.Lattice( sites, cell_lengths=cell_lengths )
 
 def cubic_lattice( a, b, c, spacing ):
+    """
+    Generate a cubic lattice.
+
+    Args:
+        a (Int):         Number of lattice repeat units along x.
+        b (Int):         Number of lattice repeat units along y.
+        c (Int):         Number of lattice repeat units along z.
+        spacing (Float): Distance between lattice sites.
+
+    Returns:
+        (Lattice): The new lattice
+    """
     grid = np.array( list( range( 1, a * b * c + 1 ) ) ).reshape( a, b, c, order='F' )
     it = np.nditer( grid, flags=[ 'multi_index' ] )
     sites = []
@@ -87,6 +132,30 @@ def cubic_lattice( a, b, c, spacing ):
 #        return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
 
 def lattice_from_sites_file( site_file, cell_lengths ):
+    """
+    Generate a lattice from a sites file..
+
+    Args:
+        site_file (Str): Filename for the file containing the site information.
+        cell_lengths (List(Float,Float,Float)): A list containing the [ x, y, z ] cell lengths.
+
+    Returns:
+        (Lattice): The new lattice
+
+    Notes:
+        The site information file format is
+            <number_of_sites> (integer)
+        Followed by blocks of data separated by double linebreaks; one block per site.
+            site: <site number> (integer)
+            centre: <x> <y> <z> (floats)
+            neighbours: <list of site numbers of neighbouring sites> (integers)
+            label: <site group labal> (string)
+            energy: <site occupation energy> (float)
+        The energy is optional, and will be set to 0.0 if not included.
+        Line order within each block is not meaningful.
+        British and American spelling for centre|center and neighbour|neighbor are accepted.
+        An example file can be found in the examples directory. 
+    """
     sites = []
     site_re = re.compile( 'site:\s+([-+]?\d+)' )
     r_re = re.compile( 'cent(?:er|re):\s+([-\d\.e]+)\s+([-\d\.e]+)\s+([-\d\.e]+)' )
