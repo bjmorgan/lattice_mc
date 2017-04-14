@@ -14,15 +14,15 @@ def read(fname):
 
 config = {
     'description': 'A lattice-gas Monte-Carlo simulation tool',
-    'long_description': read('README'),
+    'long_description': read('README.md'),
     'author': 'Benjamin J. Morgan',
     'url': 'https://github.com/bjmorgan/lattice_mc',
     'download_url': 'https://github.com/bjmorgan/lattice_mc/archive/master.zip',
     'author_email': 'b.j.morgan@bath.ac.uk',
-    'version': '0.1',
-    'install_requires': ['numpy'],
+    'version': '1.0',
+    'install_requires': ['numpy, matplotlib, pandas'],
     'license': 'MIT',
-    'packages': ['lattice_mc', 'tests'],
+    'packages': ['lattice_mc'],
     'scripts': [],
     'name': 'lattice_mc'
 }
