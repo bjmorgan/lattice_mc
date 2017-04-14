@@ -131,33 +131,9 @@ class InitLatticeTestCase( unittest.TestCase ):
                           neighbours: 4 5 6
                           label: H"""
         mock_site.return_value = 'site'
-        mock_lattice.return_value = 'lattice' 
-        with patch( 'builtins.open', mock_open( read_data=example_file), create=True) as m:
-            lattice = init_lattice.lattice_from_sites_file( 'filename', cell_lengths )
-        site_calls = mock_site.mock_calls[0][1]
-        self.assertEqual( site_calls[0], 2 ) # site number
-        np.testing.assert_array_equal( site_calls[1], np.array( [ 21.4669, -1.37, 6.1334 ] ) ) # r
-        self.assertEqual( site_calls[2], [ 4, 5, 6 ] ) # neighbour list
-        self.assertEqual( site_calls[3], 0.0 ) # ?
-        self.assertEqual( site_calls[4], 'H' ) # site label 
-        self.assertEqual( mock_lattice.mock_calls[0][1][0], [ 'site' ] )
-        np.testing.assert_array_equal( mock_lattice.mock_calls[0][2]['cell_lengths'], cell_lengths )
-        self.assertEqual( lattice, 'lattice' )
- 
-    @patch( 'lattice_mc.lattice_site.Site' )
-    @patch( 'lattice_mc.lattice.Lattice' )
-    def test_lattice_from_file_new( self, mock_lattice, mock_site ):
-        cell_lengths = np.array( [ 2.0, 3.0, 4.0 ] )
-        example_file = """1\n
-                          site: 2
-                          centre: 21.4669 -1.37 6.1334
-                          vertices: 1 315 435 649
-                          neighbours: 4 5 6
-                          label: H"""
-        mock_site.return_value = 'site'
         mock_lattice.return_value = 'lattice'
         with patch( 'builtins.open', mock_open( read_data=example_file), create=True) as m:
-            lattice = init_lattice.lattice_from_sites_file_new( 'filename', cell_lengths )
+            lattice = init_lattice.lattice_from_sites_file( 'filename', cell_lengths )
         site_calls = mock_site.mock_calls[0][1]
         self.assertEqual( site_calls[0], 2 ) # site number
         np.testing.assert_array_equal( site_calls[1], np.array( [ 21.4669, -1.37, 6.1334 ] ) ) # r
@@ -182,7 +158,7 @@ class InitLatticeTestCase( unittest.TestCase ):
         mock_site.return_value = 'site'
         mock_lattice.return_value = 'lattice'
         with patch( 'builtins.open', mock_open( read_data=example_file), create=True) as m:
-            lattice = init_lattice.lattice_from_sites_file_new( 'filename', cell_lengths )
+            lattice = init_lattice.lattice_from_sites_file( 'filename', cell_lengths )
         site_calls = mock_site.mock_calls[0][1]
         self.assertEqual( site_calls[0], 2 ) # site number
         np.testing.assert_array_equal( site_calls[1], np.array( [ 21.4669, -1.37, 6.1334 ] ) ) # r
