@@ -6,7 +6,7 @@
 
 Download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases)
 ```
-https://github.com/bjmorgan/lattice_mc/archive/0.9.1.tar.gz
+https://github.com/bjmorgan/lattice_mc/archive/1.0.0.tar.gz
 ```
 Then install
 ```
@@ -46,4 +46,4 @@ python3 -m unittest discover
 <span id='ref4'>[4] R. Kutner [*Phys. Lett.* **81A**, 239 (1981)](https://dx.doi.org/10.1016/0375-9601%2881%2990251-6)
 </span>  
 <span id='ref5'>\[5\] Morgan and Madden, [*J. Phys. Condens. Matter* **24**, 275303 (2012)](http://www.iopscience.iop.org/article/10.1088/0953-8984/24/27/275303/)</span>.  
-<span id='ref6'> \[6\] G. E. Murch & R. J. Thorn, [Phil. Mag. **36** 529 (1977)](http://dx.doi.org/10.1080/14786437708239737).
+<span id='ref6'> \[6\] G. E. Murch & R. J. Thorn, [Phil. Mag. **36** 529 (1977)](http://dx.doi.org/10.1080/14786437708239737).</span>
