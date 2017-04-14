@@ -1,6 +1,17 @@
 class Cluster:
-
+    """
+    Clusters are sets of sites.
+    """
     def __init__( self, sites ):
+        """
+        Initialise an Cluster instance.
+
+        Args:
+            sites (List(Site): The list of sites that make up the cluster.
+
+        Returns:
+            None
+        """
         self.sites = set( sites )
         self.neighbours = set()
         for s in self.sites:
@@ -8,6 +19,15 @@ class Cluster:
         self.neighbours = self.neighbours.difference( self.sites )
 
     def merge( self, other_cluster ):
+        """
+        Combine two clusters into a single cluster.
+
+        Args:
+            other_cluster (Cluster): The second cluster to combine.
+
+        Returns:
+            (Cluster):   The combination of both clusters.
+        """
         new_cluster = Cluster( self.sites | other_cluster.sites )
         new_cluster.neighbours = ( self.neighbours | other_cluster.neighbours ).difference( new_cluster.sites )
         return new_cluster
@@ -25,10 +45,24 @@ class Cluster:
         return bool( self.neighbours & other_cluster.sites )
 
     def size( self ):
+        """
+        Number of sites in this cluster.
+
+        Args:
+            None
+
+        Returns:
+            (Int): The number of sites in this cluster.
+        """
         return len( self.sites )
 
     def sites_at_edges( self ):
         """
+        Finds the six sites with the maximum and minimum coordinates along x, y, and z.
+
+        Args:
+            None
+
         Returns:
              (List(List)): In the order [ +x, -x, +y, -y, +z, -z ]
         """
