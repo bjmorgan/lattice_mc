@@ -12,20 +12,22 @@ except ImportError:
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+VERSION = '1.0.0'
+
 config = {
     'description': 'A lattice-gas Monte-Carlo simulation tool',
     'long_description': read('README.md'),
     'author': 'Benjamin J. Morgan',
     'author_email': 'b.j.morgan@bath.ac.uk',
-    'url': 'https://github.com/bjmorgan/lattice-mc',
-    'download_url': 'https://github.com/bjmorgan/lattice-mc/tarball/0.9.1',
+    'url': 'https://github.com/bjmorgan/lattice_mc',
+    'download_url': "https://github.com/bjmorgan/lattice_mc/archive/%s.tar.gz" % (VERSION),
     'author_email': 'b.j.morgan@bath.ac.uk',
-    'version': '1.0.0',
+    'version': VERSION,
     'install_requires': ['numpy', 'matplotlib', 'pandas'],
     'license': 'MIT',
     'packages': ['lattice_mc'],
     'scripts': [],
-    'name': 'lattice-mc'
+    'name': 'lattice_mc'
 }
 
 setup(**config)
