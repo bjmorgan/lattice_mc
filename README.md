@@ -4,9 +4,9 @@
 
 ## Installation
 
-Download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases) or clone the latest development version:
+Download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases)
 ```
-git clone git@github.com:bjmorgan/lattice_mc.git
+https://github.com/bjmorgan/lattice_mc/archive/0.9.1.tar.gz
 ```
 Then install
 ```
@@ -14,7 +14,17 @@ cd lattice_mc
 python setup.py install
 ```
 
-Alternatively, you can install using `pip`:
+Or you can clone the latest development version:
+```
+git clone git@github.com:bjmorgan/lattice_mc.git
+```
+and install the same way.
+```
+cd lattice_mc
+python setup.py install
+```
+
+Alternatively, you can install using `pip`, e.g.
 ```
 pip3 install git+https://github.com/bjmorgan/lattice_mc.git
 ```
