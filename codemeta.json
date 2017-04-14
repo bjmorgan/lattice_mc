@@ -1,0 +1,23 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "http://orcid.org/0000-0002-3056-8233",
+      "@type": "Person",
+      "email": "b.j.morgan@bath.ac.uk",
+      "name": "Benjamin Morgan",
+      "affiliation": "Department of Chemistry, University of Bath, Bath, BA2 7AY, United Kingdom."
+    }
+  ],
+  "identifier": "",
+  "codeRepository": "https://github.com/bjmorgan/lattice_mc",
+  "datePublished": "2017-04-14",
+  "dateModified": "2017-04-14",
+  "dateCreated": "2017-04-14",
+  "description": "Lattice-gas (kinetic) Monte Carlo implemented in Python",
+  "keywords": "monte-carlo, lattice-gas, correlation-factors",
+  "license": "MIT",
+  "title": "lattice_mc",
+  "version": "v1.0.0"
+}
