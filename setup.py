@@ -18,7 +18,7 @@ config = {
     'author': 'Benjamin J. Morgan',
     'author_email': 'b.j.morgan@bath.ac.uk',
     'url': 'https://github.com/bjmorgan/lattice_mc',
-    'download_url': 'https://github.com/bjmorgan/lattice_mc/tarball/1.0.0',
+    'download_url': 'https://github.com/bjmorgan/lattice_mc/tarball/0.9.1',
     'author_email': 'b.j.morgan@bath.ac.uk',
     'version': '1.0.0',
     'install_requires': ['numpy, matplotlib, pandas'],
