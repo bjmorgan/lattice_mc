@@ -153,7 +153,7 @@ def lattice_from_sites_file( site_file, cell_lengths ):
             energy: <site occupation energy> (float)
         The energy is optional, and will be set to 0.0 if not included.
         Line order within each block is not meaningful.
-        British and American spelling for centre|center and neighbour|neighbor are accepted.
+        British and American English spellings for centre|center and neighbour|neighbor are accepted.
         An example file can be found in the examples directory. 
     """
     sites = []
