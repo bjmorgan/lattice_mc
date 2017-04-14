@@ -21,6 +21,10 @@ bibliography: paper.bib
 Simple lattices can be constructed programmatically (presently square, honeycomb, and cubic lattices).
 Arbitrary lattices can be generated from files that define the lattice sites and their connectivity. The algorithms used and interaction models are described in <a href="#ref1">\[1\]</a>. Calculated properties include tracer and &ldquo;jump&rdquo; diffusion coefficients; where the latter is proportional to the mobility (and hence the conductivity for charged particles) <a href="#ref2">\[2\]</a>; and tracer (single particle) and collective correlation factors, f and f_I <a href="#ref3">\[3\]</a>. The simplest interaction model is for &ldquo;non-interacting&rdquo; particles, where the only restriction is volume exclusion (two particles cannot simultaneoulsy occupy a single site) <a href="#ref1">\[4\]</a>. Additional interaction models include nearest-neighbour repulsion and on-site energies for inequivalent sites.
 
+# Acknowledgements
+
+BJM acknowledges support from the Royal Society (UF130329).
+
 # References
 
 <span id='ref1'>[1] B. J. Morgan, In Preparation.</span>  
