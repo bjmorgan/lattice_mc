@@ -4,13 +4,20 @@
 
 ## Installation
 
-TODO
+Install the [current PyPI release](https://pypi.python.org/pypi/lattice_mc):
+```
+pip3 install lattice_mc
+```
+or clone the latest development version from [GitHub](https://github.com/bjmorgan/lattice_mc)
+```
+git clone git@github.com:bjmorgan/lattice_mc.git
+```
 
 ## Documentation
 
-Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb)
+Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). This example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb).
 
-## Unit tests
+## Tests
 
 ```
 python3 -m unittest discover
