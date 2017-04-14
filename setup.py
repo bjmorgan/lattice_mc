@@ -17,13 +17,13 @@ config = {
     'long_description': read('README.md'),
     'author': 'Benjamin J. Morgan',
     'author_email': 'b.j.morgan@bath.ac.uk',
-    'url': 'https://github.com/bjmorgan/lattice_mc',
-    'download_url': 'https://github.com/bjmorgan/lattice_mc/tarball/0.9.1',
+    'url': 'https://github.com/bjmorgan/lattice-mc',
+    'download_url': 'https://github.com/bjmorgan/lattice-mc/tarball/0.9.1',
     'author_email': 'b.j.morgan@bath.ac.uk',
     'version': '1.0.0',
     'install_requires': ['numpy', 'matplotlib', 'pandas'],
     'license': 'MIT',
-    'packages': ['lattice_mc'],
+    'packages': ['lattice-mc'],
     'scripts': [],
     'name': 'lattice-mc'
 }
