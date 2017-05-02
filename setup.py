@@ -23,7 +23,7 @@ config = {
     'download_url': "https://github.com/bjmorgan/lattice_mc/archive/%s.tar.gz" % (VERSION),
     'author_email': 'b.j.morgan@bath.ac.uk',
     'version': VERSION,
-    'install_requires': ['numpy', 'matplotlib', 'pandas'],
+    'install_requires': ['numpy', 'matplotlib', 'pandas', 'scipy'],
     'license': 'MIT',
     'packages': ['lattice_mc'],
     'scripts': [],
