@@ -23,9 +23,9 @@ class SimulationTestCase( unittest.TestCase ):
         simulation.atoms = Mock( spec=Species )
         simulation.atoms.atoms = [ Mock( spec=Atom ), Mock( spec=Atom ) ]
         simulation.reset()
-        simulation.lattice.reset.assert_called()
-        simulation.atoms.atoms[0].reset.assert_called()
-        simulation.atoms.atoms[1].reset.assert_called()
+        self.assertEqual( simulation.lattice.reset.call_count, 1 )
+        self.assertEqual( simulation.atoms.atoms[0].reset.call_count, 1 )
+        self.assertEqual( simulation.atoms.atoms[1].reset.call_count, 1 )
 
     def test_set_number_of_atoms( self ):
         simulation = Simulation()
@@ -144,7 +144,7 @@ class SimulationTestCase( unittest.TestCase ):
         simulation.number_of_jumps = 30
         simulation.run()
         self.assertEqual( simulation.lattice.jump.call_count, 20+30 )
-        simulation.reset.assert_called()
+        self.assertEqual( simulation.reset.call_count, 1 )
 
 class SimulationResultsTestCase( unittest.TestCase ):
 

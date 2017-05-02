@@ -36,7 +36,7 @@ class LookupTableTestCase( unittest.TestCase ):
         self.assertEqual( lookup_table.cn_energy, 'baz' )
         self.assertEqual( lookup_table.connected_site_pairs, 'qux' )
         self.assertEqual( lookup_table.site_specific_coordination_per_site, 'quux' )
-        mock_generate_nearest_neighbour_lookup_table.assert_called_once()
+        self.assertEqual( mock_generate_nearest_neighbour_lookup_table.call_count, 1 )
        
     def test_lookup_table_init_with_invalid_hamiltonian_keywork_raises_ValueError( self ):
         hamiltonian = 'foo'
