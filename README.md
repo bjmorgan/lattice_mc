@@ -44,9 +44,11 @@ Full documentation and examples are contained in a [Jupyter notebook](http://jup
 
 ## Tests
 
+Tests can be run using
 ```
 python3 -m unittest discover
 ```
+The code has been tested with Python versions 3.5 and above.
 
 ## References
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)
