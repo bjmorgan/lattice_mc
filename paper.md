@@ -1,17 +1,18 @@
 ---
-title: 'lattice_mc: A Python Lattice-Gas Monte Carlo Module'
-tags:
-  - lattice-gas
-  - monte-carlo
-  - correlation-factors
-authors:
- - name: Benjamin J. Morgan
-   orcid: 0000-0002-3056-8233
-   affiliation: 1
-affiliations:
- - name: Department of Chemistry, University of Bath, Bath, BA2 7AY, United Kingdom.
-   index: 1
-date: 13 April 2017
+title: 'lattice_mc: A Python Lattice-Gas Monte Carlo Module'  
+tags:  
+  - lattice-gas  
+  - monte-carlo  
+  - correlation-factors  
+authors:  
+ - name: Benjamin J. Morgan  
+   email: b.j.morgan@bath.ac.uk  
+   orcid: 0000-0002-3056-8233  
+   affiliation: 1  
+affiliations:  
+ - name: Department of Chemistry, University of Bath, Bath, BA2 7AY, United Kingdom.  
+   index: 1  
+date: 13 April 2017  
 bibliography: paper.bib
 ---
 
