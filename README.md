@@ -48,10 +48,13 @@ Full documentation and examples are contained in a [Jupyter notebook](http://jup
 
 ## Tests
 
-Tests can be run using
+Automated testing of the latest build happens [here](https://travis-ci.org/bjmorgan/lattice_mc).
+
+Manual tests can be run using
 ```
 python3 -m unittest discover
 ```
+
 The code has been tested with Python versions 3.5 and above.
 
 ## References
