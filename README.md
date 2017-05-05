@@ -1,7 +1,8 @@
 # lattice_mc
 
 [![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
-[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912)
+[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
+ 
 [![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
 [![Test Coverage](https://codeclimate.com/github/bjmorgan/lattice_mc/badges/coverage.svg)](https://codeclimate.com/github/bjmorgan/lattice_mc/coverage)
 [![Code Climate](https://codeclimate.com/github/bjmorgan/lattice_mc/badges/gpa.svg)](https://codeclimate.com/github/bjmorgan/lattice_mc)
