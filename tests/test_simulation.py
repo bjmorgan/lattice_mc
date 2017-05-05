@@ -96,33 +96,28 @@ class SimulationTestCase( unittest.TestCase ):
         simulation.atoms = 'foo'
         simulation.number_of_jumps = 'bar'
         simulation.lattice = None
-        true_or_false, error = simulation.is_initialised()
-        self.assertEqual( true_or_false, False )
-        self.assertEqual( type( error ), AttributeError )
+        with self.assertRaises( AttributeError ):
+            simulation.is_initialised()
     
     def test_is_initialised_fails_with_no_atoms( self ):
         simulation = Simulation()
         simulation.atoms = None
         simulation.number_of_jumps = 'bar'
         simulation.lattice = 'foo'
-        true_or_false, error = simulation.is_initialised()
-        self.assertEqual( true_or_false, False )
-        self.assertEqual( type( error ), AttributeError )
+        with self.assertRaises( AttributeError ):
+            simulation.is_initialised()
         
     def test_is_initilaised_fails_with_no_number_of_jumps( self ):
         simulation = Simulation()
         simulation.atoms = 'bar'
         simulation.number_of_jumps = None
         simulation.lattice = 'foo'
-        true_or_false, error = simulation.is_initialised()
-        self.assertEqual( true_or_false, False )
-        self.assertEqual( type( error ), AttributeError )
+        with self.assertRaises( AttributeError ):
+            simulation.is_initialised()
 
     def test_run_raises_error_if_not_initialised( self ):
         simulation = Simulation()
-        dummy_exception = AttributeError( 'test' )
-        simulation.is_initialised = Mock( return_value=( False, dummy_exception ) )
-        run_is_initialised, init_error = simulation.is_initialised()
+        simulation.is_initialised = Mock( side_effect=AttributeError( 'test' ) )
         with self.assertRaises( AttributeError ) as context:
             simulation.run() 
         

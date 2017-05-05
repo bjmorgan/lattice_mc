@@ -140,16 +140,14 @@ class Simulation:
             None
 
         Returns:
-            (Bool): Has the simulation been initialised?
-            (Obj:(Exception|None)): If the simulation has not been initialised, this contains an AttributeError
+            None
         """
         if not self.lattice:
-            return False, AttributeError('Running a simulation needs the lattice to be initialised')
+            raise AttributeError('Running a simulation needs the lattice to be initialised')
         if not self.atoms:
-            return False, AttributeError('Running a simulation needs the atoms to be initialised')
-        if not ( self.number_of_jumps or self.for_time):
-            return False, AttributeError('Running a simulation needs number_of_jumps or for_time to be set')
-        return True, None
+            raise AttributeError('Running a simulation needs the atoms to be initialised')
+        if not self.number_of_jumps and not self.for_time:
+            raise AttributeError('Running a simulation needs number_of_jumps or for_time to be set')
  
     def run( self, for_time=None ):
         """
@@ -162,9 +160,10 @@ class Simulation:
             None
         """
         self.for_time = for_time
-        run_is_initialised, initialisation_error = self.is_initialised()
-        if not run_is_initialised:
-           raise initialisation_error 
+        try:
+            self.is_initialised()
+        except AttributeError:
+            raise
         if self.number_of_equilibration_jumps > 0:
             for step in range( self.number_of_equilibration_jumps ):
                 self.lattice.jump()
