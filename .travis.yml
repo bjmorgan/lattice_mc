@@ -3,6 +3,8 @@ branches:
     - master
     - develop
 language: python
+notifications:
+  email: false
 python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
