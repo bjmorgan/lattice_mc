@@ -14,6 +14,8 @@ class SimulationTestCase( unittest.TestCase ):
         self.assertEqual( simulation.lattice, None )
         self.assertEqual( simulation.number_of_atoms, None )
         self.assertEqual( simulation.number_of_equilibration_jumps, 0 )
+        self.assertEqual( simulation.number_of_jumps, None )
+        self.assertEqual( simulation.for_time, None )
         self.assertEqual( simulation.number_of_atoms, None )
         self.assertEqual( simulation.has_run, False )
 
@@ -89,32 +91,44 @@ class SimulationTestCase( unittest.TestCase ):
         simulation.set_site_energies( 'foo' )
         simulation.lattice.set_site_energies.assert_called_with( 'foo' )
 
-    def test_run_fails_with_no_lattice( self ):
+    def test_is_initialised_fails_with_no_lattice( self ):
         simulation = Simulation()
         simulation.atoms = 'foo'
         simulation.number_of_jumps = 'bar'
         simulation.lattice = None
-        with self.assertRaises( AttributeError ):
-            simulation.run()
+        true_or_false, error = simulation.is_initialised()
+        self.assertEqual( true_or_false, False )
+        self.assertEqual( type( error ), AttributeError )
     
-    def test_run_fails_with_no_atoms( self ):
+    def test_is_initialised_fails_with_no_atoms( self ):
         simulation = Simulation()
         simulation.atoms = None
         simulation.number_of_jumps = 'bar'
         simulation.lattice = 'foo'
-        with self.assertRaises( AttributeError ):
-            simulation.run()
+        true_or_false, error = simulation.is_initialised()
+        self.assertEqual( true_or_false, False )
+        self.assertEqual( type( error ), AttributeError )
         
-    def test_run_fails_with_no_number_of_jumps( self ):
+    def test_is_initilaised_fails_with_no_number_of_jumps( self ):
         simulation = Simulation()
         simulation.atoms = 'bar'
         simulation.number_of_jumps = None
         simulation.lattice = 'foo'
-        with self.assertRaises( AttributeError ):
-            simulation.run()
+        true_or_false, error = simulation.is_initialised()
+        self.assertEqual( true_or_false, False )
+        self.assertEqual( type( error ), AttributeError )
 
+    def test_run_raises_error_if_not_initialised( self ):
+        simulation = Simulation()
+        dummy_exception = AttributeError( 'test' )
+        simulation.is_initialised = Mock( return_value=( False, dummy_exception ) )
+        run_is_initialised, init_error = simulation.is_initialised()
+        with self.assertRaises( AttributeError ) as context:
+            simulation.run() 
+        
     def test_run_without_equilibration_steps( self ):
         simulation = Simulation()
+        simulation.is_initialised = Mock( return_value=( True, None ) )
         simulation.atoms = 'a'
         simulation.lattice = Mock( spec=Lattice )
         simulation.lattice.jump = Mock()
@@ -124,6 +138,7 @@ class SimulationTestCase( unittest.TestCase ):
 
     def test_run_for_time( self ):
         simulation = Simulation()
+        simulation.is_initialised = Mock( return_value=( True, None ) )
         simulation.atoms = 'a'
         simulation.lattice = Mock( spec=Lattice )
         simulation.lattice.time = 0.0
@@ -136,6 +151,7 @@ class SimulationTestCase( unittest.TestCase ):
 
     def test_run_with_equilibration_steps( self ):
         simulation = Simulation()
+        simulation.is_initialised = Mock( return_value=( True, None ) )
         simulation.atoms = 'a'
         simulation.lattice = Mock( spec=Lattice )
         simulation.lattice.jump = Mock()

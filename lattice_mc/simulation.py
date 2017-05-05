@@ -21,6 +21,7 @@ class Simulation:
         self.lattice = None
         self.number_of_atoms = None
         self.number_of_jumps = None
+        self.for_time = None
         self.number_of_equilibration_jumps = 0
         self.atoms = None
         self.has_run = False
@@ -131,6 +132,25 @@ class Simulation:
         if site_energies:
             self.lattice.set_site_energies( site_energies )
 
+    def is_initialised( self ):
+        """
+        Check whether the simulation has been initialised.
+
+        Args:
+            None
+
+        Returns:
+            (Bool): Has the simulation been initialised?
+            (Obj:(Exception|None)): If the simulation has not been initialised, this contains an AttributeError
+        """
+        if not self.lattice:
+            return False, AttributeError('Running a simulation needs the lattice to be initialised')
+        if not self.atoms:
+            return False, AttributeError('Running a simulation needs the atoms to be initialised')
+        if not ( self.number_of_jumps or self.for_time):
+            return False, AttributeError('Running a simulation needs number_of_jumps or for_time to be set')
+        return True, None
+ 
     def run( self, for_time=None ):
         """
         Run the simulation.
@@ -141,19 +161,17 @@ class Simulation:
         Returns:
             None
         """
-        if not self.lattice:
-            raise AttributeError('Running a simulation needs the lattice to be initialised')
-        if not self.atoms:
-            raise AttributeError('Running a simulation needs the atoms to be initialised')
-        if not ( self.number_of_jumps or for_time):
-            raise AttributeError('Running a simulation needs number_of_jumps or for_time to be set')
+        self.for_time = for_time
+        run_is_initialised, initialisation_error = self.is_initialised()
+        if not run_is_initialised:
+           raise initialisation_error 
         if self.number_of_equilibration_jumps > 0:
             for step in range( self.number_of_equilibration_jumps ):
                 self.lattice.jump()
             self.reset()
-        if for_time:
+        if self.for_time:
             self.number_of_jumps = 0
-            while self.lattice.time < for_time:
+            while self.lattice.time < self.for_time:
                 self.lattice.jump()
                 self.number_of_jumps += 1
         else: 
