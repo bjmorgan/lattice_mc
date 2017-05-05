@@ -11,6 +11,6 @@ python:
 # command to install dependencies
 install: pip install -r requirements.txt
 # command to run tests
-script: coverage run -m unittest discover
-after_success: coveralls -d .coverage
+script: coverage run --rcfile=.coveragerc -m unittest discover
+after_success: coveralls --config_file .coveragerc
 
