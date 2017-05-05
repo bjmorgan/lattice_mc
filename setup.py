@@ -27,7 +27,6 @@ config = {
                           'matplotlib', 
                           'pandas', 
                           'scipy', 
-                          'coveralls', 
                           'python-coveralls' ],
     'license': 'MIT',
     'packages': ['lattice_mc'],
