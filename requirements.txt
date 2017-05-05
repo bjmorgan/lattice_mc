@@ -4,3 +4,4 @@ pandas
 scipy
 coverage
 python-coveralls
+codeclimate-test-reporter
