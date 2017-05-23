@@ -2,7 +2,6 @@
 
 [![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
 [![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
- 
 [![PyPI version](https://badge.fury.io/py/lattice-mc.svg)](https://badge.fury.io/py/lattice-mc)
 [![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
 
