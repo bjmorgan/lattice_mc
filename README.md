@@ -4,7 +4,6 @@
 [![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
  
 [![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
-[![Test Coverage](https://codeclimate.com/github/bjmorgan/lattice_mc/badges/coverage.svg)](https://codeclimate.com/github/bjmorgan/lattice_mc/coverage)
 
 `lattice_mc` is Python module for performing (kinetic) lattice-gas Monte Carlo (LGMC) simulations of ionic transport in solid electrolytes.
 
@@ -16,7 +15,11 @@ The code allows the programmatic construction of simple lattices (presently impl
 
 ## Installation
 
-Download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases)
+```
+pip install lattice_mc
+```
+
+Or download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases)
 ```
 https://github.com/bjmorgan/lattice_mc/archive/1.0.0.tar.gz
 ```
@@ -36,7 +39,7 @@ cd lattice_mc
 python setup.py install
 ```
 
-Alternatively, you can install using `pip`, e.g.
+Alternatively, you can install the latest build using `pip`, direct from GitHub, e.g.
 ```
 pip3 install git+https://github.com/bjmorgan/lattice_mc.git
 ```
