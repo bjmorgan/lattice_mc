@@ -11,7 +11,8 @@ try:
 except ImportError:
     long_description = open('README.md').read()
 
-VERSION = '1.0.2'
+from lattice_mc import __version__
+VERSION = __version__
 
 config = {
     'description': 'A lattice-gas Monte-Carlo simulation tool',
