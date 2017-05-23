@@ -27,7 +27,7 @@ config = {
                           'matplotlib', 
                           'pandas', 
                           'scipy', 
-                          'coverage',
+                          'coverage==4.3.4',
                           'codeclimate-test-reporter' ],
     'license': 'MIT',
     'packages': ['lattice_mc'],

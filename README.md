@@ -5,7 +5,6 @@
  
 [![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
 [![Test Coverage](https://codeclimate.com/github/bjmorgan/lattice_mc/badges/coverage.svg)](https://codeclimate.com/github/bjmorgan/lattice_mc/coverage)
-[![Code Climate](https://codeclimate.com/github/bjmorgan/lattice_mc/badges/gpa.svg)](https://codeclimate.com/github/bjmorgan/lattice_mc)
 
 `lattice_mc` is Python module for performing (kinetic) lattice-gas Monte Carlo (LGMC) simulations of ionic transport in solid electrolytes.
 
