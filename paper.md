@@ -11,9 +11,9 @@ authors:
    affiliation: 1  
 affiliations:  
  - name: Department of Chemistry, University of Bath, Bath, BA2 7AY, United Kingdom.  
- index: 1  
-bibliography: paper.bib
+   index: 1  
 date: 13 April 2017  
+bibliography: paper.bib
 ---
 
 # Summary
@@ -24,7 +24,7 @@ In solid electrolytes, ionic motion is typically effected by a series of discret
 
 `lattice_mc` has been written to allow materials scientists and solid-state chemists model how the microscopic physics of solid electrolytes (crystal structure, stoichiometry, interaction models) determine macroscopic transport behaviour (diffusion and ionic conduction), with the goal of understand the factors that make different materials more or less useful for specific applications (e.g. Li-ion batteries or fuel cells).
 
-The code allows the programmatic construction of simple lattices (presently implemented are square, honeycomb, and cubic lattices). Lattices with arbitrary geometries can be constructed from a file format that defines the lattice sites and their connectivity, allowing models based on crystallographic data. The algorithms used and interaction models are described in more detail in [@Morgan_LLZO]. Calculated properties include tracer and &ldquo;jump&rdquo; diffusion coefficients; where the latter is proportional to the mobility (and hence the conductivity for charged particles) [@VanDerVenEtAl_AccChemRes2013]; and tracer (single particle) and collective correlation factors, *f* and *f*<sub>I</sub> [@Murch_SolStatIonics1982] The simplest interaction model is for &ldquo;non-interacting&rdquo; particles, where the only restriction is volume exclusion (two particles cannot simultaneously occupy a single site) [@Kutner_PhysLett1981]. Additional interaction models include nearest-neighbour repulsion and on-site energies for inequivalent sites. Simulations are performed using an efficient rejection-free Monte Carlo scheme [@Voter_kMCmethod].
+The code allows the programmatic construction of simple lattices (presently implemented are square, honeycomb, and cubic lattices). Lattices with arbitrary geometries can be constructed from a file format that defines the lattice sites and their connectivity, allowing models based on crystallographic data. Calculated properties include tracer and &ldquo;jump&rdquo; diffusion coefficients; where the latter is proportional to the mobility (and hence the conductivity for charged particles) [@VanDerVenEtAl_AccChemRes2013]; and tracer (single particle) and collective correlation factors, $f$ and $f_I$ [@Murch_SolStatIonics1982] The simplest interaction model is for &ldquo;non-interacting&rdquo; particles, where the only restriction is volume exclusion (two particles cannot simultaneously occupy a single site) [@Kutner_PhysLett1981]. Additional interaction models include nearest-neighbour repulsion and on-site energies for inequivalent sites. Simulations are performed using an efficient rejection-free Monte Carlo scheme [@Voter_kMCmethod].
 
 # Acknowledgements
 
