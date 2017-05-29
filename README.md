@@ -1,9 +1,9 @@
-# lattice_mc
+# lattice_mc: A Python Lattice-Gas Monte Carlo Module
 
-[![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
-[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
 [![PyPI version](https://badge.fury.io/py/lattice-mc.svg)](https://badge.fury.io/py/lattice-mc)
 [![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
+[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
+[![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
 
 
 `lattice_mc` is Python module for performing (kinetic) lattice-gas Monte Carlo (LGMC) simulations of ionic transport in solid electrolytes.
@@ -63,11 +63,11 @@ The code has been tested with Python versions 3.5 and above.
 ## References
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)
 1. <a name="HowardAndLidiard1964" />[R. E. Howard and A. B. Lidiard, *Rep. Prog. Phys.* **27**, 161 (1964).](https://doi.org/10.1088/0034-4885/27/1/305)
-1. <a name="Stoneham_IonicSolids1989" />[J. H. Harding, Defects and Transport in Ionic Solids, in *Ionic Solids at High Temperatures* ed. A. M. Stoneham, World Scientific (1989)](https://doi.org/10.1142/9789814503228_0003)
+1. <a name="Stoneham_IonicSolids1989" />[J. H. Harding, Defects and Transport in Ionic Solids, in *Ionic Solids at High Temperatures* ed. A. M. Stoneham, World Scientific (1989).](https://doi.org/10.1142/9789814503228_0003)
 1. <a name="Morgan_LLZO" />[B. J. Morgan, In Preparation.]()
-1. <a name="VanDerVenEtAl_AccChemRes2013" />[A. Van der Ven *et al.* *Acc. Chem. Res.* **46**, 1216 (2013)](https://dx.doi.org/10.1021/ar200329r)
-1. <a name="Murch_SolStatIonics1982" />[G. E. Murch *Sol. Stat. Ionics* **7**, 177 (1982)](https://dx.doi.org/10.1016/0167-2738%2882%2990050-9)
-1. <a name="Kutner_PhysLett1981" />[R. Kutner *Phys. Lett.* **81A**, 239 (1981)](https://dx.doi.org/10.1016/0375-9601%2881%2990251-6)
-1. <a name="Voter_kMCmethod" />[A. F. Voter, Introduction to the Kinetic Monte Carlo Method, in *Radiation Effects in Solids*, ed. K. E. Sicafus *et al.*, Springer( 2007)](https://doi.org/10.1007/978-1-4020-5295-8_1)
-1. <a name="MorganAndMadden_JPhysCondensMatter2012" />[Morgan and Madden, *J. Phys. Condens. Matter* **24**, 275303 (2012)](http://www.iopscience.iop.org/article/10.1088/0953-8984/24/27/275303/)
-1. <a name="MurchAndThorn_PhilMag1977" />[G. E. Murch & R. J. Thorn, *Phil. Mag.* **36** 529 (1977)](http://dx.doi.org/10.1080/14786437708239737)
+1. <a name="VanDerVenEtAl_AccChemRes2013" />[A. Van der Ven *et al.* *Acc. Chem. Res.* **46**, 1216 (2013).](https://dx.doi.org/10.1021/ar200329r)
+1. <a name="Murch_SolStatIonics1982" />[G. E. Murch *Sol. Stat. Ionics* **7**, 177 (1982).](https://dx.doi.org/10.1016/0167-2738%2882%2990050-9)
+1. <a name="Kutner_PhysLett1981" />[R. Kutner *Phys. Lett.* **81A**, 239 (1981).](https://dx.doi.org/10.1016/0375-9601%2881%2990251-6)
+1. <a name="Voter_kMCmethod" />[A. F. Voter, Introduction to the Kinetic Monte Carlo Method, in *Radiation Effects in Solids*, ed. K. E. Sicafus *et al.*, Springer (2007).](https://doi.org/10.1007/978-1-4020-5295-8_1)
+1. <a name="MorganAndMadden_JPhysCondensMatter2012" />[Morgan and Madden, *J. Phys. Condens. Matter* **24**, 275303 (2012).](http://www.iopscience.iop.org/article/10.1088/0953-8984/24/27/275303/)
+1. <a name="MurchAndThorn_PhilMag1977" />[G. E. Murch & R. J. Thorn, *Phil. Mag.* **36** 529 (1977).](http://dx.doi.org/10.1080/14786437708239737)
