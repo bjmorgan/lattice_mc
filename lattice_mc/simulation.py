@@ -191,7 +191,7 @@ class Simulation:
 
         Notes:
             This function assumes that the jump distance between sites has
-            been normalised to a=1. If the jumps distance is not equal to 1
+            been normalised to a=1. If the jump distance is not equal to 1
             then the value returned by this function should be divided by a^2.
             Even better, use `self.tracer_correlation`.
         """
