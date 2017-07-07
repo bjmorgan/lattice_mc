@@ -45,13 +45,13 @@ class Atom:
 
     def dr_squared( self ):
         """
-        |dr|^2, where dr is the total displacement vector for this Atom.
+        $|dr|^2$, where $dr$ is the total displacement vector for this `Atom`.
 
         Args:
             None
 
         Returns:
-            dr_squared (float): |dr|^2
+            dr_squared (float): $|dr|^2$.
         """
         return np.dot( self.dr, self.dr )
 

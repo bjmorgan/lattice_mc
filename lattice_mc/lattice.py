@@ -145,7 +145,8 @@ class Lattice:
         
     def potential_jumps( self ):
         """
-        All nearest-neighbour jumps not blocked by volume exclusion (i.e. from occupied to neighbouring unoccupied sites).
+        All nearest-neighbour jumps not blocked by volume exclusion 
+        (i.e. from occupied to neighbouring unoccupied sites).
 
         Args:
             None
@@ -250,7 +251,9 @@ class Lattice:
             None
 
         Returns:
-            (Dict(Str:Float)): Dictionary of occupation statistics, e.g. { 'A' : 2.5, 'B' : 25.3 } 
+            (Dict(Str:Float)): Dictionary of occupation statistics, e.g.::
+
+                { 'A' : 2.5, 'B' : 25.3 } 
         """
         if self.time == 0.0:
             return None
@@ -266,7 +269,9 @@ class Lattice:
         Set the energies for every site in the lattice according to the site labels.
 
         Args:
-            energies (Dict(Str:Float): Dictionary of energies for each site label, e.g. { 'A' : 1.0, 'B', 0.0 }
+            energies (Dict(Str:Float): Dictionary of energies for each site label, e.g.::
+
+                { 'A' : 1.0, 'B', 0.0 }
 
         Returns:
             None
@@ -294,8 +299,9 @@ class Lattice:
         Set the coordination number dependent energies for this lattice.
 
         Args:
-            cn_energies (Dict(Str:Dict(Int:Float))): Dictionary of dictionaries specifying the coordination number dependent energies for each site type.
-                e.g. { 'A' : { 0 : 0.0, 1 : 1.0, 2 : 2.0 }, 'B' : { 0 : 0.0, 1 : 2.0 } }
+            cn_energies (Dict(Str:Dict(Int:Float))): Dictionary of dictionaries specifying the coordination number dependent energies for each site type. e.g.::
+
+                { 'A' : { 0 : 0.0, 1 : 1.0, 2 : 2.0 }, 'B' : { 0 : 0.0, 1 : 2.0 } }
 
         Returns:
             None
@@ -306,8 +312,9 @@ class Lattice:
 
     def site_coordination_numbers( self ):
         """
-        Returns a dictionary of the coordination numbers for each site label.
-        e.g. { 'A' : { 4 }, 'B' : { 2, 4 } }
+        Returns a dictionary of the coordination numbers for each site label. e.g.::
+        
+            { 'A' : { 4 }, 'B' : { 2, 4 } }
  
         Args:
             none
@@ -324,7 +331,9 @@ class Lattice:
     def max_site_coordination_numbers( self ):
         """
         Returns a dictionary of the maximum coordination number for each site label.
-        e.g. { 'A' : 4, 'B' : 4 }
+        e.g.::
+   
+            { 'A' : 4, 'B' : 4 }
 
         Args:
             none
@@ -343,8 +352,9 @@ class Lattice:
             None
 
         Returns:
-            (Dict(Str:List(Int))) : Dictionary of coordination numbers for each site type,
-                e.g. { 'A' : [ 2, 4 ], 'B' : [ 2 ] }
+            (Dict(Str:List(Int))) : Dictionary of coordination numbers for each site type, e.g.::
+
+                { 'A' : [ 2, 4 ], 'B' : [ 2 ] }
         """
         specific_coordination_numbers = {}
         for site in self.sites:
@@ -354,15 +364,15 @@ class Lattice:
     def connected_site_pairs( self ):
         """
         Returns a dictionary of all connections between pair of sites (by site label).
-        e.g. for a linear lattice A-B-C will return:
+        e.g. for a linear lattice A-B-C will return::
+        
             { 'A' : [ 'B' ], 'B' : [ 'A', 'C' ], 'C' : [ 'B' ] }
 
         Args:
-            none
+            None
 
         Returns:
-            site_connections (Dict(Str:List(Str))): dictionary of neighbouring site
-                                                    types in the lattice.
+            site_connections (Dict{Str List[Str]}): A dictionary of neighbouring site types in the lattice.
         """
         site_connections = {}
         for initial_site in self.sites:
@@ -397,7 +407,17 @@ class Lattice:
 
         Args:
             site_labels (:obj:(List(Str)|Set(Str)|Str), optional): Labels for sites to be considered in the search.
-                This can be a list [ 'A', 'B' ], a set ( 'A', 'B' ), or a string 'A'.
+                This can be a list::
+
+                    [ 'A', 'B' ]
+
+                a set::
+
+                    ( 'A', 'B' )
+
+                or a string::
+
+                    'A'.
 
         Returns:
             (List(Cluster)): List of Cluster objects for groups of contiguous sites.

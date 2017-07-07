@@ -133,7 +133,7 @@ def cubic_lattice( a, b, c, spacing ):
 
 def lattice_from_sites_file( site_file, cell_lengths ):
     """
-    Generate a lattice from a sites file..
+    Generate a lattice from a sites file.
 
     Args:
         site_file (Str): Filename for the file containing the site information.
@@ -143,18 +143,18 @@ def lattice_from_sites_file( site_file, cell_lengths ):
         (Lattice): The new lattice
 
     Notes:
-        The site information file format is
-            <number_of_sites> (integer)
-        Followed by blocks of data separated by double linebreaks; one block per site.
-            site: <site number> (integer)
-            centre: <x> <y> <z> (floats)
-            neighbours: <list of site numbers of neighbouring sites> (integers)
-            label: <site group labal> (string)
-            energy: <site occupation energy> (float)
-        The energy is optional, and will be set to 0.0 if not included.
-        Line order within each block is not meaningful.
-        British and American English spellings for centre|center and neighbour|neighbor are accepted.
-        An example file can be found in the examples directory. 
+        | The site information file format is:
+        |     <number_of_sites> (Int).
+        | Followed by blocks of data separated by double linebreaks; one block per site.
+        |     site: <site number> (Int).
+        |     centre: <x> <y> <z> (Float,Float,Float).
+        |     neighbours: <list of site numbers of neighbouring sites> (List[Int]).
+        |     label: <site group labal> (Str).
+        |     energy: <site occupation energy> (Float).
+        | The energy is optional, and will be set to 0.0 if not included.
+        | Line order within each block is not meaningful.
+        | British and American English spellings for centre|center and neighbour|neighbor are accepted.
+        | An example file can be found in the examples directory. 
     """
     sites = []
     site_re = re.compile( 'site:\s+([-+]?\d+)' )
