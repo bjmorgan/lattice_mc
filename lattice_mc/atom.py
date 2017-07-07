@@ -30,7 +30,7 @@ class Atom:
 
     def reset( self ):
         """
-        Reinitialise the stored displacements, number of hops, and list of sites visited for this Atom.
+        Reinitialise the stored displacements, number of hops, and list of sites visited for this `Atom`.
 
         Args:
             None
@@ -45,13 +45,13 @@ class Atom:
 
     def dr_squared( self ):
         """
-        $|dr|^2$, where $dr$ is the total displacement vector for this `Atom`.
+        :math:`|dr|^2`, where :math:`dr` is the total displacement vector for this `Atom`.
 
         Args:
             None
 
         Returns:
-            dr_squared (float): $|dr|^2$.
+            dr_squared (float): :math:`|dr|^2`.
         """
         return np.dot( self.dr, self.dr )
 
