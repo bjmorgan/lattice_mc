@@ -57,6 +57,9 @@ class Atom:
 
     @property
     def site( self ):
+        """
+        Get or set `self.site` for this `Atom`.
+        """
         return self._site
 
     @site.setter
