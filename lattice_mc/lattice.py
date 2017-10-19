@@ -23,6 +23,7 @@ class Lattice:
             None
         """
         self.cell_lengths = cell_lengths
+        self.half_cell_lengths = cell_lengths / 2.0
         self.sites = sites
         self.number_of_sites = len( self.sites )
         self.site_labels = set( [ site.label for site in self.sites ] )
@@ -477,3 +478,22 @@ class Lattice:
         clusters = self.connected_sites( site_labels=site_labels )
         island_clusters = [ c for c in clusters if not any( c.is_periodically_contiguous() ) ]
         return list( itertools.chain.from_iterable( ( c.sites for c in island_clusters ) ) )
+
+    def minimum_image_dr( self, r1, r2 ):
+        """
+        The minimum image displacement from point 1 to point 2 in this lattice.
+
+        Args:
+            r1 (np.array(x,y,z)): coordinates of point 1.
+            r2 (np.array(x,y,z)): coordinates of point 2.
+
+        Returns
+            (np.array(x,y,z)): dr
+        """
+        this_dr = r2 - r1
+        for i in range( 3 ):
+            if this_dr[ i ] > self.half_cell_lengths[ i ]:
+                this_dr[ i ] -= self.cell_lengths[ i ]
+            if this_dr[ i ] < -self.half_cell_lengths[ i ]:
+                this_dr[ i ] += self.cell_lengths[ i ]
+        return this_dr

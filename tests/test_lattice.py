@@ -25,6 +25,7 @@ class LatticeTestCase( unittest.TestCase ):
 
     def test_lattice_is_initialised( self ):
         np.testing.assert_array_equal( self.lattice.cell_lengths, self.cell_lengths )
+        np.testing.assert_array_equal( self.lattice.half_cell_lengths, self.cell_lengths / 2.0 )
         self.assertEqual( self.lattice.sites, self.mock_sites )
         self.assertEqual( self.lattice.number_of_sites, 5 )
         self.assertEqual( self.lattice.site_labels, { 'A', 'B', 'C' } )
@@ -383,6 +384,26 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.connected_sites = Mock( return_value=clusters )
         self.lattice.sites = sites
         self.assertEqual( self.lattice.detached_sites(), [ sites[1] ] )
+
+    @patch( 'lattice_mc.lattice.Lattice.site_with_id' )
+    @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
+    @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
+    def test_minimum_image_dr( self, pbc, islt, site_id ):
+        mock_sites = [ Mock( spec=Site, label='A', neighbours=[], r=np.array( [ 3.0, 3.0, 3.0 ] ) ),
+                       Mock( spec=Site, label='B', neighbours=[], r=np.array( [ 4.0, 5.0, 6.0 ] ) ) ]
+        cell_lengths = np.array( [ 10.0, 10.0, 10.0 ] )
+        lattice = Lattice( sites=mock_sites, cell_lengths=cell_lengths )
+        np.testing.assert_array_equal( lattice.minimum_image_dr( lattice.sites[0].r, lattice.sites[1].r ), np.array( [ 1.0, 2.0, 3.0 ] ) )
+
+    @patch( 'lattice_mc.lattice.Lattice.site_with_id' )
+    @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
+    @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
+    def test_minimum_image_dr_with_image_in_next_cell( self, pbc, islt, site_id ):
+        mock_sites = [ Mock( spec=Site, label='A', neighbours=[], r=np.array( [ 3.0, 3.0, 3.0 ] ) ),
+                       Mock( spec=Site, label='B', neighbours=[], r=np.array( [ 9.0, 9.0, 8.1 ] ) ) ]
+        cell_lengths = np.array( [ 10.0, 10.0, 10.0 ] )
+        lattice = Lattice( sites=mock_sites, cell_lengths=cell_lengths )
+        np.testing.assert_array_equal( lattice.minimum_image_dr( lattice.sites[0].r, lattice.sites[1].r ), np.array( [ -4.0, -4.0, -4.9 ] ) )
 
 if __name__ == '__main__':
     unittest.main()
