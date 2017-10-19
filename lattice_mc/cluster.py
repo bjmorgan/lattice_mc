@@ -64,7 +64,7 @@ class Cluster:
             None
 
         Returns:
-             (List(List)): In the order [ +x, -x, +y, -y, +z, -z ]
+             (List(List)): In the order [ -x, +x, -y, +y, -z, +z ]
         """
         min_x = min( [ s.r[0] for s in self.sites ] )
         max_x = max( [ s.r[0] for s in self.sites ] )
@@ -72,13 +72,13 @@ class Cluster:
         max_y = max( [ s.r[1] for s in self.sites ] )
         min_z = min( [ s.r[2] for s in self.sites ] )
         max_z = max( [ s.r[2] for s in self.sites ] )
-        x_max = [ s for s in self.sites if s.r[0] == min_x ]
-        x_min = [ s for s in self.sites if s.r[0] == max_x ]
-        y_max = [ s for s in self.sites if s.r[1] == min_y ]
-        y_min = [ s for s in self.sites if s.r[1] == max_y ]
-        z_max = [ s for s in self.sites if s.r[2] == min_z ]
-        z_min = [ s for s in self.sites if s.r[2] == max_z ]
-        return ( x_max, x_min, y_max, y_min, z_max, z_min )
+        x_min = [ s for s in self.sites if s.r[0] == min_x ]
+        x_max = [ s for s in self.sites if s.r[0] == max_x ]
+        y_min = [ s for s in self.sites if s.r[1] == min_y ]
+        y_max = [ s for s in self.sites if s.r[1] == max_y ]
+        z_min = [ s for s in self.sites if s.r[2] == min_z ]
+        z_max = [ s for s in self.sites if s.r[2] == max_z ]
+        return ( x_min, x_max, y_min, y_max, z_min, z_max )
    
     def is_periodically_contiguous( self ):
         """
