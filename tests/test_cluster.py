@@ -102,6 +102,15 @@ class ClusterTestCase( unittest.TestCase ):
         cluster = Cluster( sites )
         self.assertEqual( cluster.is_periodically_contiguous()[0], True )
 
+    def test_cluster_is_not_periodically_contiguous_with_two_sites( self ):
+        sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
+        sites[0].r = np.array( [ 3.0, 0.0, 0.0 ] )
+        sites[1].r = np.array( [ 4.0, 0.0, 0.0 ] )
+        sites[0].p_neighbours = [ sites[1] ]
+        sites[1].p_neighbours = [ sites[0] ]
+        cluster = Cluster( sites )
+        self.assertEqual( cluster.is_periodically_contiguous()[0], False )
+ 
     def test_cluster_is_not_periodically_contiguous( self ):
         sites = [ Mock( spec=Site ), Mock( spec=Site ), Mock( spec=Site ) ]
         sites[0].r = np.array( [ 0.0, 0.0, 0.0 ] )
