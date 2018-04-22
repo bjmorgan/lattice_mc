@@ -48,7 +48,7 @@ pip3 install git+https://github.com/bjmorgan/lattice_mc.git
 
 ## Documentation
 
-Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb).
+Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb).
 
 ## Tests
 
