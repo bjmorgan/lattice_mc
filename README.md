@@ -65,7 +65,7 @@ The code has been tested with Python versions 3.5 and above.
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)
 1. <a name="HowardAndLidiard1964" />[R. E. Howard and A. B. Lidiard, *Rep. Prog. Phys.* **27**, 161 (1964).](https://doi.org/10.1088/0034-4885/27/1/305)
 1. <a name="Stoneham_IonicSolids1989" />[J. H. Harding, Defects and Transport in Ionic Solids, in *Ionic Solids at High Temperatures* ed. A. M. Stoneham, World Scientific (1989).](https://doi.org/10.1142/9789814503228_0003)
-1. <a name="Morgan_LLZO" />[B. J. Morgan, *arXiv*: 1707.00491](https://arxiv.org/abs/1707.00491)
+1. <a name="Morgan_LLZO" />[B. J. Morgan, *R. Soc. Open Sci.* **4**, 170824 (2017).](http://dx.doi.org/10.1098/rsos.170824)
 1. <a name="VanDerVenEtAl_AccChemRes2013" />[A. Van der Ven *et al.* *Acc. Chem. Res.* **46**, 1216 (2013).](https://dx.doi.org/10.1021/ar200329r)
 1. <a name="Murch_SolStatIonics1982" />[G. E. Murch *Sol. Stat. Ionics* **7**, 177 (1982).](https://dx.doi.org/10.1016/0167-2738%2882%2990050-9)
 1. <a name="Kutner_PhysLett1981" />[R. Kutner *Phys. Lett.* **81A**, 239 (1981).](https://dx.doi.org/10.1016/0375-9601%2881%2990251-6)

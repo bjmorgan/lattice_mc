@@ -7,3 +7,4 @@ build
 dist
 lattice_mc.egg-info
 examples/.ipynb_checkpoints/
+**/.DS_Store
