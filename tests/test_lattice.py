@@ -5,6 +5,7 @@ from lattice_mc.atom import Atom
 from lattice_mc.jump import Jump
 from lattice_mc.transitions import Transitions
 from lattice_mc.cluster import Cluster
+from lattice_mc.error import BlockedLatticeError
 from unittest.mock import Mock, MagicMock, patch, call
 import numpy as np
 
@@ -15,11 +16,11 @@ class LatticeTestCase( unittest.TestCase ):
     @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
     @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
     def setUp( self, pbc, islt, site_id ):
-        site_id.side_effect = ( 1,2,3,4,5,6,7,8 )
+        site_id.side_effect = (1,2,3,4,5,6,7,8)
         self.site_id = site_id
         site_labels = [ 'A', 'B', 'A', 'B', 'C' ]
         site_neighbours = [ [ 2, 3 ], [ 1, 3 ], [ 1, 2 ], [ 5 ], [ 4 ] ]
-        self.mock_sites = [ Mock( spec=Site, label = l, neighbours = n ) for l, n in zip( site_labels, site_neighbours ) ]
+        self.mock_sites = [ Mock( spec=Site, label=l, neighbours=n ) for l, n in zip( site_labels, site_neighbours ) ]
         self.cell_lengths = np.array( [ 7.0, 8.0, 9.0 ] )
         self.lattice = Lattice( self.mock_sites, self.cell_lengths )
 
@@ -207,6 +208,12 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.update_site_occupation_times.assert_called_with( 5.0 )
         self.assertEqual( self.lattice.time, 2.0 + 5.0 )
 
+    def test_jump_raises_BlockedLatticeErrror_if_no_possible_jumps( self ):
+        potential_jumps = []
+        self.lattice.potential_jumps = Mock( return_value=potential_jumps )
+        with self.assertRaises( BlockedLatticeError ):
+            self.lattice.jump()
+
     def test_update_site_occupation_times( self ):
         occupied_sites = [ Mock( spec=Site ), Mock( spec=Site ) ]
         occupied_sites[0].time_occupied = 2.0
@@ -383,6 +390,40 @@ class LatticeTestCase( unittest.TestCase ):
         self.lattice.connected_sites = Mock( return_value=clusters )
         self.lattice.sites = sites
         self.assertEqual( self.lattice.detached_sites(), [ sites[1] ] )
+
+    @patch( 'lattice_mc.lattice.Lattice.site_with_id' )
+    @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
+    @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
+    @patch( 'lattice_mc.lattice.Lattice.potential_jumps' )
+    def test_is_blocked_returns_true( self, p_jumps, pbc, islt, site_id ):
+        p_jumps.return_value = []
+        site_id.side_effect = ( 1, 2 )
+        site_labels = [ 'A', 'A' ]
+        site_neighbours = [ [ ], [ ] ]
+        mock_sites = [ Mock( spec=Site, label=l, neighbours=n ) for l, n in zip( site_labels, site_neighbours ) ]
+        cell_lengths = np.array( [ 7.0, 8.0, 9.0 ] )
+        lattice = Lattice( mock_sites, cell_lengths )
+        lattice.sites[0].is_occupied = True
+        lattice.sites[1].is_occupied = True
+        lattice.number_of_occupied_sites = 1
+        self.assertEqual( lattice.is_blocked(), True )
+    
+    @patch( 'lattice_mc.lattice.Lattice.site_with_id' )
+    @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
+    @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
+    @patch( 'lattice_mc.lattice.Lattice.potential_jumps' )
+    def test_is_blocked_returns_true( self, p_jumps, pbc, islt, site_id ):
+        p_jumps.return_value = [ Mock( spec=Jump ) ]
+        site_id.side_effect = ( 1, 2 )
+        site_labels = [ 'A', 'A' ]
+        site_neighbours = [ [ 2 ], [ 1 ] ]
+        mock_sites = [ Mock( spec=Site, label=l, neighbours=n ) for l, n in zip( site_labels, site_neighbours ) ]
+        cell_lengths = np.array( [ 7.0, 8.0, 9.0 ] )
+        lattice = Lattice( mock_sites, cell_lengths )
+        lattice.sites[0].is_occupied = True
+        lattice.sites[1].is_occupied = True
+        lattice.number_of_occupied_sites = 1
+        self.assertEqual( lattice.is_blocked(), False ) 
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,6 +4,7 @@ import itertools
 import sys
 
 from lattice_mc import atom, jump, transitions, cluster
+from lattice_mc.error import BlockedLatticeError
 from collections import Counter
 
 class Lattice:
@@ -222,6 +223,9 @@ class Lattice:
         Returns:
             None
         """
+        potential_jumps = self.potential_jumps()
+        if not potential_jumps:
+            raise BlockedLatticeError('No moves are possible in this lattice')
         all_transitions = transitions.Transitions( self.potential_jumps() )
         random_jump = all_transitions.random()
         delta_t = all_transitions.time_to_jump()
@@ -477,3 +481,18 @@ class Lattice:
         clusters = self.connected_sites( site_labels=site_labels )
         island_clusters = [ c for c in clusters if not any( c.is_periodically_contiguous() ) ]
         return list( itertools.chain.from_iterable( ( c.sites for c in island_clusters ) ) )
+
+    def is_blocked( self ):
+        """
+        Check whether there are any possible jumps.
+
+        Args:
+            None
+
+        Returns:
+            (Bool): True if there are no possible jumps. Otherwise returns False.
+        """
+        if not self.potential_jumps():
+            return True
+        else:
+            return False
