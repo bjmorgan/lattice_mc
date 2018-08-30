@@ -412,7 +412,7 @@ class LatticeTestCase( unittest.TestCase ):
     @patch( 'lattice_mc.lattice.Lattice.initialise_site_lookup_table' )
     @patch( 'lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions' )
     @patch( 'lattice_mc.lattice.Lattice.potential_jumps' )
-    def test_is_blocked_returns_true( self, p_jumps, pbc, islt, site_id ):
+    def test_is_blocked_returns_false( self, p_jumps, pbc, islt, site_id ):
         p_jumps.return_value = [ Mock( spec=Jump ) ]
         site_id.side_effect = ( 1, 2 )
         site_labels = [ 'A', 'A' ]
