@@ -5,6 +5,7 @@
 [![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
 [![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
 [![Documentation Status](https://readthedocs.org/projects/lattice-mc/badge/?version=latest)](http://lattice-mc.readthedocs.io/en/latest/?badge=latest)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/826179cbf740e162a9e4/test_coverage)](https://codeclimate.com/github/bjmorgan/lattice_mc/test_coverage)
 
 
 `lattice_mc` is Python module for performing (kinetic) lattice-gas Monte Carlo (LGMC) simulations of ionic transport in solid electrolytes.
