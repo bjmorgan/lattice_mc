@@ -5,11 +5,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except ImportError:
-    long_description = open('README.md').read()
+long_description = open('README.md').read()
 
 from lattice_mc import __version__
 VERSION = __version__
@@ -17,6 +13,7 @@ VERSION = __version__
 config = {
     'description': 'A lattice-gas Monte-Carlo simulation tool',
     'long_description': long_description,
+    'long_description_content_type': 'text/markdown',
     'author': 'Benjamin J. Morgan',
     'author_email': 'b.j.morgan@bath.ac.uk',
     'url': 'https://github.com/bjmorgan/lattice_mc',
