@@ -6,6 +6,9 @@ import sys
 from lattice_mc import atom, jump, transitions, cluster
 from lattice_mc.error import BlockedLatticeError
 from collections import Counter
+from pymatgen import Structure as PMGStructure
+from pymatgen import Lattice as PMGLattice
+from pymatgen import Site as PMGSite
 
 class Lattice:
     """
@@ -496,3 +499,22 @@ class Lattice:
             return True
         else:
             return False
+
+    def to_structure(self):
+        """
+        Return a pymatgen Structure for this Lattice.
+
+        Args:
+            None
+
+        Returns:
+            (pymatgen.Structure)
+        """
+        lattice = PMGLattice.orthorhombic( *self.cell_lengths )
+        species = []
+        coords = []
+        for s in self.sites:
+            species.append( s.label )
+            coords.append( s.r )
+        structure = PMGStructure( lattice, species, coords, coords_are_cartesian=True )
+        return structure 
