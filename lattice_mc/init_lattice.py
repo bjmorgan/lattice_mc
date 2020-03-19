@@ -158,7 +158,7 @@ def lattice_from_sites_file( site_file, cell_lengths ):
     """
     sites = []
     site_re = re.compile( 'site:\s+([-+]?\d+)' )
-    r_re = re.compile( 'cent(?:er|re):\s+([-\d\.e]+)\s+([-\d\.e]+)\s+([-\d\.e]+)' )
+    r_re = re.compile( 'cent(?:er|re):\s+([-+\d\.e]+)\s+([-+\d\.e]+)\s+([-+\d\.e]+)' )
     r_neighbours = re.compile( 'neighbou{0,1}rs:((\s+[-+]?\d+)+)' )
     r_label = re.compile( 'label:\s+(\S+)' )
     r_energy = re.compile( 'energy:\s([-+\d\.]+)' )
