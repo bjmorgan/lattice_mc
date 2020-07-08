@@ -273,13 +273,15 @@ class Simulation:
     @property
     def collective_diffusion_coefficient( self ):
         """
-        Returns the collective or "jump" diffusion coefficient, D_J.
+        Returns the collective or "jump" diffusion coefficient multiplied by the number of atoms,
+        ( D_J * number_of_atoms).
 
         Args:
             None
 
         Returns:
-            (Float): The collective diffusion coefficient, D_J.
+            (Float): the collective or "jump" diffusion coefficient multiplied by the number of
+            atoms, ( D_J * number_of_atoms).
         """
         if self.has_run:
             return self.atoms.collective_dr_squared() / ( 6.0 * self.lattice.time )
@@ -289,16 +291,34 @@ class Simulation:
     @property
     def collective_diffusion_coefficient_per_atom( self ):
         """
-        The collective diffusion coefficient per atom. D_J / n_atoms.
+        Returns the collective or "jump" diffusion coefficient, D_J.
 
         Args:
             None
 
         Returns:
-            (Float): The collective diffusion coefficient per atom, D_J / n_atoms.
+            (Float): The collective diffusion coefficient, D_J.
         """
         if self.has_run:
             return self.collective_diffusion_coefficient / float( self.number_of_atoms )
+        else:
+            return None
+        
+    @property
+    def reduced_ionic_conductivity( self ):
+        """
+        Returns the reduced ionic conductivity, \u03C3\' ( D_J * ( number_of_atoms / 
+        number_of_sites ) ).
+
+        Args:
+            None
+
+        Returns:
+            (Float): The reduced ionic conductivity, \u03C3\' ( D_J * ( number_of_atoms / 
+        number_of_sites )).
+        """
+        if self.has_run:
+            return self.atoms.collective_diffusion_coefficient_per_atom * float( self.number_of_atoms / self.number_of_sites )
         else:
             return None
 
