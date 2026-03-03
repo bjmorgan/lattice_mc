@@ -2,11 +2,32 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check lattice_mc/ tests/
+
+      - name: Type check
+        run: mypy lattice_mc/
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -21,18 +42,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          allow-prereleases: true
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Lint
-        run: ruff check lattice_mc/ tests/
-
-      - name: Type check
-        run: mypy lattice_mc/
-
       - name: Run tests
-        run: pytest --cov=lattice_mc --cov-report=term-missing
+        run: pytest --cov=lattice_mc --cov-report=term-missing --cov-fail-under=95
