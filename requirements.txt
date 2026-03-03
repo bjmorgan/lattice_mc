@@ -1,6 +1,0 @@
-numpy
-matplotlib
-pandas
-scipy
-coverage==4.3.4
-codeclimate-test-reporter

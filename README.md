@@ -1,11 +1,9 @@
 # lattice_mc: A Python Lattice-Gas Monte Carlo Module
 
 [![PyPI version](https://badge.fury.io/py/lattice-mc.svg)](https://badge.fury.io/py/lattice-mc)
-[![Build Status](https://travis-ci.org/bjmorgan/lattice_mc.svg?branch=master)](https://travis-ci.org/bjmorgan/lattice_mc)
-[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912) 
+[![DOI](https://zenodo.org/badge/75750912.svg)](https://zenodo.org/badge/latestdoi/75750912)
 [![JOSS status](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0/status.svg)](http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0)
 [![Documentation Status](https://readthedocs.org/projects/lattice-mc/badge/?version=latest)](http://lattice-mc.readthedocs.io/en/latest/?badge=latest)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/826179cbf740e162a9e4/test_coverage)](https://codeclimate.com/github/bjmorgan/lattice_mc/test_coverage)
 
 
 `lattice_mc` is Python module for performing (kinetic) lattice-gas Monte Carlo (LGMC) simulations of ionic transport in solid electrolytes.
@@ -22,45 +20,30 @@ The code allows the programmatic construction of simple lattices (presently impl
 pip install lattice_mc
 ```
 
-Or download the latest release from [GitHub](https://github.com/bjmorgan/lattice_mc/releases)
+Or install the latest development version directly from GitHub:
 ```
-https://github.com/bjmorgan/lattice_mc/archive/1.0.0.tar.gz
-```
-Then install
-```
-cd lattice_mc
-python setup.py install
+pip install git+https://github.com/bjmorgan/lattice_mc.git
 ```
 
-Or you can clone the latest development version:
+For development, clone the repository and install in editable mode with dev dependencies:
 ```
 git clone git@github.com:bjmorgan/lattice_mc.git
-```
-and install the same way.
-```
 cd lattice_mc
-python setup.py install
-```
-
-Alternatively, you can install the latest build using `pip`, direct from GitHub, e.g.
-```
-pip3 install git+https://github.com/bjmorgan/lattice_mc.git
+pip install -e ".[dev]"
 ```
 
 ## Documentation
 
-Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb).
+Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/main/examples/lattice_mc_examples.ipynb).
 
 ## Tests
 
-Automated testing of the latest build happens [here](https://travis-ci.org/bjmorgan/lattice_mc).
-
-Manual tests can be run using
+Tests can be run using
 ```
-python3 -m unittest discover
+pytest
 ```
 
-The code has been tested with Python versions 3.5 and above.
+The code requires Python 3.11 or above.
 
 ## References
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)
