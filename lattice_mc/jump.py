@@ -9,7 +9,7 @@ A Jump describes a possible move by a particle from one site to another site.
 
 class Jump:
 
-    def __init__( self, initial_site, final_site, nearest_neighbour_energy=False, coordination_number_energy=False, jump_lookup_table=None ):
+    def __init__( self, initial_site, final_site, nearest_neighbour_energy=None, coordination_number_energy=None, jump_lookup_table=None ):
         """
         Initialise a Jump instance.
 
@@ -27,7 +27,7 @@ class Jump:
         self.final_site = final_site
         self.nearest_neighbour_energy = nearest_neighbour_energy
         self.coordination_number_energy = coordination_number_energy
-        if jump_lookup_table:
+        if jump_lookup_table is not None:
             self._relative_probability = self.relative_probability_from_lookup_table( jump_lookup_table )
         else:
             self._relative_probability = self.boltzmann_factor()
@@ -70,9 +70,9 @@ class Jump:
             (Float): delta E
         """
         site_delta_E = self.final_site.energy - self.initial_site.energy
-        if self.nearest_neighbour_energy:
+        if self.nearest_neighbour_energy is not None:
             site_delta_E += self.nearest_neighbour_delta_E()
-        if self.coordination_number_energy:
+        if self.coordination_number_energy is not None:
             site_delta_E += self.coordination_number_delta_E()
         return site_delta_E
 

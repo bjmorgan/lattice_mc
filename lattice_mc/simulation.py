@@ -102,7 +102,7 @@ class Simulation:
         Returns:
             None
         """
-        if nn_energy:
+        if nn_energy is not None:
             self.lattice.set_nn_energy( nn_energy )
 
     def set_cn_energies( self, cn_energies ):
@@ -114,9 +114,9 @@ class Simulation:
                 e.g. { 'A' : { 0 : 0.0, 1: 0.5 }, 'B' : { 0 : -0.5, 1 : -2.0 } }
 
         Returns:
-            None	
+            None
         """
-        if cn_energies:
+        if cn_energies is not None:
             self.lattice.set_cn_energies( cn_energies )
 
     def set_site_energies( self, site_energies ):
@@ -129,7 +129,7 @@ class Simulation:
         Returns:
             None
         """
-        if site_energies:
+        if site_energies is not None:
             self.lattice.set_site_energies( site_energies )
 
     def is_initialised( self ):
@@ -160,10 +160,7 @@ class Simulation:
             None
         """
         self.for_time = for_time
-        try:
-            self.is_initialised()
-        except AttributeError:
-            raise
+        self.is_initialised()
         if self.number_of_equilibration_jumps > 0:
             for step in range( self.number_of_equilibration_jumps ):
                 self.lattice.jump()

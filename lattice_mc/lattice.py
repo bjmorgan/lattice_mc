@@ -1,7 +1,6 @@
 import numpy as np
 import random
 import itertools
-import sys
 
 from lattice_mc import atom, jump, transitions, cluster
 from lattice_mc.error import BlockedLatticeError
@@ -30,10 +29,10 @@ class Lattice:
         self.site_populations = Counter( [ site.label for site in self.sites ] )
         self.enforce_periodic_boundary_conditions()
         self.initialise_site_lookup_table()
-        self.nn_energy = False
-        self.cn_energies = False
-        self.site_energies = False
-        self.jump_lookup_table = False
+        self.nn_energy = None
+        self.cn_energies = None
+        self.site_energies = None
+        self.jump_lookup_table = None
         for site in self.sites:
             site.p_neighbours = [ self.site_with_id( i ) for i in site.neighbours ]
         self.reset()
@@ -180,7 +179,6 @@ class Lattice:
         """
         atom = jump.initial_site.atom
         dr = jump.dr( self.cell_lengths )
-        #print( "atom {} jumped from site {} to site {}".format( atom.number, jump.initial_site.number, jump.final_site.number ) )
         jump.final_site.occupation = atom.number
         jump.final_site.atom = atom
         jump.final_site.is_occupied = True
@@ -226,13 +224,12 @@ class Lattice:
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
             raise BlockedLatticeError('No moves are possible in this lattice')
-        all_transitions = transitions.Transitions( self.potential_jumps() )
+        all_transitions = transitions.Transitions( potential_jumps )
         random_jump = all_transitions.random()
         delta_t = all_transitions.time_to_jump()
         self.time += delta_t
         self.update_site_occupation_times( delta_t )
         self.update( random_jump )
-        return( all_transitions.time_to_jump() )
 
     def update_site_occupation_times( self, delta_t ):
         """
@@ -329,7 +326,7 @@ class Lattice:
         """
         coordination_numbers = {}
         for l in self.site_labels:
-            coordination_numbers[ l ] = set( [ len( site.neighbours ) for site in self.sites if site.label is l ] ) 
+            coordination_numbers[ l ] = set( [ len( site.neighbours ) for site in self.sites if site.label == l ] )
         return coordination_numbers 
 
     def max_site_coordination_numbers( self ):
@@ -460,7 +457,7 @@ class Lattice:
         if type( site_labels ) in ( list, set ):
             selected_sites = [ s for s in self.sites if s.label in site_labels ]
         elif type( site_labels ) is str:
-            selected_sites = [ s for s in self.sites if s.label is site_labels ]
+            selected_sites = [ s for s in self.sites if s.label == site_labels ]
         else:
             raise ValueError( str( site_labels ) )
         return selected_sites
