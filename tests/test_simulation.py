@@ -260,10 +260,6 @@ class SimulationNoResultsTestCase( unittest.TestCase ):
         s = Simulation()
         self.assertEqual( s.collective_correlation, None )
 
-    def test_collective_correlation( self ):
-        s = Simulation()
-        self.assertEqual( s.collective_correlation, None )
-
     def test_collective_diffusion_coefficient( self ):
         s = Simulation()
         self.assertEqual( s.collective_diffusion_coefficient, None )
