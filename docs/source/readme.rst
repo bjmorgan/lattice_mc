@@ -1,8 +1,7 @@
 lattice_mc: A Python Lattice-Gas Monte Carlo Module
 ===================================================
 
-`PyPI version <https://badge.fury.io/py/lattice-mc>`__ `Build
-Status <https://travis-ci.org/bjmorgan/lattice_mc>`__
+`PyPI version <https://badge.fury.io/py/lattice-mc>`__
 `DOI <https://zenodo.org/badge/latestdoi/75750912>`__ `JOSS
 status <http://joss.theoj.org/papers/6940b7bb0d59be86b8823a10780caae0>`__
 `Documentation
@@ -65,39 +64,19 @@ Installation
 
    pip install lattice_mc
 
-Or download the latest release from
-`GitHub <https://github.com/bjmorgan/lattice_mc/releases>`__
+Or install the latest development version directly from GitHub:
 
 ::
 
-   https://github.com/bjmorgan/lattice_mc/archive/1.0.0.tar.gz
+   pip install git+https://github.com/bjmorgan/lattice_mc.git
 
-Then install
-
-::
-
-   cd lattice_mc
-   python setup.py install
-
-Or you can clone the latest development version:
+For development, clone the repository and install in editable mode with dev dependencies:
 
 ::
 
    git clone git@github.com:bjmorgan/lattice_mc.git
-
-and install the same way.
-
-::
-
    cd lattice_mc
-   python setup.py install
-
-Alternatively, you can install the latest build using ``pip``, direct
-from GitHub, e.g.
-
-::
-
-   pip3 install git+https://github.com/bjmorgan/lattice_mc.git
+   pip install -e ".[dev]"
 
 Documentation
 -------------
@@ -106,21 +85,18 @@ Full documentation and examples are contained in a `Jupyter
 notebook <http://jupyter-notebook.readthedocs.io/en/latest/#>`__ at
 `examples/lattice_mc_example.ipynb <examples/lattice_mc_example.ipynb>`__.
 The example notebook is also hosted on
-`GitHub <https://github.com/bjmorgan/lattice_mc/blob/master/examples/lattice_mc_examples.ipynb>`__.
+`GitHub <https://github.com/bjmorgan/lattice_mc/blob/main/examples/lattice_mc_examples.ipynb>`__.
 
 Tests
 -----
 
-Automated testing of the latest build happens
-`here <https://travis-ci.org/bjmorgan/lattice_mc>`__.
-
-Manual tests can be run using
+Tests can be run using
 
 ::
 
-   python3 -m unittest discover
+   pytest
 
-The code has been tested with Python versions 3.5 and above.
+The code requires Python 3.11 or above.
 
 References
 ----------

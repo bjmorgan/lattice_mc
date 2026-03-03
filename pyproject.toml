@@ -32,6 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "mypy",
     "pytest",
     "pytest-cov",
     "ruff",
@@ -45,7 +46,7 @@ Repository = "https://github.com/bjmorgan/lattice_mc"
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "W"]
+select = ["E", "F", "I", "W"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
