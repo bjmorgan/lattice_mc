@@ -73,7 +73,7 @@ class JumpTestCase( unittest.TestCase ):
     def test_boltzmann_factor_gt_0( self ):
         self.jump.delta_E = Mock( return_value=0.2 )
         expected = math.exp( -0.2 / kT )
-        self.assertEqual( self.jump.boltzmann_factor(), expected )
+        self.assertAlmostEqual( self.jump.boltzmann_factor(), expected )
 
     def test_delta_E_non_interacting( self ):
         initial_energy = 1.5
