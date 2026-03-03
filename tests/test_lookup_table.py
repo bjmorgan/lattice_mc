@@ -1,5 +1,7 @@
 import unittest
+import math
 from lattice_mc.lookup_table import LookupTable, metropolis
+from lattice_mc.global_vars import kT
 from lattice_mc.lattice import Lattice
 from unittest.mock import Mock, patch, call
 import numpy as np
@@ -10,7 +12,8 @@ class LookupTableSupportFunctionsTestCase( unittest.TestCase ):
         self.assertEqual( metropolis( -0.02 ), 1.0 )
 
     def test_metropolis_returns_boltzmann_factor_for_positive_delta_E( self ):
-        self.assertAlmostEqual( metropolis( +0.02 ), 0.4589440428831954 )
+        expected = math.exp( -0.02 / kT )
+        self.assertAlmostEqual( metropolis( +0.02 ), expected )
 
 class LookupTableTestCase( unittest.TestCase ):
     """Tests for LookupTable class"""

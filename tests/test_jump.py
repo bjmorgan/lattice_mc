@@ -1,5 +1,7 @@
 import unittest
+import math
 from lattice_mc import jump as jump_module
+from lattice_mc.global_vars import kT
 from lattice_mc.lattice_site import Site
 from lattice_mc.lookup_table import LookupTable
 from unittest.mock import Mock, patch
@@ -70,7 +72,8 @@ class JumpTestCase( unittest.TestCase ):
  
     def test_boltzmann_factor_gt_0( self ):
         self.jump.delta_E = Mock( return_value=0.2 )
-        self.assertEqual( self.jump.boltzmann_factor(), 0.000414569521855495 )
+        expected = math.exp( -0.2 / kT )
+        self.assertAlmostEqual( self.jump.boltzmann_factor(), expected )
 
     def test_delta_E_non_interacting( self ):
         initial_energy = 1.5
