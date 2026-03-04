@@ -119,21 +119,6 @@ def cubic_lattice(a, b, c, spacing):
     return lattice.Lattice(sites, cell_lengths=np.array([a, b, c]) * spacing)
 
 
-# def lattice_from_sites_file( site_file, cell_lengths ):
-#    sites = []
-#    with open( site_file ) as f:
-#        number_of_sites = int( f.readline() )
-#        for i in range( number_of_sites ):
-#            f.readline()
-#            number = int( f.readline().split()[1] )
-#            r = np.array( [ float( s ) for s in f.readline().split()[1:4] ] )
-#            f.readline() # ignore vertices
-#            neighbours = [ int( s ) for s in f.readline().split()[1:] ]
-#            label = f.readline().split()[1]
-#            sites.append( lattice_site.Site( number, r, neighbours, 0.0, label ) )
-#        return lattice.Lattice( sites, cell_lengths = np.array( cell_lengths ) )
-
-
 def lattice_from_sites_file(site_file, cell_lengths):
     """
     Generate a lattice from a sites file.
