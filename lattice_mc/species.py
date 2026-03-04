@@ -61,6 +61,8 @@ class Species:
         Returns:
             (Float): The square of the summed total displacements for these atoms.
         """
+        if not self.atoms:
+            raise ValueError("Cannot compute collective displacement for empty Species.")
         return float(sum(np.square(sum([atom.dr for atom in self.atoms]))))
 
     def occupations(self, site_label: str) -> int:
