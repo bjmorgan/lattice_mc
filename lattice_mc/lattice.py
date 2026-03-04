@@ -341,7 +341,7 @@ class Lattice:
         """
         coordination_numbers = {}
         for label in self.site_labels:
-            coordination_numbers[label] = set([len(site.neighbours) for site in self.sites if site.label is label])
+            coordination_numbers[label] = set([len(site.neighbours) for site in self.sites if site.label == label])
         return coordination_numbers
 
     def max_site_coordination_numbers(self):
@@ -472,7 +472,7 @@ class Lattice:
         if type(site_labels) in (list, set):
             selected_sites = [s for s in self.sites if s.label in site_labels]
         elif type(site_labels) is str:
-            selected_sites = [s for s in self.sites if s.label is site_labels]
+            selected_sites = [s for s in self.sites if s.label == site_labels]
         else:
             raise ValueError(str(site_labels))
         return selected_sites
