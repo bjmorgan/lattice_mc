@@ -1,14 +1,13 @@
 import math
 
-from lattice_mc.global_vars import kT
 
-
-def metropolis(delta_E):
+def metropolis(delta_E, kT):
     """
     Boltzmann probability factor for an event with an energy change `delta_E`, following the Metropolis algorithm.
 
     Args:
         delta_E (Float): The change in energy.
+        kT (Float): Thermal energy kT in eV.
 
     Returns:
         (Float): Metropolis relative probability for this event.
@@ -16,7 +15,7 @@ def metropolis(delta_E):
     if delta_E <= 0.0:
         return 1.0
     else:
-        return math.exp(-delta_E / (kT))
+        return math.exp(-delta_E / kT)
 
 
 class LookupTable:  # TODO if nearest-neighbour and coordination number dependent look-up tables have different data structures, they should each subclass this general class: the different implementations for setting these up and accessing the jump probabilities can then be self-contained
@@ -31,7 +30,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Args:
             lattice (lattice_mc.Lattice): The lattice object, used to define the allowed jumps.
             hamiltonian (Str): The model Hamiltonian used to define the jump energies.
-                Allowed values = `nearest-neigbour`
+                Allowed values = `nearest-neighbour`
 
         Returns:
             None
@@ -39,6 +38,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
             raise ValueError(hamiltonian)
+        self.kT = lattice.params.kT
         self.site_energies = lattice.site_energies
         self.nn_energy = lattice.nn_energy
         self.cn_energy = lattice.cn_energies
@@ -68,7 +68,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         if self.nn_energy:
             delta_nn = c2 - c1 - 1  # -1 because the hopping ion is not counted in the final site occupation number
             site_delta_E += delta_nn * self.nn_energy
-        return metropolis(site_delta_E)
+        return metropolis(site_delta_E, self.kT)
 
     def generate_nearest_neighbour_lookup_table(self):
         """

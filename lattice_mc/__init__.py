@@ -3,6 +3,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from lattice_mc.options import Options as Options
 from lattice_mc.simulation import Simulation as Simulation
+from lattice_mc.simulation import SimulationParameters as SimulationParameters
 
 try:
     __version__ = version("lattice_mc")

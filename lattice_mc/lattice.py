@@ -31,6 +31,7 @@ class Lattice:
         self.site_populations = Counter([site.label for site in self.sites])
         self.enforce_periodic_boundary_conditions()
         self.initialise_site_lookup_table()
+        self.params = None
         self.nn_energy = None
         self.cn_energies = None
         self.site_energies = None
@@ -156,6 +157,8 @@ class Lattice:
         Returns:
             (List(Jump)): List of possible jumps.
         """
+        if self.params is None:
+            raise RuntimeError("Lattice.params must be set before computing jumps")
         jumps = []
         if self.number_of_occupied_sites <= self.number_of_sites / 2:
             for occupied_site in self.occupied_sites():
@@ -164,7 +167,10 @@ class Lattice:
                 ]
                 for vacant_site in unoccupied_neighbours:
                     jumps.append(
-                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
+                        jump.Jump(
+                            occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table,
+                            params=self.params,
+                        )
                     )
         else:
             for vacant_site in self.vacant_sites():
@@ -173,7 +179,10 @@ class Lattice:
                 ]
                 for occupied_site in occupied_neighbours:
                     jumps.append(
-                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
+                        jump.Jump(
+                            occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table,
+                            params=self.params,
+                        )
                     )
         return jumps
 
@@ -238,7 +247,7 @@ class Lattice:
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
             raise BlockedLatticeError("No moves are possible in this lattice")
-        all_transitions = transitions.Transitions(potential_jumps)
+        all_transitions = transitions.Transitions(potential_jumps, params=self.params)
         random_jump = all_transitions.random()
         delta_t = all_transitions.time_to_jump()
         self.time += delta_t

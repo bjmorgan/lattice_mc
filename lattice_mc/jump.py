@@ -1,7 +1,5 @@
 import math
 
-from lattice_mc.global_vars import kT, rate_prefactor
-
 """
 A Jump describes a possible move by a particle from one site to another site.
 """
@@ -17,6 +15,8 @@ class Jump:
         nearest_neighbour_energy=None,
         coordination_number_energy=None,
         jump_lookup_table=None,
+        *,
+        params,
     ):
         """
         Initialise a Jump instance.
@@ -27,6 +27,7 @@ class Jump:
             nearest_neighbour_energy (float | None, optional): Nearest-neighbour interaction energy. Defaults to None.
             coordination_number_energy (dict | None, optional): Coordination-number dependent energy. Defaults to None.
             jump_lookup_table (:obj:`LookupTable`, optional): If the jump relative probabilities have been precalculated and stored in a lookup-table, this table should be passed in here. If not, jump probabilities are calculated on the fly. Defaults to None.
+            params (SimulationParameters): Simulation parameters (temperature, rate prefactor).
 
         Returns:
             None
@@ -35,6 +36,7 @@ class Jump:
         self.final_site = final_site
         self.nearest_neighbour_energy = nearest_neighbour_energy
         self.coordination_number_energy = coordination_number_energy
+        self.params = params
         if jump_lookup_table:
             self._relative_probability = self.relative_probability_from_lookup_table(jump_lookup_table)
         else:
@@ -50,7 +52,7 @@ class Jump:
         Returns:
             (Float): The average rate for this jump.
         """
-        return rate_prefactor * self.relative_probability
+        return self.params.rate_prefactor * self.relative_probability
 
     def boltzmann_factor(self):
         """
@@ -65,7 +67,7 @@ class Jump:
         if self.delta_E() <= 0.0:
             return 1.0
         else:
-            return math.exp(-self.delta_E() / kT)
+            return math.exp(-self.delta_E() / self.params.kT)
 
     def delta_E(self):
         """

@@ -5,15 +5,18 @@ import numpy as np
 
 from lattice_mc.atom import Atom
 from lattice_mc.lattice import Lattice
-from lattice_mc.simulation import Simulation
+from lattice_mc.simulation import Simulation, SimulationParameters
 from lattice_mc.species import Species
+
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
 class SimulationTestCase(unittest.TestCase):
-    """Test for Species class"""
+    """Tests for Simulation class"""
 
     def test_simulation_is_initialised(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
+        self.assertIs(simulation.params, PARAMS)
         self.assertEqual(simulation.lattice, None)
         self.assertEqual(simulation.number_of_atoms, None)
         self.assertEqual(simulation.number_of_equilibration_jumps, 0)
@@ -23,7 +26,7 @@ class SimulationTestCase(unittest.TestCase):
         self.assertEqual(simulation.has_run, False)
 
     def test_reset(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         simulation.atoms = Mock(spec=Species)
         simulation.atoms.atoms = [Mock(spec=Atom), Mock(spec=Atom)]
@@ -33,7 +36,7 @@ class SimulationTestCase(unittest.TestCase):
         self.assertEqual(simulation.atoms.atoms[1].reset.call_count, 1)
 
     def test_set_number_of_atoms(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         mock_atoms = [Mock(spec=Atom), Mock(spec=Atom)]
         simulation.lattice.populate_sites = Mock(return_value=mock_atoms)
@@ -45,7 +48,7 @@ class SimulationTestCase(unittest.TestCase):
             mock_Species.assert_called_with(mock_atoms)
 
     def test_set_number_of_atoms_with_specific_sites(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         mock_atoms = [Mock(spec=Atom), Mock(spec=Atom)]
         simulation.lattice.populate_sites = Mock(return_value=mock_atoms)
@@ -55,47 +58,47 @@ class SimulationTestCase(unittest.TestCase):
             self.assertEqual(simulation.lattice.populate_sites.call_args[1]["selected_sites"], ["A"])
 
     def test_set_number_of_jumps(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.set_number_of_jumps(32)
         self.assertEqual(simulation.number_of_jumps, 32)
 
     def test_set_number_of_equilibration_jumps(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.set_number_of_equilibration_jumps(32)
         self.assertEqual(simulation.number_of_equilibration_jumps, 32)
 
     def test_define_lattice_from_file(self):
         with patch("lattice_mc.init_lattice.lattice_from_sites_file") as mock_lattice_from_file:
             mock_lattice_from_file.return_value = "foo"
-            simulation = Simulation()
+            simulation = Simulation(PARAMS)
             cell_lengths = np.array([1.0, 2.0, 3.0])
             simulation.define_lattice_from_file("filename", cell_lengths)
             self.assertEqual(simulation.lattice, "foo")
             mock_lattice_from_file.assert_called_with("filename", cell_lengths=cell_lengths)
 
     def test_set_nn_energy(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         simulation.lattice.set_nn_energy = Mock()
         simulation.set_nn_energy("foo")
         simulation.lattice.set_nn_energy.assert_called_with("foo")
 
     def test_set_cn_energies(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         simulation.lattice.set_cn_energies = Mock()
         simulation.set_cn_energies("foo")
         simulation.lattice.set_cn_energies.assert_called_with("foo")
 
     def test_set_site_energies(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.lattice = Mock(spec=Lattice)
         simulation.lattice.set_site_energies = Mock()
         simulation.set_site_energies("foo")
         simulation.lattice.set_site_energies.assert_called_with("foo")
 
     def test_is_initialised_fails_with_no_lattice(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.atoms = "foo"
         simulation.number_of_jumps = "bar"
         simulation.lattice = None
@@ -103,7 +106,7 @@ class SimulationTestCase(unittest.TestCase):
             simulation.is_initialised()
 
     def test_is_initialised_fails_with_no_atoms(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.atoms = None
         simulation.number_of_jumps = "bar"
         simulation.lattice = "foo"
@@ -111,7 +114,7 @@ class SimulationTestCase(unittest.TestCase):
             simulation.is_initialised()
 
     def test_is_initilaised_fails_with_no_number_of_jumps(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.atoms = "bar"
         simulation.number_of_jumps = None
         simulation.lattice = "foo"
@@ -119,13 +122,13 @@ class SimulationTestCase(unittest.TestCase):
             simulation.is_initialised()
 
     def test_run_raises_error_if_not_initialised(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.is_initialised = Mock(side_effect=AttributeError("test"))
         with self.assertRaises(AttributeError):
             simulation.run()
 
     def test_run_without_equilibration_steps(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.is_initialised = Mock(return_value=(True, None))
         simulation.atoms = "a"
         simulation.lattice = Mock(spec=Lattice)
@@ -135,7 +138,7 @@ class SimulationTestCase(unittest.TestCase):
         self.assertEqual(simulation.lattice.jump.call_count, 10)
 
     def test_run_for_time(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.is_initialised = Mock(return_value=(True, None))
         simulation.atoms = "a"
         simulation.lattice = Mock(spec=Lattice)
@@ -150,7 +153,7 @@ class SimulationTestCase(unittest.TestCase):
         self.assertEqual(simulation.number_of_jumps, 10)
 
     def test_run_with_equilibration_steps(self):
-        simulation = Simulation()
+        simulation = Simulation(PARAMS)
         simulation.is_initialised = Mock(return_value=(True, None))
         simulation.atoms = "a"
         simulation.lattice = Mock(spec=Lattice)
@@ -165,7 +168,7 @@ class SimulationTestCase(unittest.TestCase):
 
 class SimulationResultsTestCase(unittest.TestCase):
     def setUp(self):
-        self.simulation = Simulation()
+        self.simulation = Simulation(PARAMS)
         self.simulation.has_run = True
 
     def test_tracer_correlation(self):
@@ -221,16 +224,12 @@ class SimulationResultsTestCase(unittest.TestCase):
             self.assertEqual(s.lattice.jump_lookup_table, "foo")
             mock_lookup_table.assert_called_with(s.lattice, "nearest-neighbour")
 
-    def test_setup_lookup_table_with_hamiltonian(self):
+    def test_setup_lookup_table_with_unsupported_hamiltonian(self):
         s = self.simulation
-        s.lattice = Mock(spec=Lattice)
-        with patch("lattice_mc.lookup_table.LookupTable") as mock_lookup_table:
-            mock_lookup_table.return_value = "foo"
+        with self.assertRaises(ValueError):
             s.setup_lookup_table(hamiltonian="coordination_number")
-            self.assertEqual(s.lattice.jump_lookup_table, "foo")
-            mock_lookup_table.assert_called_with(s.lattice, "coordination_number")
 
-    def test_setup_lookup_table_with_non_implemented_hamiltonian(self):
+    def test_setup_lookup_table_with_invalid_hamiltonian(self):
         s = self.simulation
         with self.assertRaises(ValueError):
             s.setup_lookup_table(hamiltonian="bar")
@@ -238,23 +237,23 @@ class SimulationResultsTestCase(unittest.TestCase):
 
 class SimulationNoResultsTestCase(unittest.TestCase):
     def test_tracer_correlation(self):
-        s = Simulation()
+        s = Simulation(PARAMS)
         self.assertEqual(s.tracer_correlation, None)
 
     def test_tracer_diffusion_coefficient(self):
-        s = Simulation()
+        s = Simulation(PARAMS)
         self.assertEqual(s.tracer_diffusion_coefficient, None)
 
     def test_collective_correlation(self):
-        s = Simulation()
+        s = Simulation(PARAMS)
         self.assertEqual(s.collective_correlation, None)
 
     def test_collective_diffusion_coefficient(self):
-        s = Simulation()
+        s = Simulation(PARAMS)
         self.assertEqual(s.collective_diffusion_coefficient, None)
 
     def test_collective_diffusion_coefficient_per_atom(self):
-        s = Simulation()
+        s = Simulation(PARAMS)
         self.assertEqual(s.collective_diffusion_coefficient_per_atom, None)
 
 

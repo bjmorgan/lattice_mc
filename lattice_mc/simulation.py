@@ -1,4 +1,30 @@
+from dataclasses import dataclass
+
 from lattice_mc import init_lattice, lookup_table, species
+from lattice_mc.constants import k_boltzmann
+
+
+@dataclass(frozen=True)
+class SimulationParameters:
+    """Immutable container for the physical parameters of a simulation."""
+
+    temperature: float
+    rate_prefactor: float
+
+    def __post_init__(self) -> None:
+        if self.temperature <= 0:
+            raise ValueError(
+                f"temperature must be positive; got {self.temperature!r}."
+            )
+        if self.rate_prefactor <= 0:
+            raise ValueError(
+                f"rate_prefactor must be positive; got {self.rate_prefactor!r}."
+            )
+
+    @property
+    def kT(self) -> float:
+        """Thermal energy kT in eV."""
+        return k_boltzmann * self.temperature
 
 
 class Simulation:
@@ -6,19 +32,18 @@ class Simulation:
     Simulation class
     """
 
-    def __init__(self):
+    def __init__(self, params):
         """
         Initialise a Simulation object.
 
         Args:
-            None
+            params (SimulationParameters): Physical parameters for the simulation
+                (temperature, rate prefactor).
 
         Returns:
             None
-
-        Notes:
-            Simulation parameters need to be set using their corresponding setter methods.
         """
+        self.params = params
         self.lattice = None
         self.number_of_atoms = None
         self.number_of_jumps = None
@@ -163,6 +188,7 @@ class Simulation:
         """
         self.for_time = for_time
         self.is_initialised()
+        self.lattice.params = self.params
         if self.number_of_equilibration_jumps > 0:
             for step in range(self.number_of_equilibration_jumps):
                 self.lattice.jump()
@@ -277,12 +303,16 @@ class Simulation:
 
         Args:
             hamiltonian (Str, optional): String specifying the simulation Hamiltonian.
-                valid values are 'nearest-neighbour' (default) and 'coordination_number'.
+                Valid values are 'nearest-neighbour' (default).
 
         Returns:
             None
         """
-        expected_hamiltonian_values = ["nearest-neighbour", "coordination_number"]
+        expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
-            raise ValueError
+            raise ValueError(
+                f"Unsupported hamiltonian {hamiltonian!r}. "
+                f"Expected one of {expected_hamiltonian_values!r}."
+            )
+        self.lattice.params = self.params
         self.lattice.jump_lookup_table = lookup_table.LookupTable(self.lattice, hamiltonian)

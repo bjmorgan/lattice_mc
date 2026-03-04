@@ -4,15 +4,18 @@ from unittest.mock import Mock, patch
 import numpy as np
 
 from lattice_mc.jump import Jump
+from lattice_mc.simulation import SimulationParameters
 from lattice_mc.transitions import Transitions
 
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
-class TranstitionsTestCase(unittest.TestCase):
+
+class TransitionsTestCase(unittest.TestCase):
     """Test for Transitions class"""
 
     def setUp(self):
         self.jumps = [Mock(spec=Jump, relative_probability=0.25) for i in range(4)]
-        self.transitions = Transitions(self.jumps)
+        self.transitions = Transitions(self.jumps, params=PARAMS)
 
     def test_transitions_is_initialised(self):
         self.assertEqual(self.transitions.jumps, self.jumps)
