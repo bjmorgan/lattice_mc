@@ -1,6 +1,8 @@
-import numpy as np
 import math
 import random
+
+import numpy as np
+
 from lattice_mc.global_vars import rate_prefactor
 
 

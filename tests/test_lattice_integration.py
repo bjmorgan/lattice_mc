@@ -1,8 +1,10 @@
 import unittest
+from unittest.mock import Mock, patch
+
+import numpy as np
+
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
-from unittest.mock import Mock, patch
-import numpy as np
 
 
 class LatticeIntegrationTestCase(unittest.TestCase):
@@ -16,10 +18,7 @@ class LatticeIntegrationTestCase(unittest.TestCase):
         self.site_id = site_id
         site_labels = ["A", "A", "A", "A", "A"]
         site_neighbours = [[2, 3], [1, 3], [1, 2], [5], [4]]
-        self.mock_sites = [
-            Mock(spec=Site, label=l, neighbours=n)
-            for l, n in zip(site_labels, site_neighbours)
-        ]
+        self.mock_sites = [Mock(spec=Site, label=label, neighbours=n) for label, n in zip(site_labels, site_neighbours)]
         self.cell_lengths = np.array([7.0, 8.0, 9.0])
         self.lattice = Lattice(self.mock_sites, self.cell_lengths)
 

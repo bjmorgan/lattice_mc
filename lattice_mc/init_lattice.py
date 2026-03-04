@@ -1,7 +1,9 @@
-import numpy as np
-from lattice_mc import lattice, lattice_site
-from math import sqrt
 import re
+from math import sqrt
+
+import numpy as np
+
+from lattice_mc import lattice, lattice_site
 
 """
 Functions for constructing lattices.
@@ -73,9 +75,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
                 np.roll(grid, +1, axis=0)[i, j, 1],
                 np.roll(grid, +1, axis=1)[i, j, 3],
             ]
-            sites.append(
-                lattice_site.Site(grid[i, j, 0], r, neighbours, 0.0, site_labels[0])
-            )
+            sites.append(lattice_site.Site(grid[i, j, 0], r, neighbours, 0.0, site_labels[0]))
             # site 2
             r = np.array(
                 [
@@ -89,9 +89,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
                 grid[i, j, 2],
                 np.roll(grid, -1, axis=0)[i, j, 0],
             ]
-            sites.append(
-                lattice_site.Site(grid[i, j, 1], r, neighbours, 0.0, site_labels[1])
-            )
+            sites.append(lattice_site.Site(grid[i, j, 1], r, neighbours, 0.0, site_labels[1]))
             # site 3
             r = np.array(
                 [
@@ -105,9 +103,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
                 grid[i, j, 3],
                 np.roll(grid, -1, axis=0)[i, j, 3],
             ]
-            sites.append(
-                lattice_site.Site(grid[i, j, 2], r, neighbours, 0.0, site_labels[2])
-            )
+            sites.append(lattice_site.Site(grid[i, j, 2], r, neighbours, 0.0, site_labels[2]))
             # site 4
             r = np.array([i * sqrt(3) * spacing, (j * 3 + 2) * spacing, 0.0])
             neighbours = [
@@ -115,9 +111,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
                 np.roll(grid, +1, axis=0)[i, j, 2],
                 np.roll(grid, -1, axis=1)[i, j, 0],
             ]
-            sites.append(
-                lattice_site.Site(grid[i, j, 3], r, neighbours, 0.0, site_labels[3])
-            )
+            sites.append(lattice_site.Site(grid[i, j, 3], r, neighbours, 0.0, site_labels[3]))
     return lattice.Lattice(sites, cell_lengths=cell_lengths)
 
 

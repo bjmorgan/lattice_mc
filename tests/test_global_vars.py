@@ -1,4 +1,5 @@
 import unittest
+
 from lattice_mc.global_vars import kT
 
 

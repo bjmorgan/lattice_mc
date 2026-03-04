@@ -30,9 +30,7 @@ class Cluster:
             (Cluster):   The combination of both clusters.
         """
         new_cluster = Cluster(self.sites | other_cluster.sites)
-        new_cluster.neighbours = (
-            self.neighbours | other_cluster.neighbours
-        ).difference(new_cluster.sites)
+        new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
         return new_cluster
 
     def is_neighbouring(self, other_cluster):
@@ -95,7 +93,6 @@ class Cluster:
             ( Bool, Bool, Bool ): Contiguity along the x, y, and z coordinate axes
         """
         edges = self.sites_at_edges()
-        is_contiguous = [False, False, False]
         along_x = any([s2 in s1.p_neighbours for s1 in edges[0] for s2 in edges[1]])
         along_y = any([s2 in s1.p_neighbours for s1 in edges[2] for s2 in edges[3]])
         along_z = any([s2 in s1.p_neighbours for s1 in edges[4] for s2 in edges[5]])
@@ -113,6 +110,4 @@ class Cluster:
         """
         if type(remove_labels) is str:
             remove_labels = [remove_labels]
-        self.neighbours = set(
-            n for n in self.neighbours if n.label not in remove_labels
-        )
+        self.neighbours = set(n for n in self.neighbours if n.label not in remove_labels)

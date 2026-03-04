@@ -1,4 +1,5 @@
 import math
+
 from lattice_mc.global_vars import kT, rate_prefactor
 
 """
@@ -35,9 +36,7 @@ class Jump:
         self.nearest_neighbour_energy = nearest_neighbour_energy
         self.coordination_number_energy = coordination_number_energy
         if jump_lookup_table:
-            self._relative_probability = self.relative_probability_from_lookup_table(
-                jump_lookup_table
-            )
+            self._relative_probability = self.relative_probability_from_lookup_table(jump_lookup_table)
         else:
             self._relative_probability = self.boltzmann_factor()
 
@@ -114,9 +113,7 @@ class Jump:
             s for s in self.initial_site.p_neighbours if s.is_occupied
         ]  # excludes final site, since this is always unoccupied
         final_site_neighbours = [
-            s
-            for s in self.final_site.p_neighbours
-            if s.is_occupied and s is not self.initial_site
+            s for s in self.final_site.p_neighbours if s.is_occupied and s is not self.initial_site
         ]  # excludes initial site
         initial_cn_occupation_energy = (
             self.initial_site.cn_occupation_energy()
@@ -124,22 +121,16 @@ class Jump:
             + sum([site.cn_occupation_energy() for site in final_site_neighbours])
         )
         final_cn_occupation_energy = (
-            self.final_site.cn_occupation_energy(
-                delta_occupation={self.initial_site.label: -1}
-            )
+            self.final_site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
             + sum(
                 [
-                    site.cn_occupation_energy(
-                        delta_occupation={self.initial_site.label: -1}
-                    )
+                    site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
                     for site in initial_site_neighbours
                 ]
             )
             + sum(
                 [
-                    site.cn_occupation_energy(
-                        delta_occupation={self.final_site.label: +1}
-                    )
+                    site.cn_occupation_energy(delta_occupation={self.final_site.label: +1})
                     for site in final_site_neighbours
                 ]
             )

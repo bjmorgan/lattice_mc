@@ -1,7 +1,6 @@
 import math
-import sys
-import itertools as it
-from lattice_mc.global_vars import kT, rate_prefactor
+
+from lattice_mc.global_vars import kT
 
 
 def metropolis(delta_E):
@@ -45,9 +44,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         self.cn_energy = lattice.cn_energies
         self.connected_site_pairs = lattice.connected_site_pairs()
         self.max_coordination_per_site = lattice.max_site_coordination_numbers()
-        self.site_specific_coordination_per_site = (
-            lattice.site_specific_coordination_numbers()
-        )
+        self.site_specific_coordination_per_site = lattice.site_specific_coordination_numbers()
         if hamiltonian == "nearest-neighbour":
             self.generate_nearest_neighbour_lookup_table()
 
@@ -69,9 +66,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         else:
             site_delta_E = 0.0
         if self.nn_energy:
-            delta_nn = (
-                c2 - c1 - 1
-            )  # -1 because the hopping ion is not counted in the final site occupation number
+            delta_nn = c2 - c1 - 1  # -1 because the hopping ion is not counted in the final site occupation number
             site_delta_E += delta_nn * self.nn_energy
         return metropolis(site_delta_E)
 
@@ -90,17 +85,9 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
             self.jump_probability[site_label_1] = {}
             for site_label_2 in self.connected_site_pairs[site_label_1]:
                 self.jump_probability[site_label_1][site_label_2] = {}
-                for coordination_1 in range(
-                    self.max_coordination_per_site[site_label_1]
-                ):
-                    self.jump_probability[site_label_1][site_label_2][
-                        coordination_1
-                    ] = {}
-                    for coordination_2 in range(
-                        1, self.max_coordination_per_site[site_label_2] + 1
-                    ):
-                        self.jump_probability[site_label_1][site_label_2][
-                            coordination_1
-                        ][coordination_2] = self.relative_probability(
-                            site_label_1, site_label_2, coordination_1, coordination_2
+                for coordination_1 in range(self.max_coordination_per_site[site_label_1]):
+                    self.jump_probability[site_label_1][site_label_2][coordination_1] = {}
+                    for coordination_2 in range(1, self.max_coordination_per_site[site_label_2] + 1):
+                        self.jump_probability[site_label_1][site_label_2][coordination_1][coordination_2] = (
+                            self.relative_probability(site_label_1, site_label_2, coordination_1, coordination_2)
                         )

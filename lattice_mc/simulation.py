@@ -1,4 +1,4 @@
-from lattice_mc import init_lattice, species, lookup_table
+from lattice_mc import init_lattice, lookup_table, species
 
 
 class Simulation:
@@ -53,11 +53,7 @@ class Simulation:
             None
         """
         self.number_of_atoms = n
-        self.atoms = species.Species(
-            self.lattice.populate_sites(
-                self.number_of_atoms, selected_sites=selected_sites
-            )
-        )
+        self.atoms = species.Species(self.lattice.populate_sites(self.number_of_atoms, selected_sites=selected_sites))
 
     def set_number_of_jumps(self, n):
         """
@@ -95,9 +91,7 @@ class Simulation:
         Returns:
             None
         """
-        self.lattice = init_lattice.lattice_from_sites_file(
-            filename, cell_lengths=cell_lengths
-        )
+        self.lattice = init_lattice.lattice_from_sites_file(filename, cell_lengths=cell_lengths)
 
     def set_nn_energy(self, nn_energy):
         """
@@ -150,17 +144,11 @@ class Simulation:
             None
         """
         if not self.lattice:
-            raise AttributeError(
-                "Running a simulation needs the lattice to be initialised"
-            )
+            raise AttributeError("Running a simulation needs the lattice to be initialised")
         if not self.atoms:
-            raise AttributeError(
-                "Running a simulation needs the atoms to be initialised"
-            )
+            raise AttributeError("Running a simulation needs the atoms to be initialised")
         if not self.number_of_jumps and not self.for_time:
-            raise AttributeError(
-                "Running a simulation needs number_of_jumps or for_time to be set"
-            )
+            raise AttributeError("Running a simulation needs number_of_jumps or for_time to be set")
 
     def run(self, for_time=None):
         """
@@ -241,9 +229,7 @@ class Simulation:
             (Float): The tracer diffusion coefficient, D*.
         """
         if self.has_run:
-            return self.atoms.sum_dr_squared() / (
-                6.0 * float(self.number_of_atoms) * self.lattice.time
-            )
+            return self.atoms.sum_dr_squared() / (6.0 * float(self.number_of_atoms) * self.lattice.time)
         else:
             return None
 
@@ -345,6 +331,4 @@ class Simulation:
         expected_hamiltonian_values = ["nearest-neighbour", "coordination_number"]
         if hamiltonian not in expected_hamiltonian_values:
             raise ValueError
-        self.lattice.jump_lookup_table = lookup_table.LookupTable(
-            self.lattice, hamiltonian
-        )
+        self.lattice.jump_lookup_table = lookup_table.LookupTable(self.lattice, hamiltonian)

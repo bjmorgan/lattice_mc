@@ -27,11 +27,7 @@ class Atom:
             self._site.is_occupied = True
             self._site.atom = self
         else:
-            raise ValueError(
-                "This site is already occupied by atom {}".format(
-                    initial_site.occupation
-                )
-            )
+            raise ValueError("This site is already occupied by atom {}".format(initial_site.occupation))
         self.reset()
 
     def reset(self):
