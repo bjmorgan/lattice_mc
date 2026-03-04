@@ -68,14 +68,6 @@ lattice\_mc\.lookup\_table module
     :undoc-members:
     :show-inheritance:
 
-lattice\_mc\.options module
----------------------------
-
-.. automodule:: lattice_mc.options
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 lattice\_mc\.simulation module
 ------------------------------
 
