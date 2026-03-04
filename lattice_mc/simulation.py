@@ -310,6 +310,9 @@ class Simulation:
         """
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
-            raise ValueError
+            raise ValueError(
+                f"Unsupported hamiltonian {hamiltonian!r}. "
+                f"Expected one of {expected_hamiltonian_values!r}."
+            )
         self.lattice.params = self.params
         self.lattice.jump_lookup_table = lookup_table.LookupTable(self.lattice, hamiltonian)
