@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Options:
     """
     Object for storing options for setting up and running a simulation.

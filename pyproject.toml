@@ -59,6 +59,9 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 
+[tool.setuptools.package-data]
+lattice_mc = ["py.typed"]
+
 [tool.coverage.run]
 source = ["lattice_mc"]
 

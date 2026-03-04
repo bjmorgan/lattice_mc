@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from lattice_mc import init_lattice, lookup_table, species
