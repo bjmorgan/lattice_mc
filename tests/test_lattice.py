@@ -220,6 +220,12 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.update_site_occupation_times.assert_called_with(5.0)
         self.assertEqual(self.lattice.time, 2.0 + 5.0)
 
+    def test_potential_jumps_raises_RuntimeError_if_params_not_set(self):
+        self.lattice.number_of_occupied_sites = 1
+        self.lattice.params = None
+        with self.assertRaises(RuntimeError):
+            self.lattice.potential_jumps()
+
     def test_jump_raises_BlockedLatticeErrror_if_no_possible_jumps(self):
         potential_jumps = []
         self.lattice.potential_jumps = Mock(return_value=potential_jumps)

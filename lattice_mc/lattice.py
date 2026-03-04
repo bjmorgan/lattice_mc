@@ -157,6 +157,8 @@ class Lattice:
         Returns:
             (List(Jump)): List of possible jumps.
         """
+        if self.params is None:
+            raise RuntimeError("Lattice.params must be set before computing jumps")
         jumps = []
         if self.number_of_occupied_sites <= self.number_of_sites / 2:
             for occupied_site in self.occupied_sites():
