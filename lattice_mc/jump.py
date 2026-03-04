@@ -14,8 +14,8 @@ class Jump:
         self,
         initial_site,
         final_site,
-        nearest_neighbour_energy=False,
-        coordination_number_energy=False,
+        nearest_neighbour_energy=None,
+        coordination_number_energy=None,
         jump_lookup_table=None,
     ):
         """
@@ -24,8 +24,8 @@ class Jump:
         Args:
             initial_site (Site): Lattice site occupied before the jump.
             final_site (Site): Lattice site occupied after the jump.
-            nearest_neighbour_energy (Bool, optional): Does the jump probability depend on a nearest-neighbour energy term? Defaults to False.
-            coordination_number_energy (Bool, optional): Does the jump probability depend on a coordination-number dependent energy term? Defaults to False.
+            nearest_neighbour_energy (float | None, optional): Nearest-neighbour interaction energy. Defaults to None.
+            coordination_number_energy (dict | None, optional): Coordination-number dependent energy. Defaults to None.
             jump_lookup_table (:obj:`LookupTable`, optional): If the jump relative probabilities have been precalculated and stored in a lookup-table, this table should be passed in here. If not, jump probabilities are calculated on the fly. Defaults to None.
 
         Returns:

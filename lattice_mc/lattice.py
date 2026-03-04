@@ -31,10 +31,10 @@ class Lattice:
         self.site_populations = Counter([site.label for site in self.sites])
         self.enforce_periodic_boundary_conditions()
         self.initialise_site_lookup_table()
-        self.nn_energy = False
-        self.cn_energies = False
-        self.site_energies = False
-        self.jump_lookup_table = False
+        self.nn_energy = None
+        self.cn_energies = None
+        self.site_energies = None
+        self.jump_lookup_table = None
         for site in self.sites:
             site.p_neighbours = [self.site_with_id(i) for i in site.neighbours]
         self.reset()
@@ -238,13 +238,12 @@ class Lattice:
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
             raise BlockedLatticeError("No moves are possible in this lattice")
-        all_transitions = transitions.Transitions(self.potential_jumps())
+        all_transitions = transitions.Transitions(potential_jumps)
         random_jump = all_transitions.random()
         delta_t = all_transitions.time_to_jump()
         self.time += delta_t
         self.update_site_occupation_times(delta_t)
         self.update(random_jump)
-        return all_transitions.time_to_jump()
 
     def update_site_occupation_times(self, delta_t):
         """
@@ -469,9 +468,9 @@ class Lattice:
         Returns:
             (List(Site)): List of sites with labels given by `site_labels`.
         """
-        if type(site_labels) in (list, set):
+        if isinstance(site_labels, (list, set)):
             selected_sites = [s for s in self.sites if s.label in site_labels]
-        elif type(site_labels) is str:
+        elif isinstance(site_labels, str):
             selected_sites = [s for s in self.sites if s.label == site_labels]
         else:
             raise ValueError(str(site_labels))

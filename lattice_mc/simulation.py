@@ -112,7 +112,8 @@ class Simulation:
 
         Args:
             cn_energies	(Dict(Str:Dict(Int:Float))): Dict of Dicts specficying the coordination-number dependent energies.
-                e.g. { 'A' : { 0 : 0.0, 1: 0.5 }, 'B' : { 0 : -0.5, 1 : -2.0 } }
+                e.g. {'A': {0: 0.0, 1: 0.5},
+                      'B': {0: -0.5, 1: -2.0}}
 
         Returns:
             None
@@ -161,10 +162,7 @@ class Simulation:
             None
         """
         self.for_time = for_time
-        try:
-            self.is_initialised()
-        except AttributeError:
-            raise
+        self.is_initialised()
         if self.number_of_equilibration_jumps > 0:
             for step in range(self.number_of_equilibration_jumps):
                 self.lattice.jump()

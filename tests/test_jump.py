@@ -25,8 +25,8 @@ class JumpTestCase(unittest.TestCase):
     def test_jump_is_initialised_with_no_interactions(self):
         self.assertEqual(self.jump.initial_site, self.mock_initial_site)
         self.assertEqual(self.jump.final_site, self.mock_final_site)
-        self.assertEqual(self.jump.nearest_neighbour_energy, False)
-        self.assertEqual(self.jump.coordination_number_energy, False)
+        self.assertIsNone(self.jump.nearest_neighbour_energy)
+        self.assertIsNone(self.jump.coordination_number_energy)
         self.assertEqual(self.jump.relative_probability, self.mock_boltzmann_factor.return_value)
 
     def test_jump_is_initialised_with_nn_energy(self):
@@ -37,7 +37,7 @@ class JumpTestCase(unittest.TestCase):
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)
         self.assertEqual(jump.nearest_neighbour_energy, nearest_neighbour_energy)
-        self.assertEqual(jump.coordination_number_energy, False)
+        self.assertIsNone(jump.coordination_number_energy)
         self.assertEqual(jump.relative_probability, 0.13)
 
     def test_jump_is_initialised_with_cn_energy(self):
@@ -49,7 +49,7 @@ class JumpTestCase(unittest.TestCase):
             )
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)
-        self.assertEqual(jump.nearest_neighbour_energy, False)
+        self.assertIsNone(jump.nearest_neighbour_energy)
         self.assertEqual(jump.coordination_number_energy, coordination_number_energy)
         self.assertEqual(jump.relative_probability, 0.13)
 
@@ -62,8 +62,8 @@ class JumpTestCase(unittest.TestCase):
             jump = Jump(mock_initial_site, mock_final_site, jump_lookup_table=jump_lookup_table)
         self.assertEqual(jump.initial_site, mock_initial_site)
         self.assertEqual(jump.final_site, mock_final_site)
-        self.assertEqual(jump.nearest_neighbour_energy, False)
-        self.assertEqual(jump.coordination_number_energy, False)
+        self.assertIsNone(jump.nearest_neighbour_energy)
+        self.assertIsNone(jump.coordination_number_energy)
         self.assertEqual(jump.relative_probability, 0.73)
 
     def test_rate(self):
@@ -85,8 +85,8 @@ class JumpTestCase(unittest.TestCase):
         final_energy = 2.1
         self.jump.initial_site.energy = initial_energy
         self.jump.final_site.energy = final_energy
-        self.jump.nearest_neighbour_energy = False
-        self.jump.coordination_number_energy = False
+        self.jump.nearest_neighbour_energy = None
+        self.jump.coordination_number_energy = None
         delta_E = final_energy - initial_energy
         self.assertEqual(self.jump.delta_E(), delta_E)
 
@@ -96,7 +96,7 @@ class JumpTestCase(unittest.TestCase):
         self.jump.initial_site.energy = initial_energy
         self.jump.final_site.energy = final_energy
         self.jump.nearest_neighbour_energy = True
-        self.jump.coordination_number_energy = False
+        self.jump.coordination_number_energy = None
         self.jump.nearest_neighbour_delta_E = Mock(return_value=0.3)
         delta_E = final_energy - initial_energy + self.jump.nearest_neighbour_delta_E.return_value
         self.assertEqual(self.jump.delta_E(), delta_E)
@@ -106,7 +106,7 @@ class JumpTestCase(unittest.TestCase):
         final_energy = 2.1
         self.jump.initial_site.energy = initial_energy
         self.jump.final_site.energy = final_energy
-        self.jump.nearest_neighbour_energy = False
+        self.jump.nearest_neighbour_energy = None
         self.jump.coordination_number_energy = True
         self.jump.coordination_number_delta_E = Mock(return_value=0.5)
         delta_E = final_energy - initial_energy + self.jump.coordination_number_delta_E.return_value
