@@ -303,12 +303,12 @@ class Simulation:
 
         Args:
             hamiltonian (Str, optional): String specifying the simulation Hamiltonian.
-                valid values are 'nearest-neighbour' (default) and 'coordination_number'.
+                Valid values are 'nearest-neighbour' (default).
 
         Returns:
             None
         """
-        expected_hamiltonian_values = ["nearest-neighbour", "coordination_number"]
+        expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
             raise ValueError
         self.lattice.params = self.params

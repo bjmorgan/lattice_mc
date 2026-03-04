@@ -224,16 +224,12 @@ class SimulationResultsTestCase(unittest.TestCase):
             self.assertEqual(s.lattice.jump_lookup_table, "foo")
             mock_lookup_table.assert_called_with(s.lattice, "nearest-neighbour")
 
-    def test_setup_lookup_table_with_hamiltonian(self):
+    def test_setup_lookup_table_with_unsupported_hamiltonian(self):
         s = self.simulation
-        s.lattice = Mock(spec=Lattice)
-        with patch("lattice_mc.lookup_table.LookupTable") as mock_lookup_table:
-            mock_lookup_table.return_value = "foo"
+        with self.assertRaises(ValueError):
             s.setup_lookup_table(hamiltonian="coordination_number")
-            self.assertEqual(s.lattice.jump_lookup_table, "foo")
-            mock_lookup_table.assert_called_with(s.lattice, "coordination_number")
 
-    def test_setup_lookup_table_with_non_implemented_hamiltonian(self):
+    def test_setup_lookup_table_with_invalid_hamiltonian(self):
         s = self.simulation
         with self.assertRaises(ValueError):
             s.setup_lookup_table(hamiltonian="bar")

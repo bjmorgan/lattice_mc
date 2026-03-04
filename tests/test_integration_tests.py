@@ -33,6 +33,21 @@ class IntegrationTestCase(unittest.TestCase):
         self.assertNotEqual(s.collective_diffusion_coefficient_per_atom, None)
         self.assertNotEqual(s.average_site_occupations, None)
 
+    def test_simulation_runs_with_cn_energies(self):
+        s = lattice_mc.Simulation(PARAMS)
+        site_data = [
+            [1, np.array([0.0, 0.0, 0.0]), [2], 0.0, "A"],
+            [2, np.array([1.0, 0.0, 0.0]), [1, 3], 0.0, "A"],
+            [3, np.array([2.0, 0.0, 0.0]), [2], 0.0, "A"],
+        ]
+        sites = [lattice_mc.lattice_site.Site(*d) for d in site_data]
+        s.lattice = lattice_mc.lattice.Lattice(sites, cell_lengths=np.array([10.0, 10.0, 10.0]))
+        s.set_cn_energies({"A": {"A": {0: 0.0, 1: -0.1, 2: -0.3}}})
+        s.set_number_of_atoms(1)
+        s.set_number_of_jumps(10)
+        s.run()
+        self.assertIsNotNone(s.tracer_correlation)
+
     def test_simulation_runs_with_variable_coordination_numbers(self):
         s = lattice_mc.Simulation(PARAMS)
         site_data = [
