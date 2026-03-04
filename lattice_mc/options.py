@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import numpy as np
+import numpy.typing as npt
+
 
 class Options:
     """
     Object for storing options for setting up and running a simulation.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialise an Options object.
 
@@ -16,11 +19,17 @@ class Options:
         Returns:
             None
         """
-        self.site_energies = None
-        self.nn_energy_scaling = None
-        self.number_of_equilibration_jumps = 0
+        self.site_energies: dict[str, float] | None = None
+        self.nn_energy_scaling: float | None = None
+        self.number_of_equilibration_jumps: int = 0
+        self.number_of_atoms: int = 0
+        self.cn_energies: dict[str, dict[int, float]] | None = None
+        self.cn_energy_scaling: float | None = None
+        self.number_of_jumps: int = 0
+        self.lattice_site_file: str | None = None
+        self.lattice_cell_lengths: npt.NDArray[np.float64] | None = None
 
-    def set_number_of_atoms(self, number_of_atoms):
+    def set_number_of_atoms(self, number_of_atoms: int) -> None:
         """
         Set the number of atoms present in the simulation.
 
@@ -33,7 +42,7 @@ class Options:
         """
         self.number_of_atoms = number_of_atoms
 
-    def set_nn_energy_scaling(self, energy_scaling):
+    def set_nn_energy_scaling(self, energy_scaling: float) -> None:
         """
         Set a scaling factor for the nearest-neighbour interaction energy.
 
@@ -45,7 +54,7 @@ class Options:
         """
         self.nn_energy_scaling = energy_scaling
 
-    def set_cn_energies(self, cn_energies):
+    def set_cn_energies(self, cn_energies: dict[str, dict[int, float]]) -> None:
         """
         Set the coordination-number dependent energies.
 
@@ -58,7 +67,7 @@ class Options:
         """
         self.cn_energies = cn_energies
 
-    def set_cn_energy_scaling(self, cn_energy_scaling):
+    def set_cn_energy_scaling(self, cn_energy_scaling: float) -> None:
         """
         Set a scaling factor for the coordination-number dependent energies.
 
@@ -70,7 +79,7 @@ class Options:
         """
         self.cn_energy_scaling = cn_energy_scaling
 
-    def set_site_energies(self, site_energies):
+    def set_site_energies(self, site_energies: dict[str, float]) -> None:
         """
         Set the on-site energies for each site type.
 
@@ -83,7 +92,7 @@ class Options:
         """
         self.site_energies = site_energies
 
-    def set_number_of_jumps(self, number_of_jumps):
+    def set_number_of_jumps(self, number_of_jumps: int) -> None:
         """
         Set the on-site energies for each site type.
 
@@ -96,7 +105,7 @@ class Options:
         """
         self.number_of_jumps = number_of_jumps
 
-    def set_number_of_equilibration_jumps(self, number_of_equilibration_jumps):
+    def set_number_of_equilibration_jumps(self, number_of_equilibration_jumps: int) -> None:
         """
         Set the number of equilibration jumps for a simulation.
 
@@ -108,7 +117,7 @@ class Options:
         """
         self.number_of_equilibration_jumps = number_of_equilibration_jumps
 
-    def read_lattice_from_file(self, filename):
+    def read_lattice_from_file(self, filename: str) -> None:
         """
         Set the filename for the sites file used to define the simulation lattice.
 
@@ -120,7 +129,7 @@ class Options:
         """
         self.lattice_site_file = filename
 
-    def set_lattice_cell_lengths(self, cell_lengths):
+    def set_lattice_cell_lengths(self, cell_lengths: npt.NDArray[np.float64]) -> None:
         """
         Set the lattice cell lengths for a simulation.
 
