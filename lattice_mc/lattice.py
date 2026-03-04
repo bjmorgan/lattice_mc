@@ -3,7 +3,8 @@ from __future__ import annotations
 import itertools
 import random
 from collections import Counter
-from typing import TYPE_CHECKING, Iterator
+from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
