@@ -178,28 +178,6 @@ class Simulation:
         self.has_run = True
 
     @property
-    def old_tracer_correlation(self):
-        """
-        Deprecated tracer correlation factor for this simulation.
-
-        Args:
-            None
-
-        Returns:
-            (Float): The tracer correlation factor, f.
-
-        Notes:
-            This function assumes that the jump distance between sites has
-            been normalised to a=1. If the jump distance is not equal to 1
-            then the value returned by this function should be divided by a^2.
-            Even better, use `self.tracer_correlation`.
-        """
-        if self.has_run:
-            return self.atoms.sum_dr_squared() / float(self.number_of_jumps)
-        else:
-            return None
-
-    @property
     def tracer_correlation(self):
         """
         Tracer correlation factor, f.
@@ -228,28 +206,6 @@ class Simulation:
         """
         if self.has_run:
             return self.atoms.sum_dr_squared() / (6.0 * float(self.number_of_atoms) * self.lattice.time)
-        else:
-            return None
-
-    @property
-    def old_collective_correlation(self):
-        """
-        Returns the collective correlation factor, f_I
-
-        Args:
-            None
-
-        Returns:
-            (Float): The collective correlation factor, f_I.
-
-        Notes:
-            This function assumes that the jump distance between sites has
-            been normalised to a=1. If the jumps distance is not equal to 1
-            then the value returned by this function should be divided by a^2.
-            Even better, use self.collective_correlation
-        """
-        if self.has_run:
-            return self.atoms.collective_dr_squared() / float(self.number_of_jumps)
         else:
             return None
 
