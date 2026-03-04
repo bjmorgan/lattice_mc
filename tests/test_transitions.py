@@ -10,7 +10,7 @@ from lattice_mc.transitions import Transitions
 PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class TranstitionsTestCase(unittest.TestCase):
+class TransitionsTestCase(unittest.TestCase):
     """Test for Transitions class"""
 
     def setUp(self):

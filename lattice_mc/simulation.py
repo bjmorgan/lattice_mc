@@ -11,6 +11,16 @@ class SimulationParameters:
     temperature: float
     rate_prefactor: float
 
+    def __post_init__(self) -> None:
+        if self.temperature <= 0:
+            raise ValueError(
+                f"temperature must be positive; got {self.temperature!r}."
+            )
+        if self.rate_prefactor <= 0:
+            raise ValueError(
+                f"rate_prefactor must be positive; got {self.rate_prefactor!r}."
+            )
+
     @property
     def kT(self) -> float:
         """Thermal energy kT in eV."""

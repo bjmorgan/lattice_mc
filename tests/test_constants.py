@@ -26,6 +26,22 @@ class SimulationParametersTestCase(unittest.TestCase):
         with self.assertRaises(AttributeError):
             params.temperature = 500.0
 
+    def test_negative_temperature_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            SimulationParameters(temperature=-100.0, rate_prefactor=1e13)
+
+    def test_zero_temperature_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            SimulationParameters(temperature=0.0, rate_prefactor=1e13)
+
+    def test_negative_rate_prefactor_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            SimulationParameters(temperature=298.0, rate_prefactor=-1e13)
+
+    def test_zero_rate_prefactor_raises_ValueError(self):
+        with self.assertRaises(ValueError):
+            SimulationParameters(temperature=298.0, rate_prefactor=0.0)
+
 
 if __name__ == "__main__":
     unittest.main()
