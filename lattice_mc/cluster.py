@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lattice_mc.lattice_site import Site
+
 
 class Cluster:
     """
     Clusters are sets of sites.
     """
 
-    def __init__(self, sites):
+    def __init__(self, sites: set[Site]) -> None:
         """
         Initialise an Cluster instance.
 
@@ -16,13 +21,14 @@ class Cluster:
         Returns:
             None
         """
-        self.sites = set(sites)
-        self.neighbours = set()
+        self.sites: set[Site] = set(sites)
+        self.neighbours: set[Site] = set()
         for s in self.sites:
+            assert s.p_neighbours is not None
             self.neighbours.update(s.p_neighbours)
         self.neighbours = self.neighbours.difference(self.sites)
 
-    def merge(self, other_cluster):
+    def merge(self, other_cluster: Cluster) -> Cluster:
         """
         Combine two clusters into a single cluster.
 
@@ -36,7 +42,7 @@ class Cluster:
         new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
         return new_cluster
 
-    def is_neighbouring(self, other_cluster):
+    def is_neighbouring(self, other_cluster: Cluster) -> bool:
         """
         logical check whether the neighbour list for cluster A includes any sites in cluster B
 
@@ -48,7 +54,7 @@ class Cluster:
         """
         return bool(self.neighbours & other_cluster.sites)
 
-    def size(self):
+    def size(self) -> int:
         """
         Number of sites in this cluster.
 
@@ -60,7 +66,7 @@ class Cluster:
         """
         return len(self.sites)
 
-    def sites_at_edges(self):
+    def sites_at_edges(self) -> tuple[list[Site], list[Site], list[Site], list[Site], list[Site], list[Site]]:
         """
         Finds the six sites with the maximum and minimum coordinates along x, y, and z.
 
@@ -84,7 +90,7 @@ class Cluster:
         z_min = [s for s in self.sites if s.r[2] == max_z]
         return (x_max, x_min, y_max, y_min, z_max, z_min)
 
-    def is_periodically_contiguous(self):
+    def is_periodically_contiguous(self) -> tuple[bool, bool, bool]:
         """
         logical check whether a cluster connects with itself across the
         simulation periodic boundary conditions.
@@ -101,7 +107,7 @@ class Cluster:
         along_z = any([s2 in s1.p_neighbours for s1 in edges[4] for s2 in edges[5]])
         return (along_x, along_y, along_z)
 
-    def remove_sites_from_neighbours(self, remove_labels):
+    def remove_sites_from_neighbours(self, remove_labels: list[str] | str) -> None:
         """
         Removes sites from the set of neighbouring sites if these have labels in remove_labels.
 
