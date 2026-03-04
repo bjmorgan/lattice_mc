@@ -1,10 +1,12 @@
-lattice_mc/__pycache__
-lattice_mc/*.pyc
-tests/*.pyc
-tests/__pycache__
+__pycache__/
+*.pyc
 *coverage
-build
-dist
-lattice_mc.egg-info
+build/
+dist/
+*.egg-info/
 examples/.ipynb_checkpoints/
 **/.DS_Store
+
+# Ignore markdown files in root by default, then whitelist tracked ones
+/*.md
+!/README.md
