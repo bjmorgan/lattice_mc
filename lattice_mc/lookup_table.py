@@ -30,7 +30,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Args:
             lattice (lattice_mc.Lattice): The lattice object, used to define the allowed jumps.
             hamiltonian (Str): The model Hamiltonian used to define the jump energies.
-                Allowed values = `nearest-neigbour`
+                Allowed values = `nearest-neighbour`
 
         Returns:
             None

@@ -226,7 +226,7 @@ class LatticeTestCase(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.lattice.potential_jumps()
 
-    def test_jump_raises_BlockedLatticeErrror_if_no_possible_jumps(self):
+    def test_jump_raises_BlockedLatticeError_if_no_possible_jumps(self):
         potential_jumps = []
         self.lattice.potential_jumps = Mock(return_value=potential_jumps)
         with self.assertRaises(BlockedLatticeError):

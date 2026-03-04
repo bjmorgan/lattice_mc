@@ -12,7 +12,7 @@ PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
 class SimulationTestCase(unittest.TestCase):
-    """Test for Species class"""
+    """Tests for Simulation class"""
 
     def test_simulation_is_initialised(self):
         simulation = Simulation(PARAMS)
