@@ -33,11 +33,7 @@ class JumpTestCase(unittest.TestCase):
         nearest_neighbour_energy = "foo"
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
-            jump = Jump(
-                self.mock_initial_site,
-                self.mock_final_site,
-                nearest_neighbour_energy=nearest_neighbour_energy,
-            )
+            jump = Jump(self.mock_initial_site, self.mock_final_site, nearest_neighbour_energy=nearest_neighbour_energy)
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)
         self.assertEqual(jump.nearest_neighbour_energy, nearest_neighbour_energy)
@@ -49,9 +45,7 @@ class JumpTestCase(unittest.TestCase):
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
             jump = Jump(
-                self.mock_initial_site,
-                self.mock_final_site,
-                coordination_number_energy=coordination_number_energy,
+                self.mock_initial_site, self.mock_final_site, coordination_number_energy=coordination_number_energy
             )
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)

@@ -15,12 +15,7 @@ class SiteTestCase(unittest.TestCase):
         self.label = "foo5"
         self.cn_energies = {"A": [1.0, 2.0, 3.0], "B": [2.0, 4.0, 6.0]}
         self.site = Site(
-            self.number,
-            self.coordinates,
-            self.neighbours,
-            self.energy,
-            self.label,
-            cn_energies=self.cn_energies,
+            self.number, self.coordinates, self.neighbours, self.energy, self.label, cn_energies=self.cn_energies
         )
         self.neighbouring_sites = [
             Mock(spec=Site, is_occupied=True, label="A"),

@@ -164,13 +164,7 @@ class Lattice:
                 ]
                 for vacant_site in unoccupied_neighbours:
                     jumps.append(
-                        jump.Jump(
-                            occupied_site,
-                            vacant_site,
-                            self.nn_energy,
-                            self.cn_energies,
-                            self.jump_lookup_table,
-                        )
+                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
                     )
         else:
             for vacant_site in self.vacant_sites():
@@ -179,13 +173,7 @@ class Lattice:
                 ]
                 for occupied_site in occupied_neighbours:
                     jumps.append(
-                        jump.Jump(
-                            occupied_site,
-                            vacant_site,
-                            self.nn_energy,
-                            self.cn_energies,
-                            self.jump_lookup_table,
-                        )
+                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
                     )
         return jumps
 
@@ -230,10 +218,7 @@ class Lattice:
         if selected_sites:
             atoms = [
                 atom.Atom(initial_site=site)
-                for site in random.sample(
-                    [s for s in self.sites if s.label in selected_sites],
-                    number_of_atoms,
-                )
+                for site in random.sample([s for s in self.sites if s.label in selected_sites], number_of_atoms)
             ]
         else:
             atoms = [atom.Atom(initial_site=site) for site in random.sample(self.sites, number_of_atoms)]

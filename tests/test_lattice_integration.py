@@ -54,13 +54,7 @@ class LatticeIntegrationTestCase(unittest.TestCase):
                 self.assertEqual(sites[3] in c.sites, True)
 
     def test_connected_sites_3(self):
-        sites = [
-            Mock(spec=Site),
-            Mock(spec=Site),
-            Mock(spec=Site),
-            Mock(spec=Site),
-            Mock(spec=Site),
-        ]
+        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [sites[1], sites[2]]
         sites[1].p_neighbours = [sites[0], sites[2]]
         sites[2].p_neighbours = [sites[0], sites[1]]

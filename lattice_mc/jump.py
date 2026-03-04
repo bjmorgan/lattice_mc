@@ -42,7 +42,7 @@ class Jump:
 
     def rate(self):
         """
-        Average rate for this jump. Calculated as ( v_0 * P_jump ).
+        Average rate for this jump. Calculated as v_0 * P_jump.
 
         Args:
             None
@@ -122,18 +122,10 @@ class Jump:
         )
         final_cn_occupation_energy = (
             self.final_site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
-            + sum(
-                [
-                    site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
-                    for site in initial_site_neighbours
-                ]
-            )
-            + sum(
-                [
-                    site.cn_occupation_energy(delta_occupation={self.final_site.label: +1})
-                    for site in final_site_neighbours
-                ]
-            )
+            + sum([site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
+                   for site in initial_site_neighbours])
+            + sum([site.cn_occupation_energy(delta_occupation={self.final_site.label: +1})
+                   for site in final_site_neighbours])
         )
         return final_cn_occupation_energy - initial_cn_occupation_energy
 

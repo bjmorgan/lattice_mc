@@ -7,11 +7,7 @@ import lattice_mc
 
 class IntegrationTestCase(unittest.TestCase):
     def test_simulation_runs_with_selected_sites(self):
-        (
-            a,
-            b,
-            c,
-        ) = 4, 4, 4
+        a, b, c = 4, 4, 4
         spacing = 1.0
         n_atoms = 32
         selected_sites = "L"
