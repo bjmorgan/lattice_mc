@@ -70,47 +70,19 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
         for j in range(b):
             # site 1
             r = np.array([i * sqrt(3) * spacing, j * 3 * spacing, 0.0])
-            neighbours = [
-                grid[i, j, 1],
-                np.roll(grid, +1, axis=0)[i, j, 1],
-                np.roll(grid, +1, axis=1)[i, j, 3],
-            ]
+            neighbours = [grid[i, j, 1], np.roll(grid, +1, axis=0)[i, j, 1], np.roll(grid, +1, axis=1)[i, j, 3]]
             sites.append(lattice_site.Site(grid[i, j, 0], r, neighbours, 0.0, site_labels[0]))
             # site 2
-            r = np.array(
-                [
-                    i * sqrt(3) * spacing + sqrt(3) / 2 * spacing,
-                    (j * 3 + 0.5) * spacing,
-                    0.0,
-                ]
-            )
-            neighbours = [
-                grid[i, j, 0],
-                grid[i, j, 2],
-                np.roll(grid, -1, axis=0)[i, j, 0],
-            ]
+            r = np.array([i * sqrt(3) * spacing + sqrt(3) / 2 * spacing, (j * 3 + 0.5) * spacing, 0.0])
+            neighbours = [grid[i, j, 0], grid[i, j, 2], np.roll(grid, -1, axis=0)[i, j, 0]]
             sites.append(lattice_site.Site(grid[i, j, 1], r, neighbours, 0.0, site_labels[1]))
             # site 3
-            r = np.array(
-                [
-                    i * sqrt(3) * spacing + sqrt(3) / 2 * spacing,
-                    (j * 3 + 1.5) * spacing,
-                    0.0,
-                ]
-            )
-            neighbours = [
-                grid[i, j, 1],
-                grid[i, j, 3],
-                np.roll(grid, -1, axis=0)[i, j, 3],
-            ]
+            r = np.array([i * sqrt(3) * spacing + sqrt(3) / 2 * spacing, (j * 3 + 1.5) * spacing, 0.0])
+            neighbours = [grid[i, j, 1], grid[i, j, 3], np.roll(grid, -1, axis=0)[i, j, 3]]
             sites.append(lattice_site.Site(grid[i, j, 2], r, neighbours, 0.0, site_labels[2]))
             # site 4
             r = np.array([i * sqrt(3) * spacing, (j * 3 + 2) * spacing, 0.0])
-            neighbours = [
-                grid[i, j, 2],
-                np.roll(grid, +1, axis=0)[i, j, 2],
-                np.roll(grid, -1, axis=1)[i, j, 0],
-            ]
+            neighbours = [grid[i, j, 2], np.roll(grid, +1, axis=0)[i, j, 2], np.roll(grid, -1, axis=1)[i, j, 0]]
             sites.append(lattice_site.Site(grid[i, j, 3], r, neighbours, 0.0, site_labels[3]))
     return lattice.Lattice(sites, cell_lengths=cell_lengths)
 

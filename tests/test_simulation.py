@@ -214,8 +214,7 @@ class SimulationResultsTestCase(unittest.TestCase):
     def test_collective_diffusion_coefficient_per_atom(self):
         s = self.simulation
         with patch(
-            "lattice_mc.simulation.Simulation.collective_diffusion_coefficient",
-            new_callable=PropertyMock,
+            "lattice_mc.simulation.Simulation.collective_diffusion_coefficient", new_callable=PropertyMock
         ) as mock_cdc:
             mock_cdc.return_value = 8.0
             s.number_of_atoms = 2

@@ -65,8 +65,7 @@ class InitLatticeTestCase(unittest.TestCase):
         self.assertEqual(mock_lattice.mock_calls[0][1][0], list(range(2 * 1 * 4)))
         self.assertEqual(lattice, "foo")
         np.testing.assert_array_almost_equal(
-            mock_lattice.mock_calls[0][2]["cell_lengths"],
-            np.array([3.464102, 3.0, 0.0]),
+            mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([3.464102, 3.0, 0.0])
         )
 
     @patch("lattice_mc.lattice_site.Site")
@@ -77,12 +76,7 @@ class InitLatticeTestCase(unittest.TestCase):
         mock_lattice.return_value = "foo"
         spacing = 1.0
         init_lattice.honeycomb_lattice(a, b, spacing)
-        expected_neighbours = {
-            1: [2, 26, 12],
-            12: [1, 35, 11],
-            35: [36, 34, 12],
-            26: [27, 25, 1],
-        }
+        expected_neighbours = {1: [2, 26, 12], 12: [1, 35, 11], 35: [36, 34, 12], 26: [27, 25, 1]}
         for c in mock_site.mock_calls:
             site_number = c[1][0]
             if site_number in expected_neighbours:
@@ -92,10 +86,7 @@ class InitLatticeTestCase(unittest.TestCase):
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
     def test_honeycomb_lattice_alternating_sites(self, mock_lattice, mock_site):
-        (
-            a,
-            b,
-        ) = 3, 3
+        a, b = 3, 3
         mock_site.side_effect = range(a * b * 4)
         mock_lattice.return_value = "foo"
         spacing = 1.0
@@ -110,11 +101,7 @@ class InitLatticeTestCase(unittest.TestCase):
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
     def test_cubic_lattice(self, mock_lattice, mock_site):
-        (
-            a,
-            b,
-            c,
-        ) = 2, 2, 2
+        a, b, c = 2, 2, 2
         spacing = 1.0
         mock_site.side_effect = range(2 * 2 * 2)
         mock_lattice.return_value = "bar"
@@ -137,16 +124,7 @@ class InitLatticeTestCase(unittest.TestCase):
             self.assertEqual(call[1][4], e[4])  # site label
         self.assertEqual(mock_lattice.mock_calls[0][1][0], list(range(2 * 2 * 2)))
         self.assertEqual(lattice, "bar")
-        np.testing.assert_array_equal(
-            mock_lattice.mock_calls[0][2]["cell_lengths"],
-            np.array(
-                [
-                    a,
-                    b,
-                    c,
-                ]
-            ),
-        )
+        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([a, b, c]))
 
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")

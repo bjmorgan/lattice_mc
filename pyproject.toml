@@ -47,6 +47,9 @@ Repository = "https://github.com/bjmorgan/lattice_mc"
 target-version = "py311"
 line-length = 120
 
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
 ignore = ["E501"]  # Long lines in docstrings; will be addressed with type hints PR

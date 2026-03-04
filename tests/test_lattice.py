@@ -113,14 +113,8 @@ class LatticeTestCase(unittest.TestCase):
                 mock_site_with_id.side_effect = unoccupied_sites[:2]
                 potential_jumps = self.lattice.potential_jumps()
                 self.assertEqual(potential_jumps, jumps)
-                self.assertEqual(
-                    mock_Jump.mock_calls[0][1],
-                    (site, unoccupied_sites[0], "A", "B", "C"),
-                )
-                self.assertEqual(
-                    mock_Jump.mock_calls[1][1],
-                    (site, unoccupied_sites[1], "A", "B", "C"),
-                )
+                self.assertEqual(mock_Jump.mock_calls[0][1], (site, unoccupied_sites[0], "A", "B", "C"))
+                self.assertEqual(mock_Jump.mock_calls[1][1], (site, unoccupied_sites[1], "A", "B", "C"))
                 mock_site_with_id.assert_has_calls([call(2), call(3)])
 
     @patch("lattice_mc.jump.Jump")

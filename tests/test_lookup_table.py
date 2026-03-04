@@ -74,8 +74,7 @@ class LookupTableTestCase(unittest.TestCase):
         self.table.relative_probability = Mock(side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
         self.table.generate_nearest_neighbour_lookup_table()
         self.assertEqual(
-            self.table.jump_probability,
-            {"A": {"B": {0: {1: 1.0, 2: 2.0, 3: 3.0}, 1: {1: 4.0, 2: 5.0, 3: 6.0}}}},
+            self.table.jump_probability, {"A": {"B": {0: {1: 1.0, 2: 2.0, 3: 3.0}, 1: {1: 4.0, 2: 5.0, 3: 6.0}}}}
         )
         self.assertEqual(
             self.table.relative_probability.mock_calls,

@@ -164,13 +164,7 @@ class Lattice:
                 ]
                 for vacant_site in unoccupied_neighbours:
                     jumps.append(
-                        jump.Jump(
-                            occupied_site,
-                            vacant_site,
-                            self.nn_energy,
-                            self.cn_energies,
-                            self.jump_lookup_table,
-                        )
+                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
                     )
         else:
             for vacant_site in self.vacant_sites():
@@ -179,13 +173,7 @@ class Lattice:
                 ]
                 for occupied_site in occupied_neighbours:
                     jumps.append(
-                        jump.Jump(
-                            occupied_site,
-                            vacant_site,
-                            self.nn_energy,
-                            self.cn_energies,
-                            self.jump_lookup_table,
-                        )
+                        jump.Jump(occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table)
                     )
         return jumps
 
@@ -230,10 +218,7 @@ class Lattice:
         if selected_sites:
             atoms = [
                 atom.Atom(initial_site=site)
-                for site in random.sample(
-                    [s for s in self.sites if s.label in selected_sites],
-                    number_of_atoms,
-                )
+                for site in random.sample([s for s in self.sites if s.label in selected_sites], number_of_atoms)
             ]
         else:
             atoms = [atom.Atom(initial_site=site) for site in random.sample(self.sites, number_of_atoms)]
@@ -356,7 +341,7 @@ class Lattice:
         """
         coordination_numbers = {}
         for label in self.site_labels:
-            coordination_numbers[label] = set([len(site.neighbours) for site in self.sites if site.label == label])
+            coordination_numbers[label] = set([len(site.neighbours) for site in self.sites if site.label is label])
         return coordination_numbers
 
     def max_site_coordination_numbers(self):
@@ -487,7 +472,7 @@ class Lattice:
         if type(site_labels) in (list, set):
             selected_sites = [s for s in self.sites if s.label in site_labels]
         elif type(site_labels) is str:
-            selected_sites = [s for s in self.sites if s.label == site_labels]
+            selected_sites = [s for s in self.sites if s.label is site_labels]
         else:
             raise ValueError(str(site_labels))
         return selected_sites
