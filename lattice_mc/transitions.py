@@ -3,8 +3,6 @@ import random
 
 import numpy as np
 
-from lattice_mc.global_vars import rate_prefactor
-
 
 class Transitions:
     """
@@ -13,17 +11,19 @@ class Transitions:
     Contains methods that operate on sets of Jumps.
     """
 
-    def __init__(self, jumps):
+    def __init__(self, jumps, *, params):
         """
         Initialise a Transitions object.
 
         Args:
             jumps (List(Jump)): List of jumps to be contained in this Transitions object.
+            params (SimulationParameters): Simulation parameters (temperature, rate prefactor).
 
         Returns:
             None
         """
         self.jumps = jumps
+        self.params = params
         self.p = np.array([jump.relative_probability for jump in self.jumps])
 
     def cumulative_probabilities(self):
@@ -62,5 +62,5 @@ class Transitions:
         Returns:
             (Float): The timestep until the next jump.
         """
-        k_tot = rate_prefactor * np.sum(self.p)
+        k_tot = self.params.rate_prefactor * np.sum(self.p)
         return -(1.0 / k_tot) * math.log(random.random())

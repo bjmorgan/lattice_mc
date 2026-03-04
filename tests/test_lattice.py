@@ -9,7 +9,10 @@ from lattice_mc.error import BlockedLatticeError
 from lattice_mc.jump import Jump
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
+from lattice_mc.simulation import SimulationParameters
 from lattice_mc.transitions import Transitions
+
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
 class LatticeTestCase(unittest.TestCase):
@@ -98,6 +101,7 @@ class LatticeTestCase(unittest.TestCase):
         mock_Jump.side_effect = jumps
         self.lattice.number_of_occupied_sites = 1
         self.lattice_number_of_sites = 4
+        self.lattice.params = PARAMS
         site = Mock(spec=Site)
         site.neighbours = [2, 3]
         occupied_sites = [site]
@@ -114,7 +118,9 @@ class LatticeTestCase(unittest.TestCase):
                 potential_jumps = self.lattice.potential_jumps()
                 self.assertEqual(potential_jumps, jumps)
                 self.assertEqual(mock_Jump.mock_calls[0][1], (site, unoccupied_sites[0], "A", "B", "C"))
+                self.assertEqual(mock_Jump.mock_calls[0][2], {"params": PARAMS})
                 self.assertEqual(mock_Jump.mock_calls[1][1], (site, unoccupied_sites[1], "A", "B", "C"))
+                self.assertEqual(mock_Jump.mock_calls[1][2], {"params": PARAMS})
                 mock_site_with_id.assert_has_calls([call(2), call(3)])
 
     @patch("lattice_mc.jump.Jump")
@@ -122,6 +128,7 @@ class LatticeTestCase(unittest.TestCase):
         mock_Jump.side_effect = ["jump1", "jump2"]
         self.lattice.number_of_occupied_sites = 3
         self.lattice_number_of_sites = 4
+        self.lattice.params = PARAMS
         site = Mock(spec=Site)
         site.neighbours = [2, 3]
         vacant_sites = [site]
@@ -138,7 +145,9 @@ class LatticeTestCase(unittest.TestCase):
                 jumps = self.lattice.potential_jumps()
                 self.assertEqual(jumps, ["jump1", "jump2"])
                 self.assertEqual(mock_Jump.mock_calls[0][1], (occupied_sites[0], site, "A", "B", "C"))
+                self.assertEqual(mock_Jump.mock_calls[0][2], {"params": PARAMS})
                 self.assertEqual(mock_Jump.mock_calls[1][1], (occupied_sites[1], site, "A", "B", "C"))
+                self.assertEqual(mock_Jump.mock_calls[1][2], {"params": PARAMS})
                 mock_site_with_id.assert_has_calls([call(2), call(3)])
 
     def test_update(self):
@@ -196,6 +205,7 @@ class LatticeTestCase(unittest.TestCase):
     def test_jump(self, mock_Transitions):
         potential_jumps = [Mock(spec=Jump), Mock(spec=Jump)]
         self.lattice.potential_jumps = Mock(return_value=potential_jumps)
+        self.lattice.params = PARAMS
         selected_jump = Mock(spec=Jump)
         mock_transitions = Mock(spec=Transitions)
         mock_transitions.random = Mock(return_value=selected_jump)
@@ -205,7 +215,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.update_site_occupation_times = Mock()
         self.lattice.update = Mock()
         self.lattice.jump()
-        mock_Transitions.assert_called_with(potential_jumps)
+        mock_Transitions.assert_called_with(potential_jumps, params=PARAMS)
         self.lattice.update.assert_called_with(selected_jump)
         self.lattice.update_site_occupation_times.assert_called_with(5.0)
         self.assertEqual(self.lattice.time, 2.0 + 5.0)

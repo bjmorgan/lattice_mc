@@ -1,4 +1,20 @@
+from dataclasses import dataclass
+
 from lattice_mc import init_lattice, lookup_table, species
+from lattice_mc.constants import k_boltzmann
+
+
+@dataclass(frozen=True)
+class SimulationParameters:
+    """Immutable container for the physical parameters of a simulation."""
+
+    temperature: float
+    rate_prefactor: float
+
+    @property
+    def kT(self) -> float:
+        """Thermal energy kT in eV."""
+        return k_boltzmann * self.temperature
 
 
 class Simulation:
@@ -6,19 +22,18 @@ class Simulation:
     Simulation class
     """
 
-    def __init__(self):
+    def __init__(self, params):
         """
         Initialise a Simulation object.
 
         Args:
-            None
+            params (SimulationParameters): Physical parameters for the simulation
+                (temperature, rate prefactor).
 
         Returns:
             None
-
-        Notes:
-            Simulation parameters need to be set using their corresponding setter methods.
         """
+        self.params = params
         self.lattice = None
         self.number_of_atoms = None
         self.number_of_jumps = None
@@ -163,6 +178,7 @@ class Simulation:
         """
         self.for_time = for_time
         self.is_initialised()
+        self.lattice.params = self.params
         if self.number_of_equilibration_jumps > 0:
             for step in range(self.number_of_equilibration_jumps):
                 self.lattice.jump()
@@ -285,4 +301,5 @@ class Simulation:
         expected_hamiltonian_values = ["nearest-neighbour", "coordination_number"]
         if hamiltonian not in expected_hamiltonian_values:
             raise ValueError
+        self.lattice.params = self.params
         self.lattice.jump_lookup_table = lookup_table.LookupTable(self.lattice, hamiltonian)

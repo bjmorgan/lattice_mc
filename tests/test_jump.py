@@ -4,12 +4,12 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 
-from lattice_mc import jump as jump_module
-from lattice_mc.global_vars import kT
+from lattice_mc.jump import Jump
 from lattice_mc.lattice_site import Site
 from lattice_mc.lookup_table import LookupTable
+from lattice_mc.simulation import SimulationParameters
 
-Jump = jump_module.Jump
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
 class JumpTestCase(unittest.TestCase):
@@ -20,7 +20,7 @@ class JumpTestCase(unittest.TestCase):
         self.mock_final_site = Mock(spec=Site)
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as self.mock_boltzmann_factor:
             self.mock_boltzmann_factor.return_value = 0.13
-            self.jump = Jump(self.mock_initial_site, self.mock_final_site)
+            self.jump = Jump(self.mock_initial_site, self.mock_final_site, params=PARAMS)
 
     def test_jump_is_initialised_with_no_interactions(self):
         self.assertEqual(self.jump.initial_site, self.mock_initial_site)
@@ -33,7 +33,10 @@ class JumpTestCase(unittest.TestCase):
         nearest_neighbour_energy = "foo"
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
-            jump = Jump(self.mock_initial_site, self.mock_final_site, nearest_neighbour_energy=nearest_neighbour_energy)
+            jump = Jump(
+                self.mock_initial_site, self.mock_final_site,
+                nearest_neighbour_energy=nearest_neighbour_energy, params=PARAMS,
+            )
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)
         self.assertEqual(jump.nearest_neighbour_energy, nearest_neighbour_energy)
@@ -45,7 +48,8 @@ class JumpTestCase(unittest.TestCase):
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
             jump = Jump(
-                self.mock_initial_site, self.mock_final_site, coordination_number_energy=coordination_number_energy
+                self.mock_initial_site, self.mock_final_site,
+                coordination_number_energy=coordination_number_energy, params=PARAMS,
             )
         self.assertEqual(jump.initial_site, self.mock_initial_site)
         self.assertEqual(jump.final_site, self.mock_final_site)
@@ -59,7 +63,7 @@ class JumpTestCase(unittest.TestCase):
         jump_lookup_table = "foo"
         with patch("lattice_mc.jump.Jump.relative_probability_from_lookup_table") as mock_p_from_lookup_table:
             mock_p_from_lookup_table.return_value = 0.73
-            jump = Jump(mock_initial_site, mock_final_site, jump_lookup_table=jump_lookup_table)
+            jump = Jump(mock_initial_site, mock_final_site, jump_lookup_table=jump_lookup_table, params=PARAMS)
         self.assertEqual(jump.initial_site, mock_initial_site)
         self.assertEqual(jump.final_site, mock_final_site)
         self.assertIsNone(jump.nearest_neighbour_energy)
@@ -67,9 +71,11 @@ class JumpTestCase(unittest.TestCase):
         self.assertEqual(jump.relative_probability, 0.73)
 
     def test_rate(self):
-        self.jump.relative_probability = 0.5
-        jump_module.rate_prefactor = 1e-3
-        self.assertEqual(self.jump.rate(), 5e-4)
+        params = SimulationParameters(temperature=298.0, rate_prefactor=1e-3)
+        with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_bf:
+            mock_bf.return_value = 0.5
+            j = Jump(self.mock_initial_site, self.mock_final_site, params=params)
+        self.assertEqual(j.rate(), 5e-4)
 
     def test_boltzmann_factor_lt_0(self):
         self.jump.delta_E = Mock(return_value=-2.5)
@@ -77,7 +83,7 @@ class JumpTestCase(unittest.TestCase):
 
     def test_boltzmann_factor_gt_0(self):
         self.jump.delta_E = Mock(return_value=0.2)
-        expected = math.exp(-0.2 / kT)
+        expected = math.exp(-0.2 / PARAMS.kT)
         self.assertAlmostEqual(self.jump.boltzmann_factor(), expected)
 
     def test_delta_E_non_interacting(self):

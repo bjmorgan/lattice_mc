@@ -2,18 +2,20 @@ import math
 import unittest
 from unittest.mock import Mock, call, patch
 
-from lattice_mc.global_vars import kT
 from lattice_mc.lattice import Lattice
 from lattice_mc.lookup_table import LookupTable, metropolis
+from lattice_mc.simulation import SimulationParameters
+
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
 class LookupTableSupportFunctionsTestCase(unittest.TestCase):
     def test_metropolis_returns_one_for_negative_delta_E(self):
-        self.assertEqual(metropolis(-0.02), 1.0)
+        self.assertEqual(metropolis(-0.02, PARAMS.kT), 1.0)
 
     def test_metropolis_returns_boltzmann_factor_for_positive_delta_E(self):
-        expected = math.exp(-0.02 / kT)
-        self.assertAlmostEqual(metropolis(+0.02), expected)
+        expected = math.exp(-0.02 / PARAMS.kT)
+        self.assertAlmostEqual(metropolis(+0.02, PARAMS.kT), expected)
 
 
 class LookupTableTestCase(unittest.TestCase):
@@ -22,6 +24,7 @@ class LookupTableTestCase(unittest.TestCase):
     @patch("lattice_mc.lookup_table.LookupTable.generate_nearest_neighbour_lookup_table")
     def setUp(self, mock_generate_nearest_neighbour_lookup_table):
         self.lattice = Mock(spec=Lattice)
+        self.lattice.params = PARAMS
         self.lattice.site_energies = "foo"
         self.lattice.nn_energy = "bar"
         self.lattice.cn_energies = "baz"
@@ -52,21 +55,21 @@ class LookupTableTestCase(unittest.TestCase):
         self.table.site_energies = {"A": 1.0, "B": 2.0}
         self.table.nn_energy = None
         self.table.relative_probability("A", "B", 3, 1)
-        mock_metropolis.assert_called_with(1.0)
+        mock_metropolis.assert_called_with(1.0, PARAMS.kT)
 
     @patch("lattice_mc.lookup_table.metropolis")
     def test_relative_probability_with_coordination_numbers(self, mock_metropolis):
         self.table.site_energies = None
         self.table.nn_energy = 1.0
         self.table.relative_probability("A", "B", 3, 1)
-        mock_metropolis.assert_called_with(-3.0)
+        mock_metropolis.assert_called_with(-3.0, PARAMS.kT)
 
     @patch("lattice_mc.lookup_table.metropolis")
     def test_relative_probability_with_site_energies_and_coordination_numbers(self, mock_metropolis):
         self.table.site_energies = {"A": 1.0, "B": 2.0}
         self.table.nn_energy = 1.0
         self.table.relative_probability("A", "B", 3, 1)
-        mock_metropolis.assert_called_with(-2.0)
+        mock_metropolis.assert_called_with(-2.0, PARAMS.kT)
 
     def test_generate_nearest_neighbour_lookup_table(self):
         self.table.connected_site_pairs = {"A": ["B"]}

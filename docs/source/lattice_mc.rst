@@ -20,10 +20,10 @@ lattice\_mc\.cluster module
     :undoc-members:
     :show-inheritance:
 
-lattice\_mc\.global\_vars module
---------------------------------
+lattice\_mc\.constants module
+------------------------------
 
-.. automodule:: lattice_mc.global_vars
+.. automodule:: lattice_mc.constants
     :members:
     :undoc-members:
     :show-inheritance:
