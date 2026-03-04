@@ -1,8 +1,10 @@
 import unittest
+from unittest.mock import Mock
+
+import numpy as np
+
 from lattice_mc.cluster import Cluster
 from lattice_mc.lattice_site import Site
-from unittest.mock import Mock, patch
-import numpy as np
 
 
 class ClusterTestCase(unittest.TestCase):

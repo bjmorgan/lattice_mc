@@ -1,6 +1,6 @@
 import unittest
+
 from lattice_mc.options import Options
-from unittest.mock import Mock
 
 
 class OptionsTestCase(unittest.TestCase):

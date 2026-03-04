@@ -1,6 +1,7 @@
 import unittest
-from lattice_mc.lattice_site import Site
 from unittest.mock import Mock
+
+from lattice_mc.lattice_site import Site
 
 
 class SiteTestCase(unittest.TestCase):
@@ -67,9 +68,7 @@ class SiteTestCase(unittest.TestCase):
         delta_occupation = {"A": 1, "B": -1}
         self.site.p_neighbours = self.neighbouring_sites
         self.site_specific_nn_occupation = Mock(return_value={"A": 2, "B": 2})
-        self.assertEqual(
-            self.site.cn_occupation_energy(delta_occupation=delta_occupation), 5.0
-        )
+        self.assertEqual(self.site.cn_occupation_energy(delta_occupation=delta_occupation), 5.0)
 
 
 if __name__ == "__main__":

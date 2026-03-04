@@ -1,9 +1,9 @@
 import unittest
-from unittest.mock import Mock, MagicMock, patch, call, mock_open
-from lattice_mc import init_lattice
-from lattice_mc.lattice_site import Site
-from lattice_mc.lattice import Lattice
+from unittest.mock import mock_open, patch
+
 import numpy as np
+
+from lattice_mc import init_lattice
 
 # TODO write integration tests for creating lattices
 
@@ -36,9 +36,7 @@ class InitLatticeTestCase(unittest.TestCase):
             self.assertEqual(c[1][4], e[4])  # site label
         self.assertEqual(mock_lattice.mock_calls[0][1][0], list(range(2 * 3)))
         self.assertEqual(lattice, "foo")
-        np.testing.assert_array_equal(
-            mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([2.0, 3.0, 0.0])
-        )
+        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([2.0, 3.0, 0.0]))
 
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
@@ -78,7 +76,7 @@ class InitLatticeTestCase(unittest.TestCase):
         mock_site.side_effect = range(a * b * 4)
         mock_lattice.return_value = "foo"
         spacing = 1.0
-        lattice = init_lattice.honeycomb_lattice(a, b, spacing)
+        init_lattice.honeycomb_lattice(a, b, spacing)
         expected_neighbours = {
             1: [2, 26, 12],
             12: [1, 35, 11],
@@ -89,9 +87,7 @@ class InitLatticeTestCase(unittest.TestCase):
             site_number = c[1][0]
             if site_number in expected_neighbours:
                 site_neighbours = c[1][2]
-                self.assertEqual(
-                    site_neighbours.sort(), expected_neighbours[site_number].sort()
-                )
+                self.assertEqual(site_neighbours.sort(), expected_neighbours[site_number].sort())
 
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
@@ -103,7 +99,7 @@ class InitLatticeTestCase(unittest.TestCase):
         mock_site.side_effect = range(a * b * 4)
         mock_lattice.return_value = "foo"
         spacing = 1.0
-        lattice = init_lattice.honeycomb_lattice(a, b, spacing, alternating_sites=True)
+        init_lattice.honeycomb_lattice(a, b, spacing, alternating_sites=True)
         for c in mock_site.mock_calls:
             site_label = c[1][4]
             site_neighbours = c[1][2]
@@ -164,22 +160,16 @@ class InitLatticeTestCase(unittest.TestCase):
                           label: H"""
         mock_site.return_value = "site"
         mock_lattice.return_value = "lattice"
-        with patch(
-            "builtins.open", mock_open(read_data=example_file), create=True
-        ) as m:
+        with patch("builtins.open", mock_open(read_data=example_file), create=True):
             lattice = init_lattice.lattice_from_sites_file("filename", cell_lengths)
         site_calls = mock_site.mock_calls[0][1]
         self.assertEqual(site_calls[0], 2)  # site number
-        np.testing.assert_array_equal(
-            site_calls[1], np.array([21.4669, -1.37, 6.1334])
-        )  # r
+        np.testing.assert_array_equal(site_calls[1], np.array([21.4669, -1.37, 6.1334]))  # r
         self.assertEqual(site_calls[2], [4, 5, 6])  # neighbour list
         self.assertEqual(site_calls[3], 0.0)  # ?
         self.assertEqual(site_calls[4], "H")  # site label
         self.assertEqual(mock_lattice.mock_calls[0][1][0], ["site"])
-        np.testing.assert_array_equal(
-            mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths
-        )
+        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths)
         self.assertEqual(lattice, "lattice")
 
     @patch("lattice_mc.lattice_site.Site")
@@ -195,22 +185,16 @@ class InitLatticeTestCase(unittest.TestCase):
                           label: H"""
         mock_site.return_value = "site"
         mock_lattice.return_value = "lattice"
-        with patch(
-            "builtins.open", mock_open(read_data=example_file), create=True
-        ) as m:
+        with patch("builtins.open", mock_open(read_data=example_file), create=True):
             lattice = init_lattice.lattice_from_sites_file("filename", cell_lengths)
         site_calls = mock_site.mock_calls[0][1]
         self.assertEqual(site_calls[0], 2)  # site number
-        np.testing.assert_array_equal(
-            site_calls[1], np.array([21.4669, -1.37, 6.1334])
-        )  # r
+        np.testing.assert_array_equal(site_calls[1], np.array([21.4669, -1.37, 6.1334]))  # r
         self.assertEqual(site_calls[2], [4, 5, 6])  # neighbour list
         self.assertEqual(site_calls[3], -1.0)  # site energy
         self.assertEqual(site_calls[4], "H")  # site label
         self.assertEqual(mock_lattice.mock_calls[0][1][0], ["site"])
-        np.testing.assert_array_equal(
-            mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths
-        )
+        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths)
         self.assertEqual(lattice, "lattice")
 
 

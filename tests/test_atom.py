@@ -1,8 +1,10 @@
 import unittest
+from unittest.mock import Mock, patch
+
+import numpy as np
+
 from lattice_mc.atom import Atom
 from lattice_mc.lattice_site import Site
-from unittest.mock import Mock, patch
-import numpy as np
 
 
 class AtomTestCase(unittest.TestCase):
@@ -31,7 +33,7 @@ class AtomTestCase(unittest.TestCase):
             Atom(self.mock_site)
 
     def test_reset(self):
-        with patch("lattice_mc.atom.Atom.reset") as mock_reset:
+        with patch("lattice_mc.atom.Atom.reset"):
             self.mock_site.number = 5
             atom = Atom(self.mock_site)  # does not call Atom.reset() in __init__()
         atom.reset()

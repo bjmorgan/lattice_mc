@@ -1,7 +1,8 @@
 import unittest
-import lattice_mc
-import random
+
 import numpy as np
+
+import lattice_mc
 
 
 class IntegrationTestCase(unittest.TestCase):
@@ -19,10 +20,7 @@ class IntegrationTestCase(unittest.TestCase):
         s.lattice = lattice_mc.init_lattice.cubic_lattice(a, b, c, spacing)
         s.lattice.transmute_sites("L", "X", n_atoms)
         s.set_number_of_atoms(n_atoms, selected_sites=selected_sites)
-        [
-            self.assertEqual(site.label, selected_sites)
-            for site in s.lattice.occupied_sites()
-        ]
+        [self.assertEqual(site.label, selected_sites) for site in s.lattice.occupied_sites()]
         s.setup_lookup_table()
         s.set_number_of_jumps(number_of_jumps)
         self.assertEqual(s.tracer_correlation, None)
@@ -45,9 +43,7 @@ class IntegrationTestCase(unittest.TestCase):
             [3, np.array([2.0, 1.0, 1.0]), [2], 0.0, "A"],
         ]
         sites = [lattice_mc.lattice_site.Site(*d) for d in site_data]
-        s.lattice = lattice_mc.lattice.Lattice(
-            sites, cell_lengths=np.array([10.0, 10.0, 10.0])
-        )
+        s.lattice = lattice_mc.lattice.Lattice(sites, cell_lengths=np.array([10.0, 10.0, 10.0]))
         s.set_number_of_atoms(1)
         s.setup_lookup_table()
         s.set_number_of_jumps(10)

@@ -1,10 +1,12 @@
 import unittest
-from lattice_mc.simulation import Simulation
-from lattice_mc.lattice import Lattice
-from lattice_mc.species import Species
-from lattice_mc.atom import Atom
 from unittest.mock import Mock, PropertyMock, patch
+
 import numpy as np
+
+from lattice_mc.atom import Atom
+from lattice_mc.lattice import Lattice
+from lattice_mc.simulation import Simulation
+from lattice_mc.species import Species
 
 
 class SimulationTestCase(unittest.TestCase):
@@ -50,9 +52,7 @@ class SimulationTestCase(unittest.TestCase):
         with patch("lattice_mc.species.Species") as mock_Species:
             mock_Species.return_value = "some atoms"
             simulation.set_number_of_atoms(3, selected_sites=["A"])
-            self.assertEqual(
-                simulation.lattice.populate_sites.call_args[1]["selected_sites"], ["A"]
-            )
+            self.assertEqual(simulation.lattice.populate_sites.call_args[1]["selected_sites"], ["A"])
 
     def test_set_number_of_jumps(self):
         simulation = Simulation()
@@ -65,17 +65,13 @@ class SimulationTestCase(unittest.TestCase):
         self.assertEqual(simulation.number_of_equilibration_jumps, 32)
 
     def test_define_lattice_from_file(self):
-        with patch(
-            "lattice_mc.init_lattice.lattice_from_sites_file"
-        ) as mock_lattice_from_file:
+        with patch("lattice_mc.init_lattice.lattice_from_sites_file") as mock_lattice_from_file:
             mock_lattice_from_file.return_value = "foo"
             simulation = Simulation()
             cell_lengths = np.array([1.0, 2.0, 3.0])
             simulation.define_lattice_from_file("filename", cell_lengths)
             self.assertEqual(simulation.lattice, "foo")
-            mock_lattice_from_file.assert_called_with(
-                "filename", cell_lengths=cell_lengths
-            )
+            mock_lattice_from_file.assert_called_with("filename", cell_lengths=cell_lengths)
 
     def test_set_nn_energy(self):
         simulation = Simulation()
@@ -125,7 +121,7 @@ class SimulationTestCase(unittest.TestCase):
     def test_run_raises_error_if_not_initialised(self):
         simulation = Simulation()
         simulation.is_initialised = Mock(side_effect=AttributeError("test"))
-        with self.assertRaises(AttributeError) as context:
+        with self.assertRaises(AttributeError):
             simulation.run()
 
     def test_run_without_equilibration_steps(self):

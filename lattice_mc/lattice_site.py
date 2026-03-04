@@ -8,9 +8,7 @@ class Site:
 
     index = 0
 
-    def __init__(
-        self, number, coordinates, neighbours, energy, label, cn_energies=None
-    ):
+    def __init__(self, number, coordinates, neighbours, energy, label, cn_energies=None):
         """
         Initialise a lattce Site object.
 
@@ -33,9 +31,7 @@ class Site:
         Site.index += 1
         self.r = coordinates
         self.neighbours = neighbours
-        self.p_neighbours = (
-            None  # pointer to neighbouring sites. initialised in Lattice.__init__
-        )
+        self.p_neighbours = None  # pointer to neighbouring sites. initialised in Lattice.__init__
         self.energy = energy
         self.occupation = 0
         self.atom = None
@@ -66,7 +62,7 @@ class Site:
         Returns:
             (Dict(Str:Int)): Dictionary of nearest-neighbour occupied site numbers, classified by site label, e.g. { 'A' : 2, 'B' : 1 }.
         """
-        to_return = {l: 0 for l in set((site.label for site in self.p_neighbours))}
+        to_return = {label: 0 for label in set((site.label for site in self.p_neighbours))}
         for site in self.p_neighbours:
             if site.is_occupied:
                 to_return[site.label] += 1
@@ -112,6 +108,4 @@ class Site:
             for site in delta_occupation:
                 assert site in nn_occupations
                 nn_occupations[site] += delta_occupation[site]
-        return sum(
-            [self.cn_occupation_energies[s][n] for s, n in nn_occupations.items()]
-        )
+        return sum([self.cn_occupation_energies[s][n] for s, n in nn_occupations.items()])

@@ -1,11 +1,11 @@
-import numpy as np
-import random
 import itertools
-import sys
-
-from lattice_mc import atom, jump, transitions, cluster
-from lattice_mc.error import BlockedLatticeError
+import random
 from collections import Counter
+
+import numpy as np
+
+from lattice_mc import atom, cluster, jump, transitions
+from lattice_mc.error import BlockedLatticeError
 
 
 class Lattice:
@@ -160,9 +160,7 @@ class Lattice:
         if self.number_of_occupied_sites <= self.number_of_sites / 2:
             for occupied_site in self.occupied_sites():
                 unoccupied_neighbours = [
-                    site
-                    for site in [self.site_with_id(n) for n in occupied_site.neighbours]
-                    if not site.is_occupied
+                    site for site in [self.site_with_id(n) for n in occupied_site.neighbours] if not site.is_occupied
                 ]
                 for vacant_site in unoccupied_neighbours:
                     jumps.append(
@@ -177,9 +175,7 @@ class Lattice:
         else:
             for vacant_site in self.vacant_sites():
                 occupied_neighbours = [
-                    site
-                    for site in [self.site_with_id(n) for n in vacant_site.neighbours]
-                    if site.is_occupied
+                    site for site in [self.site_with_id(n) for n in vacant_site.neighbours] if site.is_occupied
                 ]
                 for occupied_site in occupied_neighbours:
                     jumps.append(
@@ -240,10 +236,7 @@ class Lattice:
                 )
             ]
         else:
-            atoms = [
-                atom.Atom(initial_site=site)
-                for site in random.sample(self.sites, number_of_atoms)
-            ]
+            atoms = [atom.Atom(initial_site=site) for site in random.sample(self.sites, number_of_atoms)]
         self.number_of_occupied_sites = number_of_atoms
         return atoms
 
@@ -362,10 +355,8 @@ class Lattice:
                                                        numbers for each site label.
         """
         coordination_numbers = {}
-        for l in self.site_labels:
-            coordination_numbers[l] = set(
-                [len(site.neighbours) for site in self.sites if site.label is l]
-            )
+        for label in self.site_labels:
+            coordination_numbers[label] = set([len(site.neighbours) for site in self.sites if site.label == label])
         return coordination_numbers
 
     def max_site_coordination_numbers(self):
@@ -382,7 +373,7 @@ class Lattice:
             max_coordination_numbers (Dict(Str:Int)): dictionary of maxmimum coordination
                                                       number for each site label.
         """
-        return {l: max(c) for l, c in self.site_coordination_numbers().items()}
+        return {label: max(c) for label, c in self.site_coordination_numbers().items()}
 
     def site_specific_coordination_numbers(self):
         """
@@ -416,7 +407,7 @@ class Lattice:
         """
         site_connections = {}
         for initial_site in self.sites:
-            if not initial_site.label in site_connections:
+            if initial_site.label not in site_connections:
                 site_connections[initial_site.label] = []
             for final_site in initial_site.p_neighbours:
                 if final_site.label not in site_connections[initial_site.label]:
@@ -475,9 +466,7 @@ class Lattice:
         while initial_clusters:  # loop until initial_clusters is empty
             this_cluster = initial_clusters.pop(0)
             while this_cluster.neighbours:
-                neighbouring_clusters = [
-                    c for c in initial_clusters if this_cluster.is_neighbouring(c)
-                ]
+                neighbouring_clusters = [c for c in initial_clusters if this_cluster.is_neighbouring(c)]
                 for nc in neighbouring_clusters:
                     initial_clusters.remove(nc)
                     this_cluster = this_cluster.merge(nc)
@@ -498,7 +487,7 @@ class Lattice:
         if type(site_labels) in (list, set):
             selected_sites = [s for s in self.sites if s.label in site_labels]
         elif type(site_labels) is str:
-            selected_sites = [s for s in self.sites if s.label is site_labels]
+            selected_sites = [s for s in self.sites if s.label == site_labels]
         else:
             raise ValueError(str(site_labels))
         return selected_sites
@@ -517,9 +506,7 @@ class Lattice:
             (List(Site)): List of sites not in a periodic percolating network.
         """
         clusters = self.connected_sites(site_labels=site_labels)
-        island_clusters = [
-            c for c in clusters if not any(c.is_periodically_contiguous())
-        ]
+        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
         return list(itertools.chain.from_iterable((c.sites for c in island_clusters)))
 
     def is_blocked(self):

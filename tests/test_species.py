@@ -1,8 +1,10 @@
 import unittest
-from lattice_mc.species import Species
-from lattice_mc.atom import Atom
 from unittest.mock import Mock
+
 import numpy as np
+
+from lattice_mc.atom import Atom
+from lattice_mc.species import Species
 
 
 class SpeciesTestCase(unittest.TestCase):
@@ -33,9 +35,7 @@ class SpeciesTestCase(unittest.TestCase):
         mock.dr = np.array([2.0, 1.0, 1.0])
         atoms = [mock] * 3
         species = Species(atoms)
-        self.assertEqual(
-            species.collective_dr_squared(), 54.0
-        )  # (2+2+2)**2 + (1+1+1)**2 + (1+1+1)**2
+        self.assertEqual(species.collective_dr_squared(), 54.0)  # (2+2+2)**2 + (1+1+1)**2 + (1+1+1)**2
 
     def test_occupation(self):
         mock = Mock(spec=Atom)
