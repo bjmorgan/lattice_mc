@@ -24,7 +24,7 @@ class Jump:
         initial_site: Site,
         final_site: Site,
         nearest_neighbour_energy: float | None = None,
-        coordination_number_energy: dict[str, dict[int, float]] | None = None,
+        coordination_number_energy: dict[str, dict[str, dict[int, float]]] | None = None,
         jump_lookup_table: LookupTable | None = None,
         *,
         params: SimulationParameters,
@@ -46,7 +46,7 @@ class Jump:
         self.initial_site: Site = initial_site
         self.final_site: Site = final_site
         self.nearest_neighbour_energy: float | None = nearest_neighbour_energy
-        self.coordination_number_energy: dict[str, dict[int, float]] | None = coordination_number_energy
+        self.coordination_number_energy: dict[str, dict[str, dict[int, float]]] | None = coordination_number_energy
         self.params: SimulationParameters = params
         if jump_lookup_table:
             self._relative_probability: float = self.relative_probability_from_lookup_table(jump_lookup_table)
@@ -123,6 +123,8 @@ class Jump:
         Returns:
             (Float): delta E (coordination-number)
         """
+        assert self.initial_site.p_neighbours is not None
+        assert self.final_site.p_neighbours is not None
         initial_site_neighbours = [
             s for s in self.initial_site.p_neighbours if s.is_occupied
         ]  # excludes final site, since this is always unoccupied

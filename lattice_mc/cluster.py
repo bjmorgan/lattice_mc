@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 if TYPE_CHECKING:
     from lattice_mc.lattice_site import Site
@@ -11,7 +11,7 @@ class Cluster:
     Clusters are sets of sites.
     """
 
-    def __init__(self, sites: set[Site]) -> None:
+    def __init__(self, sites: Iterable[Site]) -> None:
         """
         Initialise an Cluster instance.
 
@@ -102,12 +102,12 @@ class Cluster:
             ( Bool, Bool, Bool ): Contiguity along the x, y, and z coordinate axes
         """
         edges = self.sites_at_edges()
-        along_x = any([s2 in s1.p_neighbours for s1 in edges[0] for s2 in edges[1]])
-        along_y = any([s2 in s1.p_neighbours for s1 in edges[2] for s2 in edges[3]])
-        along_z = any([s2 in s1.p_neighbours for s1 in edges[4] for s2 in edges[5]])
+        along_x = any([s2 in (s1.p_neighbours or []) for s1 in edges[0] for s2 in edges[1]])
+        along_y = any([s2 in (s1.p_neighbours or []) for s1 in edges[2] for s2 in edges[3]])
+        along_z = any([s2 in (s1.p_neighbours or []) for s1 in edges[4] for s2 in edges[5]])
         return (along_x, along_y, along_z)
 
-    def remove_sites_from_neighbours(self, remove_labels: list[str] | str) -> None:
+    def remove_sites_from_neighbours(self, remove_labels: list[str] | set[str] | str) -> None:
         """
         Removes sites from the set of neighbouring sites if these have labels in remove_labels.
 

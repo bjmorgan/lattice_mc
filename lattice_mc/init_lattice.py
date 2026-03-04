@@ -4,10 +4,8 @@ import re
 from math import sqrt
 
 import numpy as np
-import numpy.typing as npt
 
 from lattice_mc import lattice, lattice_site
-
 
 """
 Functions for constructing lattices.

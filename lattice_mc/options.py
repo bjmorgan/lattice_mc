@@ -23,7 +23,7 @@ class Options:
         self.nn_energy_scaling: float | None = None
         self.number_of_equilibration_jumps: int = 0
         self.number_of_atoms: int = 0
-        self.cn_energies: dict[str, dict[int, float]] | None = None
+        self.cn_energies: dict[str, dict[str, dict[int, float]]] | None = None
         self.cn_energy_scaling: float | None = None
         self.number_of_jumps: int = 0
         self.lattice_site_file: str | None = None
@@ -54,7 +54,7 @@ class Options:
         """
         self.nn_energy_scaling = energy_scaling
 
-    def set_cn_energies(self, cn_energies: dict[str, dict[int, float]]) -> None:
+    def set_cn_energies(self, cn_energies: dict[str, dict[str, dict[int, float]]]) -> None:
         """
         Set the coordination-number dependent energies.
 

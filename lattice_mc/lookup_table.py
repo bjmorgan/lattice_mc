@@ -44,10 +44,11 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
             raise ValueError(hamiltonian)
+        assert lattice.params is not None
         self.kT: float = lattice.params.kT
         self.site_energies: dict[str, float] | None = lattice.site_energies
         self.nn_energy: float | None = lattice.nn_energy
-        self.cn_energy: dict[str, dict[int, float]] | None = lattice.cn_energies
+        self.cn_energy: dict[str, dict[str, dict[int, float]]] | None = lattice.cn_energies
         self.connected_site_pairs: dict[str, list[str]] = lattice.connected_site_pairs()
         self.max_coordination_per_site: dict[str, int] = lattice.max_site_coordination_numbers()
         self.site_specific_coordination_per_site: dict[str, dict[str, int]] = lattice.site_specific_coordination_numbers()

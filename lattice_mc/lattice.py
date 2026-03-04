@@ -44,7 +44,7 @@ class Lattice:
         self.initialise_site_lookup_table()
         self.params: SimulationParameters | None = None
         self.nn_energy: float | None = None
-        self.cn_energies: dict[str, dict[int, float]] | None = None
+        self.cn_energies: dict[str, dict[str, dict[int, float]]] | None = None
         self.site_energies: dict[str, float] | None = None
         self.jump_lookup_table: LookupTable | None = None
         self.number_of_occupied_sites: int = 0
@@ -259,6 +259,7 @@ class Lattice:
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
             raise BlockedLatticeError("No moves are possible in this lattice")
+        assert self.params is not None
         all_transitions = transitions.Transitions(potential_jumps, params=self.params)
         random_jump = all_transitions.random()
         delta_t = all_transitions.time_to_jump()
@@ -330,7 +331,7 @@ class Lattice:
         """
         self.nn_energy = delta_E
 
-    def set_cn_energies(self, cn_energies: dict[str, dict[int, float]]) -> None:
+    def set_cn_energies(self, cn_energies: dict[str, dict[str, dict[int, float]]]) -> None:
         """
         Set the coordination number dependent energies for this lattice.
 
@@ -410,10 +411,11 @@ class Lattice:
         Returns:
             site_connections (Dict{Str List[Str]}): A dictionary of neighbouring site types in the lattice.
         """
-        site_connections = {}
+        site_connections: dict[str, list[str]] = {}
         for initial_site in self.sites:
             if initial_site.label not in site_connections:
                 site_connections[initial_site.label] = []
+            assert initial_site.p_neighbours is not None
             for final_site in initial_site.p_neighbours:
                 if final_site.label not in site_connections[initial_site.label]:
                     site_connections[initial_site.label].append(final_site.label)
