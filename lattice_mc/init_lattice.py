@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 from math import sqrt
 
@@ -10,7 +12,7 @@ Functions for constructing lattices.
 """
 
 
-def square_lattice(a, b, spacing):
+def square_lattice(a: int, b: int, spacing: float) -> lattice.Lattice:
     """
     Generate a square lattice.
 
@@ -27,7 +29,7 @@ def square_lattice(a, b, spacing):
     """
     grid = np.array(list(range(1, a * b + 1))).reshape(a, b, order="F")
     it = np.nditer(grid, flags=["multi_index"])
-    sites = []
+    sites: list[lattice_site.Site] = []
     while not it.finished:
         x, y = it.multi_index
         r = np.array([x * spacing, y * spacing, 0.0])
@@ -42,7 +44,7 @@ def square_lattice(a, b, spacing):
     return lattice.Lattice(sites, cell_lengths=np.array([a, b, 0.0]) * spacing)
 
 
-def honeycomb_lattice(a, b, spacing, alternating_sites=False):
+def honeycomb_lattice(a: int, b: int, spacing: float, alternating_sites: bool = False) -> lattice.Lattice:
     """
     Generate a honeycomb lattice.
 
@@ -65,7 +67,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
     unit_cell_lengths = np.array([sqrt(3), 3.0, 0.0]) * spacing
     cell_lengths = unit_cell_lengths * np.array([a, b, 1.0])
     grid = np.array(list(range(1, int(a * b * 4 + 1)))).reshape(a, b, 4, order="C")
-    sites = []
+    sites: list[lattice_site.Site] = []
     for i in range(a):
         for j in range(b):
             # site 1
@@ -87,7 +89,7 @@ def honeycomb_lattice(a, b, spacing, alternating_sites=False):
     return lattice.Lattice(sites, cell_lengths=cell_lengths)
 
 
-def cubic_lattice(a, b, c, spacing):
+def cubic_lattice(a: int, b: int, c: int, spacing: float) -> lattice.Lattice:
     """
     Generate a cubic lattice.
 
@@ -102,7 +104,7 @@ def cubic_lattice(a, b, c, spacing):
     """
     grid = np.array(list(range(1, a * b * c + 1))).reshape(a, b, c, order="F")
     it = np.nditer(grid, flags=["multi_index"])
-    sites = []
+    sites: list[lattice_site.Site] = []
     while not it.finished:
         x, y, z = it.multi_index
         r = np.array([x, y, z]) * spacing
@@ -119,7 +121,7 @@ def cubic_lattice(a, b, c, spacing):
     return lattice.Lattice(sites, cell_lengths=np.array([a, b, c]) * spacing)
 
 
-def lattice_from_sites_file(site_file, cell_lengths):
+def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattice.Lattice:
     """
     Generate a lattice from a sites file.
 
@@ -144,7 +146,7 @@ def lattice_from_sites_file(site_file, cell_lengths):
         | British and American English spellings for centre|center and neighbour|neighbor are accepted.
         | An example file can be found in the examples directory.
     """
-    sites = []
+    sites: list[lattice_site.Site] = []
     site_re = re.compile(r"site:\s+([-+]?\d+)")
     r_re = re.compile(r"cent(?:er|re):\s+([-\d\.e]+)\s+([-\d\.e]+)\s+([-\d\.e]+)")
     r_neighbours = re.compile(r"neighbou{0,1}rs:((\s+[-+]?\d+)+)")
@@ -159,10 +161,7 @@ def lattice_from_sites_file(site_file, cell_lengths):
         r = np.array([float(s) for s in r_re.findall(block)[0]])
         neighbours = [int(s) for s in r_neighbours.findall(block)[0][0].split()]
         label = r_label.findall(block)[0]
-        energy = r_energy.findall(block)
-        if energy:
-            energy = float(energy[0])
-        else:
-            energy = 0.0
+        energy_match = r_energy.findall(block)
+        energy: float = float(energy_match[0]) if energy_match else 0.0
         sites.append(lattice_site.Site(number, r, neighbours, energy, label))
     return lattice.Lattice(sites, cell_lengths=np.array(cell_lengths))

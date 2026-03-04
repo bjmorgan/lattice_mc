@@ -1,4 +1,15 @@
+from __future__ import annotations
+
 import math
+from typing import TYPE_CHECKING
+
+import numpy as np
+import numpy.typing as npt
+
+if TYPE_CHECKING:
+    from lattice_mc.lattice_site import Site
+    from lattice_mc.lookup_table import LookupTable
+    from lattice_mc.simulation import SimulationParameters
 
 """
 A Jump describes a possible move by a particle from one site to another site.
@@ -10,14 +21,14 @@ A Jump describes a possible move by a particle from one site to another site.
 class Jump:
     def __init__(
         self,
-        initial_site,
-        final_site,
-        nearest_neighbour_energy=None,
-        coordination_number_energy=None,
-        jump_lookup_table=None,
+        initial_site: Site,
+        final_site: Site,
+        nearest_neighbour_energy: float | None = None,
+        coordination_number_energy: dict[str, dict[str, dict[int, float]]] | None = None,
+        jump_lookup_table: LookupTable | None = None,
         *,
-        params,
-    ):
+        params: SimulationParameters,
+    ) -> None:
         """
         Initialise a Jump instance.
 
@@ -32,17 +43,17 @@ class Jump:
         Returns:
             None
         """
-        self.initial_site = initial_site
-        self.final_site = final_site
-        self.nearest_neighbour_energy = nearest_neighbour_energy
-        self.coordination_number_energy = coordination_number_energy
-        self.params = params
+        self.initial_site: Site = initial_site
+        self.final_site: Site = final_site
+        self.nearest_neighbour_energy: float | None = nearest_neighbour_energy
+        self.coordination_number_energy: dict[str, dict[str, dict[int, float]]] | None = coordination_number_energy
+        self.params: SimulationParameters = params
         if jump_lookup_table:
-            self._relative_probability = self.relative_probability_from_lookup_table(jump_lookup_table)
+            self._relative_probability: float = self.relative_probability_from_lookup_table(jump_lookup_table)
         else:
             self._relative_probability = self.boltzmann_factor()
 
-    def rate(self):
+    def rate(self) -> float:
         """
         Average rate for this jump. Calculated as v_0 * P_jump.
 
@@ -54,7 +65,7 @@ class Jump:
         """
         return self.params.rate_prefactor * self.relative_probability
 
-    def boltzmann_factor(self):
+    def boltzmann_factor(self) -> float:
         """
         Boltzmann probability factor for accepting this jump, following the Metropolis algorithm.
 
@@ -69,7 +80,7 @@ class Jump:
         else:
             return math.exp(-self.delta_E() / self.params.kT)
 
-    def delta_E(self):
+    def delta_E(self) -> float:
         """
         The change in system energy if this jump were accepted.
 
@@ -86,7 +97,7 @@ class Jump:
             site_delta_E += self.coordination_number_delta_E()
         return site_delta_E
 
-    def nearest_neighbour_delta_E(self):
+    def nearest_neighbour_delta_E(self) -> float:
         """
         Nearest-neighbour interaction contribution to the change in system energy if this jump were accepted.
 
@@ -99,9 +110,10 @@ class Jump:
         delta_nn = (
             self.final_site.nn_occupation() - self.initial_site.nn_occupation() - 1
         )  # -1 because the hopping ion is not counted in the final site occupation number
+        assert self.nearest_neighbour_energy is not None
         return delta_nn * self.nearest_neighbour_energy
 
-    def coordination_number_delta_E(self):
+    def coordination_number_delta_E(self) -> float:
         """
         Coordination-number dependent energy conrtibution to the change in system energy if this jump were accepted.
 
@@ -111,6 +123,8 @@ class Jump:
         Returns:
             (Float): delta E (coordination-number)
         """
+        assert self.initial_site.p_neighbours is not None
+        assert self.final_site.p_neighbours is not None
         initial_site_neighbours = [
             s for s in self.initial_site.p_neighbours if s.is_occupied
         ]  # excludes final site, since this is always unoccupied
@@ -131,7 +145,7 @@ class Jump:
         )
         return final_cn_occupation_energy - initial_cn_occupation_energy
 
-    def dr(self, cell_lengths):
+    def dr(self, cell_lengths: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
         Particle displacement vector for this jump
 
@@ -150,7 +164,7 @@ class Jump:
                 this_dr[i] += cell_lengths[i]
         return this_dr
 
-    def relative_probability_from_lookup_table(self, jump_lookup_table):
+    def relative_probability_from_lookup_table(self, jump_lookup_table: LookupTable) -> float:
         """
         Relative probability of accepting this jump from a lookup-table.
 
@@ -167,9 +181,9 @@ class Jump:
         return jump_lookup_table.jump_probability[l1][l2][c1][c2]
 
     @property
-    def relative_probability(self):
+    def relative_probability(self) -> float:
         return self._relative_probability
 
     @relative_probability.setter
-    def relative_probability(self, value):
+    def relative_probability(self, value: float) -> None:
         self._relative_probability = value

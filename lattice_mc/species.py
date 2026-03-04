@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
+
+if TYPE_CHECKING:
+    from lattice_mc.atom import Atom
 
 
 class Species:
@@ -8,7 +15,7 @@ class Species:
     Contains methods that operate on sets of Atom objects
     """
 
-    def __init__(self, atoms):
+    def __init__(self, atoms: list[Atom]) -> None:
         """
         Initialise a Species object.
 
@@ -18,9 +25,9 @@ class Species:
         Returns:
             None
         """
-        self.atoms = atoms
+        self.atoms: list[Atom] = atoms
 
-    def sites_occupied(self):
+    def sites_occupied(self) -> list[int]:
         """
         Returns a list of sites occupied by these atoms.
 
@@ -32,7 +39,7 @@ class Species:
         """
         return [atom.site.number for atom in self.atoms]
 
-    def sum_dr_squared(self):
+    def sum_dr_squared(self) -> float:
         """
         Sum of squared total displacements for these atoms.
 
@@ -42,9 +49,9 @@ class Species:
         Returns:
             (Float): The sum of squared total displacements for these atoms.
         """
-        return sum([atom.dr_squared() for atom in self.atoms])
+        return float(sum([atom.dr_squared() for atom in self.atoms]))
 
-    def collective_dr_squared(self):
+    def collective_dr_squared(self) -> float:
         """
         Squared sum of total displacements for these atoms.
 
@@ -54,9 +61,11 @@ class Species:
         Returns:
             (Float): The square of the summed total displacements for these atoms.
         """
-        return sum(np.square(sum([atom.dr for atom in self.atoms])))
+        if not self.atoms:
+            raise ValueError("Cannot compute collective displacement for empty Species.")
+        return float(sum(np.square(sum([atom.dr for atom in self.atoms]))))
 
-    def occupations(self, site_label):
+    def occupations(self, site_label: str) -> int:
         """
         Number of these atoms occupying a specific site type.
 
@@ -68,7 +77,7 @@ class Species:
         """
         return sum(atom.site.label == site_label for atom in self.atoms)
 
-    def summed_dr2(self):
+    def summed_dr2(self) -> float:
         """
         Sum of squared individual displacements for these atoms.
 
@@ -78,9 +87,9 @@ class Species:
         Returns:
             (Float): The sum of squared individual displacements for these atoms.
         """
-        return sum([atom.summed_dr2 for atom in self.atoms])
+        return float(sum([atom.summed_dr2 for atom in self.atoms]))
 
-    def tracer_correlation(self):
+    def tracer_correlation(self) -> float:
         """
         Tracer correlation factor, f, for these atoms.
 
@@ -92,7 +101,7 @@ class Species:
         """
         return self.sum_dr_squared() / self.summed_dr2()
 
-    def collective_correlation(self):
+    def collective_correlation(self) -> float:
         """
         Collective correlation factor, f_I, for these atoms.
 

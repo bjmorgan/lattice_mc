@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 class Error(Exception):
     """Base class for exceptions in this module."""
 
@@ -11,5 +14,6 @@ class BlockedLatticeError(Error):
         message: explanation of the error
     """
 
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
         self.message = message

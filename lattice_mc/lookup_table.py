@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import math
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lattice_mc.lattice import Lattice
 
 
-def metropolis(delta_E, kT):
+def metropolis(delta_E: float, kT: float) -> float:
     """
     Boltzmann probability factor for an event with an energy change `delta_E`, following the Metropolis algorithm.
 
@@ -23,7 +29,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
     LookupTable class
     """
 
-    def __init__(self, lattice, hamiltonian):
+    def __init__(self, lattice: Lattice, hamiltonian: str) -> None:
         """
         Initialise a LookupTable object instance.
 
@@ -37,18 +43,22 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         """
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
-            raise ValueError(hamiltonian)
-        self.kT = lattice.params.kT
-        self.site_energies = lattice.site_energies
-        self.nn_energy = lattice.nn_energy
-        self.cn_energy = lattice.cn_energies
-        self.connected_site_pairs = lattice.connected_site_pairs()
-        self.max_coordination_per_site = lattice.max_site_coordination_numbers()
-        self.site_specific_coordination_per_site = lattice.site_specific_coordination_numbers()
+            raise ValueError(
+                f"Unsupported hamiltonian {hamiltonian!r}. "
+                f"Expected one of {expected_hamiltonian_values!r}."
+            )
+        assert lattice.params is not None
+        self.kT: float = lattice.params.kT
+        self.site_energies: dict[str, float] | None = lattice.site_energies
+        self.nn_energy: float | None = lattice.nn_energy
+        self.cn_energy: dict[str, dict[str, dict[int, float]]] | None = lattice.cn_energies
+        self.connected_site_pairs: dict[str, list[str]] = lattice.connected_site_pairs()
+        self.max_coordination_per_site: dict[str, int] = lattice.max_site_coordination_numbers()
+        self.site_specific_coordination_per_site: dict[str, dict[str, int]] = lattice.site_specific_coordination_numbers()
         if hamiltonian == "nearest-neighbour":
             self.generate_nearest_neighbour_lookup_table()
 
-    def relative_probability(self, l1, l2, c1, c2):
+    def relative_probability(self, l1: str, l2: str, c1: int, c2: int) -> float:
         """
         The relative probability for a jump between two sites with specific site types and coordination numbers.
 
@@ -70,7 +80,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
             site_delta_E += delta_nn * self.nn_energy
         return metropolis(site_delta_E, self.kT)
 
-    def generate_nearest_neighbour_lookup_table(self):
+    def generate_nearest_neighbour_lookup_table(self) -> None:
         """
         Construct a look-up table of relative jump probabilities for a nearest-neighbour interaction Hamiltonian.
 
@@ -80,7 +90,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Returns:
             None.
         """
-        self.jump_probability = {}
+        self.jump_probability: dict[str, dict[str, dict[int, dict[int, float]]]] = {}
         for site_label_1 in self.connected_site_pairs:
             self.jump_probability[site_label_1] = {}
             for site_label_2 in self.connected_site_pairs[site_label_1]:
