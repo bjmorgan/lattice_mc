@@ -43,7 +43,10 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         """
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
-            raise ValueError(hamiltonian)
+            raise ValueError(
+                f"Unsupported hamiltonian {hamiltonian!r}. "
+                f"Expected one of {expected_hamiltonian_values!r}."
+            )
         assert lattice.params is not None
         self.kT: float = lattice.params.kT
         self.site_energies: dict[str, float] | None = lattice.site_energies

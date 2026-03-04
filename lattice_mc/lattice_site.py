@@ -27,7 +27,7 @@ class Site:
         cn_energies: dict[str, dict[int, float]] | None = None,
     ) -> None:
         """
-        Initialise a lattce Site object.
+        Initialise a lattice Site object.
 
         Args:
             number (Int): An identifying number for this site.

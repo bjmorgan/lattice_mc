@@ -85,7 +85,7 @@ class Options:
 
         Args:
             site_energies (Dict(Str:Float)): On-site energies for each site type label.
-                e.g. { 'A' : 1.0, 'B', -1.0 }
+                e.g. { 'A' : 1.0, 'B' : -1.0 }
 
         Returns:
             None
@@ -94,11 +94,10 @@ class Options:
 
     def set_number_of_jumps(self, number_of_jumps: int) -> None:
         """
-        Set the on-site energies for each site type.
+        Set the number of jumps for a simulation.
 
         Args:
-            site_energies (Dict(Str:Float)): On-site energies for each site type label.
-                e.g. { 'A' : 1.0, 'B', -1.0 }
+            number_of_jumps (Int): The number of jumps.
 
         Returns:
             None
@@ -110,7 +109,7 @@ class Options:
         Set the number of equilibration jumps for a simulation.
 
         Args:
-            number_of_equilibration_jumps (Int): The number of equiibration jumps.
+            number_of_equilibration_jumps (Int): The number of equilibration jumps.
 
         Returns:
             None

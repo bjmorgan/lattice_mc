@@ -82,17 +82,17 @@ class ClusterTestCase(unittest.TestCase):
         max_z = (sites[0], sites[2])
         cluster = Cluster(sites)
         for s in cluster.sites_at_edges()[0]:
-            self.assertEqual(s in min_x, True)
-        for s in cluster.sites_at_edges()[1]:
             self.assertEqual(s in max_x, True)
+        for s in cluster.sites_at_edges()[1]:
+            self.assertEqual(s in min_x, True)
         for s in cluster.sites_at_edges()[2]:
-            self.assertEqual(s in min_y, True)
-        for s in cluster.sites_at_edges()[3]:
             self.assertEqual(s in max_y, True)
+        for s in cluster.sites_at_edges()[3]:
+            self.assertEqual(s in min_y, True)
         for s in cluster.sites_at_edges()[4]:
-            self.assertEqual(s in min_z, True)
-        for s in cluster.sites_at_edges()[5]:
             self.assertEqual(s in max_z, True)
+        for s in cluster.sites_at_edges()[5]:
+            self.assertEqual(s in min_z, True)
 
     def test_cluster_is_periodically_contiguous(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]

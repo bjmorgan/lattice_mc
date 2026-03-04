@@ -135,7 +135,7 @@ class Simulation:
             None
         """
         assert self.lattice is not None
-        if nn_energy:
+        if nn_energy is not None:
             self.lattice.set_nn_energy(nn_energy)
 
     def set_cn_energies(self, cn_energies: dict[str, dict[str, dict[int, float]]] | None) -> None:
@@ -151,7 +151,7 @@ class Simulation:
             None
         """
         assert self.lattice is not None
-        if cn_energies:
+        if cn_energies is not None:
             self.lattice.set_cn_energies(cn_energies)
 
     def set_site_energies(self, site_energies: dict[str, float] | None) -> None:
@@ -165,7 +165,7 @@ class Simulation:
             None
         """
         assert self.lattice is not None
-        if site_energies:
+        if site_energies is not None:
             self.lattice.set_site_energies(site_energies)
 
     def is_initialised(self) -> None:
