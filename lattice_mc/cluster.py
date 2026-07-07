@@ -3,6 +3,9 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
+import numpy as np
+import numpy.typing as npt
+
 if TYPE_CHECKING:
     from lattice_mc.lattice_site import Site
 
@@ -91,22 +94,48 @@ class Cluster:
         z_min = [s for s in self.sites if s.r[2] == min_z]
         return (x_max, x_min, y_max, y_min, z_max, z_min)
 
-    def is_periodically_contiguous(self) -> tuple[bool, bool, bool]:
+    def is_periodically_contiguous(self, cell_lengths: npt.NDArray[np.float64]) -> tuple[bool, bool, bool]:
         """
-        logical check whether a cluster connects with itself across the
-        simulation periodic boundary conditions.
+        Check whether this cluster winds round the periodic boundaries of the
+        simulation cell, connecting to its own periodic images.
+
+        Sites are assigned integer periodic-image vectors by traversing the
+        cluster from an arbitrary root site, using the minimum-image convention
+        to find the wrap count of each bond. The cluster is periodically
+        contiguous along an axis if and only if a bond reaches an
+        already-visited site with a different image vector on that axis
+        (a non-zero winding number).
 
         Args:
-            none
+            cell_lengths: Cell lengths for the orthorhombic simulation cell.
 
-        Returns
-            ( Bool, Bool, Bool ): Contiguity along the x, y, and z coordinate axes
+        Returns:
+            Contiguity along the x, y, and z axes.
+
+        Notes:
+            Assumes the minimum-image convention: every bond must span less
+            than half the cell length along each axis. In practice this means
+            winding can only be detected along an axis where the cluster is at
+            least three sites across the cell.
         """
-        edges = self.sites_at_edges()
-        along_x = any([s2 in (s1.p_neighbours or []) for s1 in edges[0] for s2 in edges[1]])
-        along_y = any([s2 in (s1.p_neighbours or []) for s1 in edges[2] for s2 in edges[3]])
-        along_z = any([s2 in (s1.p_neighbours or []) for s1 in edges[4] for s2 in edges[5]])
-        return (along_x, along_y, along_z)
+        root = next(iter(self.sites))
+        images: dict[Site, npt.NDArray[np.int_]] = {root: np.zeros(3, dtype=int)}
+        stack = [root]
+        winds = np.zeros(3, dtype=bool)
+        while stack:
+            site = stack.pop()
+            assert site.p_neighbours is not None
+            for neighbour in site.p_neighbours:
+                if neighbour not in self.sites:
+                    continue
+                bond_wrap = np.round((neighbour.r - site.r) / cell_lengths).astype(int)
+                neighbour_image = images[site] - bond_wrap
+                if neighbour in images:
+                    winds |= images[neighbour] != neighbour_image
+                else:
+                    images[neighbour] = neighbour_image
+                    stack.append(neighbour)
+        return (bool(winds[0]), bool(winds[1]), bool(winds[2]))
 
     def remove_sites_from_neighbours(self, remove_labels: list[str] | set[str] | str) -> None:
         """
