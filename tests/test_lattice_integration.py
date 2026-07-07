@@ -76,5 +76,43 @@ class LatticeIntegrationTestCase(unittest.TestCase):
                 self.assertEqual(c.size(), 2)
 
 
+class DetachedSitesIntegrationTestCase(unittest.TestCase):
+    """Regression tests for Lattice.detached_sites using real Site objects.
+
+    The old coordinate-extremes heuristic in Cluster.is_periodically_contiguous
+    reported fully connected 4-site clusters as periodically contiguous on all
+    axes, so a lattice of disconnected cliques wrongly reported no detached
+    sites.
+
+    The winding-ring test guards the complementary direction: genuinely
+    winding clusters must not be reported as detached.
+    """
+
+    def test_disconnected_cliques_are_all_detached(self):
+        clique_coordinates = [
+            np.array([0.0, 0.0, 1.0]),
+            np.array([1.0, 1.0, 0.0]),
+            np.array([0.0, 1.0, 1.0]),
+            np.array([1.0, 0.0, 0.0]),
+        ]
+        sites = []
+        for clique, offset in enumerate([np.zeros(3), np.array([5.0, 5.0, 5.0])]):
+            numbers = [clique * 4 + i + 1 for i in range(4)]
+            for number, r in zip(numbers, clique_coordinates):
+                neighbours = [n for n in numbers if n != number]
+                sites.append(Site(number=number, coordinates=r + offset, neighbours=neighbours, energy=0.0, label="A"))
+        lattice = Lattice(sites, cell_lengths=np.array([10.0, 10.0, 10.0]))
+        self.assertEqual({s.number for s in lattice.detached_sites()}, {s.number for s in sites})
+
+    def test_winding_ring_has_no_detached_sites(self):
+        sites = [
+            Site(number=1, coordinates=np.array([0.0, 0.0, 0.0]), neighbours=[2, 3], energy=0.0, label="A"),
+            Site(number=2, coordinates=np.array([1.0, 0.0, 0.0]), neighbours=[1, 3], energy=0.0, label="A"),
+            Site(number=3, coordinates=np.array([2.0, 0.0, 0.0]), neighbours=[1, 2], energy=0.0, label="A"),
+        ]
+        lattice = Lattice(sites, cell_lengths=np.array([3.0, 10.0, 10.0]))
+        self.assertEqual(lattice.detached_sites(), [])
+
+
 if __name__ == "__main__":
     unittest.main()
