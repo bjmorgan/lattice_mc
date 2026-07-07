@@ -55,7 +55,6 @@ select = ["E", "F", "I", "W"]
 ignore = ["E501"]  # Long lines in docstrings; will be addressed with type hints PR
 
 [tool.mypy]
-python_version = "3.11"
 strict = true
 
 [tool.setuptools.package-data]

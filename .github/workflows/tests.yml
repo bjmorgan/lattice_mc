@@ -25,9 +25,6 @@ jobs:
       - name: Lint
         run: ruff check lattice_mc/ tests/
 
-      - name: Type check
-        run: mypy lattice_mc/
-
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -50,3 +47,6 @@ jobs:
 
       - name: Run tests
         run: pytest --cov=lattice_mc --cov-report=term-missing --cov-fail-under=95
+
+      - name: Type check
+        run: mypy lattice_mc/
