@@ -10,3 +10,6 @@ examples/.ipynb_checkpoints/
 # Ignore markdown files in root by default, then whitelist tracked ones
 /*.md
 !/README.md
+
+# Working documents (design docs, specs, plans) are never committed
+docs/superpowers/
