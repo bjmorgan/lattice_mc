@@ -514,7 +514,7 @@ class Lattice:
             (List(Site)): List of sites not in a periodic percolating network.
         """
         clusters = self.connected_sites(site_labels=site_labels)
-        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
+        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous(self.cell_lengths))]
         return list(itertools.chain.from_iterable((c.sites for c in island_clusters)))
 
     def is_blocked(self) -> bool:

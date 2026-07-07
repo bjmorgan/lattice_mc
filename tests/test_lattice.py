@@ -408,6 +408,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.connected_sites = Mock(return_value=clusters)
         self.lattice.sites = sites
         self.assertEqual(self.lattice.detached_sites(), [sites[1]])
+        self.assertIs(clusters[0].is_periodically_contiguous.call_args.args[0], self.lattice.cell_lengths)
 
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")
