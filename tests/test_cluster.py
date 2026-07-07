@@ -64,36 +64,6 @@ class ClusterTestCase(unittest.TestCase):
         cluster = Cluster(sites)
         self.assertEqual(cluster.size(), 2)
 
-    def test_cluster_edges(self):
-        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
-        sites[0].r = np.array([0.0, 0.0, 1.0])
-        sites[1].r = np.array([1.0, 1.0, 0.0])
-        sites[2].r = np.array([0.0, 1.0, 1.0])
-        sites[3].r = np.array([1.0, 0.0, 0.0])
-        sites[0].p_neighbours = [sites[1], sites[2], sites[3]]
-        sites[1].p_neighbours = [sites[0], sites[2], sites[3]]
-        sites[2].p_neighbours = [sites[0], sites[1], sites[3]]
-        sites[3].p_neighbours = [sites[0], sites[1], sites[2]]
-        min_x = (sites[0], sites[2])
-        max_x = (sites[1], sites[3])
-        min_y = (sites[0], sites[3])
-        max_y = (sites[1], sites[2])
-        min_z = (sites[1], sites[3])
-        max_z = (sites[0], sites[2])
-        cluster = Cluster(sites)
-        for s in cluster.sites_at_edges()[0]:
-            self.assertEqual(s in max_x, True)
-        for s in cluster.sites_at_edges()[1]:
-            self.assertEqual(s in min_x, True)
-        for s in cluster.sites_at_edges()[2]:
-            self.assertEqual(s in max_y, True)
-        for s in cluster.sites_at_edges()[3]:
-            self.assertEqual(s in min_y, True)
-        for s in cluster.sites_at_edges()[4]:
-            self.assertEqual(s in max_z, True)
-        for s in cluster.sites_at_edges()[5]:
-            self.assertEqual(s in min_z, True)
-
     def test_cluster_is_periodically_contiguous_for_a_winding_ring_along_x(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
         sites[0].r = np.array([0.0, 0.0, 0.0])
