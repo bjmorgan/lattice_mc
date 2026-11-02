@@ -1,8 +1,8 @@
 import math
-import unittest
 from unittest.mock import Mock, patch
 
 import numpy as np
+import pytest
 
 from lattice_mc.jump import Jump
 from lattice_mc.lattice_site import Site
@@ -12,10 +12,11 @@ from lattice_mc.simulation import SimulationParameters
 PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class JumpTestCase(unittest.TestCase):
+class TestJump:
     """Test for Jump class"""
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def set_up(self):
         self.mock_initial_site = Mock(spec=Site)
         self.mock_final_site = Mock(spec=Site)
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as self.mock_boltzmann_factor:
@@ -23,11 +24,11 @@ class JumpTestCase(unittest.TestCase):
             self.jump = Jump(self.mock_initial_site, self.mock_final_site, params=PARAMS)
 
     def test_jump_is_initialised_with_no_interactions(self):
-        self.assertEqual(self.jump.initial_site, self.mock_initial_site)
-        self.assertEqual(self.jump.final_site, self.mock_final_site)
-        self.assertIsNone(self.jump.nearest_neighbour_energy)
-        self.assertIsNone(self.jump.coordination_number_energy)
-        self.assertEqual(self.jump.relative_probability, self.mock_boltzmann_factor.return_value)
+        assert self.jump.initial_site == self.mock_initial_site
+        assert self.jump.final_site == self.mock_final_site
+        assert self.jump.nearest_neighbour_energy is None
+        assert self.jump.coordination_number_energy is None
+        assert self.jump.relative_probability == self.mock_boltzmann_factor.return_value
 
     def test_jump_is_initialised_with_nn_energy(self):
         nearest_neighbour_energy = "foo"
@@ -37,11 +38,11 @@ class JumpTestCase(unittest.TestCase):
                 self.mock_initial_site, self.mock_final_site,
                 nearest_neighbour_energy=nearest_neighbour_energy, params=PARAMS,
             )
-        self.assertEqual(jump.initial_site, self.mock_initial_site)
-        self.assertEqual(jump.final_site, self.mock_final_site)
-        self.assertEqual(jump.nearest_neighbour_energy, nearest_neighbour_energy)
-        self.assertIsNone(jump.coordination_number_energy)
-        self.assertEqual(jump.relative_probability, 0.13)
+        assert jump.initial_site == self.mock_initial_site
+        assert jump.final_site == self.mock_final_site
+        assert jump.nearest_neighbour_energy == nearest_neighbour_energy
+        assert jump.coordination_number_energy is None
+        assert jump.relative_probability == 0.13
 
     def test_jump_is_initialised_with_cn_energy(self):
         coordination_number_energy = "foo"
@@ -51,11 +52,11 @@ class JumpTestCase(unittest.TestCase):
                 self.mock_initial_site, self.mock_final_site,
                 coordination_number_energy=coordination_number_energy, params=PARAMS,
             )
-        self.assertEqual(jump.initial_site, self.mock_initial_site)
-        self.assertEqual(jump.final_site, self.mock_final_site)
-        self.assertIsNone(jump.nearest_neighbour_energy)
-        self.assertEqual(jump.coordination_number_energy, coordination_number_energy)
-        self.assertEqual(jump.relative_probability, 0.13)
+        assert jump.initial_site == self.mock_initial_site
+        assert jump.final_site == self.mock_final_site
+        assert jump.nearest_neighbour_energy is None
+        assert jump.coordination_number_energy == coordination_number_energy
+        assert jump.relative_probability == 0.13
 
     def test_jump_is_initialised_with_lookup_table(self):
         mock_initial_site = Mock(spec=Site)
@@ -64,27 +65,27 @@ class JumpTestCase(unittest.TestCase):
         with patch("lattice_mc.jump.Jump.relative_probability_from_lookup_table") as mock_p_from_lookup_table:
             mock_p_from_lookup_table.return_value = 0.73
             jump = Jump(mock_initial_site, mock_final_site, jump_lookup_table=jump_lookup_table, params=PARAMS)
-        self.assertEqual(jump.initial_site, mock_initial_site)
-        self.assertEqual(jump.final_site, mock_final_site)
-        self.assertIsNone(jump.nearest_neighbour_energy)
-        self.assertIsNone(jump.coordination_number_energy)
-        self.assertEqual(jump.relative_probability, 0.73)
+        assert jump.initial_site == mock_initial_site
+        assert jump.final_site == mock_final_site
+        assert jump.nearest_neighbour_energy is None
+        assert jump.coordination_number_energy is None
+        assert jump.relative_probability == 0.73
 
     def test_rate(self):
         params = SimulationParameters(temperature=298.0, rate_prefactor=1e-3)
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_bf:
             mock_bf.return_value = 0.5
             j = Jump(self.mock_initial_site, self.mock_final_site, params=params)
-        self.assertEqual(j.rate(), 5e-4)
+        assert j.rate() == 5e-4
 
     def test_boltzmann_factor_lt_0(self):
         self.jump.delta_E = Mock(return_value=-2.5)
-        self.assertEqual(self.jump.boltzmann_factor(), 1.0)
+        assert self.jump.boltzmann_factor() == 1.0
 
     def test_boltzmann_factor_gt_0(self):
         self.jump.delta_E = Mock(return_value=0.2)
         expected = math.exp(-0.2 / PARAMS.kT)
-        self.assertAlmostEqual(self.jump.boltzmann_factor(), expected)
+        assert self.jump.boltzmann_factor() == pytest.approx(expected, abs=5e-8)
 
     def test_delta_E_non_interacting(self):
         initial_energy = 1.5
@@ -94,7 +95,7 @@ class JumpTestCase(unittest.TestCase):
         self.jump.nearest_neighbour_energy = None
         self.jump.coordination_number_energy = None
         delta_E = final_energy - initial_energy
-        self.assertEqual(self.jump.delta_E(), delta_E)
+        assert self.jump.delta_E() == delta_E
 
     def test_delta_E_nn_interactions(self):
         initial_energy = 1.5
@@ -105,7 +106,7 @@ class JumpTestCase(unittest.TestCase):
         self.jump.coordination_number_energy = None
         self.jump.nearest_neighbour_delta_E = Mock(return_value=0.3)
         delta_E = final_energy - initial_energy + self.jump.nearest_neighbour_delta_E.return_value
-        self.assertEqual(self.jump.delta_E(), delta_E)
+        assert self.jump.delta_E() == delta_E
 
     def test_delta_E_cn_dependent(self):
         initial_energy = 1.5
@@ -116,13 +117,13 @@ class JumpTestCase(unittest.TestCase):
         self.jump.coordination_number_energy = True
         self.jump.coordination_number_delta_E = Mock(return_value=0.5)
         delta_E = final_energy - initial_energy + self.jump.coordination_number_delta_E.return_value
-        self.assertEqual(self.jump.delta_E(), delta_E)
+        assert self.jump.delta_E() == delta_E
 
     def test_nearest_neighbour_delta_E(self):
         self.jump.initial_site.nn_occupation = Mock(return_value=3)
         self.jump.final_site.nn_occupation = Mock(return_value=1)
         self.jump.nearest_neighbour_energy = 0.7
-        self.assertEqual(self.jump.nearest_neighbour_delta_E(), -3 * 0.7)
+        assert self.jump.nearest_neighbour_delta_E() == -3 * 0.7
 
     def test_coordination_number_delta_E(self):
         self.jump.initial_site.cn_occupation_energy = Mock(return_value=1.5)
@@ -137,7 +138,7 @@ class JumpTestCase(unittest.TestCase):
         self.jump.initial_site.p_neighbours = mock_sites[:2]
         self.jump.final_site.p_neighbours = mock_sites[2:]
         delta_E = (0.2 + 1.0 + 3.0 + 4.0) - (1.5 + 1.0 + 3.0 + 4.0)
-        self.assertEqual(self.jump.coordination_number_delta_E(), delta_E)
+        assert self.jump.coordination_number_delta_E() == delta_E
 
     def test_dr(self):
         cell_lengths = np.array([10.0, 10.0, 10.0])
@@ -158,15 +159,11 @@ class JumpTestCase(unittest.TestCase):
         self.jump.final_site.nn_occupation = Mock(return_value=1)
         jump_lookup_table = Mock(spec=LookupTable)
         jump_lookup_table.jump_probability = {"A": {"B": {2: {1: 0.5}}}}
-        self.assertEqual(self.jump.relative_probability_from_lookup_table(jump_lookup_table), 0.5)
+        assert self.jump.relative_probability_from_lookup_table(jump_lookup_table) == 0.5
 
     def test_relative_probability_getter(self):
-        self.assertEqual(self.jump.relative_probability, self.jump._relative_probability)
+        assert self.jump.relative_probability == self.jump._relative_probability
 
     def test_relative_probability_setter(self):
         self.jump.relative_probability = 0.5
-        self.assertEqual(self.jump._relative_probability, 0.5)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert self.jump._relative_probability == 0.5

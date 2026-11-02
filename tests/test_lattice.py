@@ -1,7 +1,7 @@
-import unittest
 from unittest.mock import Mock, call, patch
 
 import numpy as np
+import pytest
 
 from lattice_mc.atom import Atom
 from lattice_mc.cluster import Cluster
@@ -15,13 +15,14 @@ from lattice_mc.transitions import Transitions
 PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class LatticeTestCase(unittest.TestCase):
+class TestLattice:
     """Tests for Lattice class"""
 
+    @pytest.fixture(autouse=True)
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")
     @patch("lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions")
-    def setUp(self, pbc, islt, site_id):
+    def set_up(self, pbc, islt, site_id):
         site_id.side_effect = (1, 2, 3, 4, 5, 6, 7, 8)
         self.site_id = site_id
         site_labels = ["A", "B", "A", "B", "C"]
@@ -32,23 +33,23 @@ class LatticeTestCase(unittest.TestCase):
 
     def test_lattice_is_initialised(self):
         np.testing.assert_array_equal(self.lattice.cell_lengths, self.cell_lengths)
-        self.assertEqual(self.lattice.sites, self.mock_sites)
-        self.assertEqual(self.lattice.number_of_sites, 5)
-        self.assertEqual(self.lattice.site_labels, {"A", "B", "C"})
-        self.assertEqual(self.lattice.site_populations, {"A": 2, "B": 2, "C": 1})
+        assert self.lattice.sites == self.mock_sites
+        assert self.lattice.number_of_sites == 5
+        assert self.lattice.site_labels == {"A", "B", "C"}
+        assert self.lattice.site_populations == {"A": 2, "B": 2, "C": 1}
         self.site_id.assert_has_calls([call(2), call(3), call(1), call(3), call(1), call(2), call(5), call(4)])
-        self.assertEqual(self.mock_sites[0].p_neighbours, [1, 2])
-        self.assertEqual(self.mock_sites[1].p_neighbours, [3, 4])
-        self.assertEqual(self.mock_sites[2].p_neighbours, [5, 6])
-        self.assertEqual(self.mock_sites[3].p_neighbours, [7])
-        self.assertEqual(self.mock_sites[4].p_neighbours, [8])
+        assert self.mock_sites[0].p_neighbours == [1, 2]
+        assert self.mock_sites[1].p_neighbours == [3, 4]
+        assert self.mock_sites[2].p_neighbours == [5, 6]
+        assert self.mock_sites[3].p_neighbours == [7]
+        assert self.mock_sites[4].p_neighbours == [8]
 
     def test_dimensionality_is_three_for_three_non_zero_cell_lengths(self):
-        self.assertEqual(self.lattice.dimensionality, 3)
+        assert self.lattice.dimensionality == 3
 
     def test_dimensionality_excludes_zero_cell_lengths(self):
         self.lattice.cell_lengths = np.array([7.0, 8.0, 0.0])
-        self.assertEqual(self.lattice.dimensionality, 2)
+        assert self.lattice.dimensionality == 2
 
     def test_enforce_periodice_boundary_consitions(self):
         site_coordinates = [np.array([-1.0, 11.0, 3.0]), np.array([2.0, -3.0, 12.0])]
@@ -61,30 +62,30 @@ class LatticeTestCase(unittest.TestCase):
 
     def test_reset(self):
         self.lattice.reset()
-        self.assertEqual(self.lattice.time, 0.0)
-        self.assertEqual(self.lattice.sites[0].time_occupied, 0.0)
+        assert self.lattice.time == 0.0
+        assert self.lattice.sites[0].time_occupied == 0.0
 
     def test_initialised_site_lookup_table(self):
         for i, site in enumerate(self.lattice.sites):
             site.number = i
         self.lattice.initialise_site_lookup_table()
-        self.assertEqual(self.lattice.site_lookup[0], self.mock_sites[0])
+        assert self.lattice.site_lookup[0] == self.mock_sites[0]
 
     def test_site_with_id(self):
         self.lattice.site_lookup = ["foo", "bar"]
-        self.assertEqual(self.lattice.site_with_id(1), "bar")
+        assert self.lattice.site_with_id(1) == "bar"
 
     def test_vacant_sites(self):
         occupied = [True, False, True, False, True]
         for o, site in zip(occupied, self.lattice.sites):
             site.is_occupied = o
-        self.assertEqual(list(self.lattice.vacant_sites()), self.mock_sites[1:5:2])
+        assert list(self.lattice.vacant_sites()) == self.mock_sites[1:5:2]
 
     def test_occupied_sites(self):
         occupied = [True, False, True, False, True]
         for o, site in zip(occupied, self.lattice.sites):
             site.is_occupied = o
-        self.assertEqual(list(self.lattice.occupied_sites()), self.mock_sites[0:5:2])
+        assert list(self.lattice.occupied_sites()) == self.mock_sites[0:5:2]
 
     def test_vacant_site_numbers(self):
         occupied = [True, False, True, False, True]
@@ -92,7 +93,7 @@ class LatticeTestCase(unittest.TestCase):
         for n, o, site in zip(numbers, occupied, self.lattice.sites):
             site.is_occupied = o
             site.number = n
-        self.assertEqual(self.lattice.vacant_site_numbers(), [5, 7])
+        assert self.lattice.vacant_site_numbers() == [5, 7]
 
     def test_occupied_site_numbers(self):
         occupied = [True, False, True, False, True]
@@ -100,7 +101,7 @@ class LatticeTestCase(unittest.TestCase):
         for n, o, site in zip(numbers, occupied, self.lattice.sites):
             site.is_occupied = o
             site.number = n
-        self.assertEqual(self.lattice.occupied_site_numbers(), [4, 6, 8])
+        assert self.lattice.occupied_site_numbers() == [4, 6, 8]
 
     @patch("lattice_mc.jump.Jump")
     def test_potential_jumps_if_lattice_is_mostly_empty(self, mock_Jump):  # lattice is mostly vacant
@@ -123,11 +124,11 @@ class LatticeTestCase(unittest.TestCase):
                 mock_occupied_sites.return_value = occupied_sites
                 mock_site_with_id.side_effect = unoccupied_sites[:2]
                 potential_jumps = self.lattice.potential_jumps()
-                self.assertEqual(potential_jumps, jumps)
-                self.assertEqual(mock_Jump.mock_calls[0][1], (site, unoccupied_sites[0], "A", "B", "C"))
-                self.assertEqual(mock_Jump.mock_calls[0][2], {"params": PARAMS})
-                self.assertEqual(mock_Jump.mock_calls[1][1], (site, unoccupied_sites[1], "A", "B", "C"))
-                self.assertEqual(mock_Jump.mock_calls[1][2], {"params": PARAMS})
+                assert potential_jumps == jumps
+                assert mock_Jump.mock_calls[0][1] == (site, unoccupied_sites[0], "A", "B", "C")
+                assert mock_Jump.mock_calls[0][2] == {"params": PARAMS}
+                assert mock_Jump.mock_calls[1][1] == (site, unoccupied_sites[1], "A", "B", "C")
+                assert mock_Jump.mock_calls[1][2] == {"params": PARAMS}
                 mock_site_with_id.assert_has_calls([call(2), call(3)])
 
     @patch("lattice_mc.jump.Jump")
@@ -150,11 +151,11 @@ class LatticeTestCase(unittest.TestCase):
                 mock_vacant_sites.return_value = vacant_sites
                 mock_site_with_id.side_effect = occupied_sites[:2]
                 jumps = self.lattice.potential_jumps()
-                self.assertEqual(jumps, ["jump1", "jump2"])
-                self.assertEqual(mock_Jump.mock_calls[0][1], (occupied_sites[0], site, "A", "B", "C"))
-                self.assertEqual(mock_Jump.mock_calls[0][2], {"params": PARAMS})
-                self.assertEqual(mock_Jump.mock_calls[1][1], (occupied_sites[1], site, "A", "B", "C"))
-                self.assertEqual(mock_Jump.mock_calls[1][2], {"params": PARAMS})
+                assert jumps == ["jump1", "jump2"]
+                assert mock_Jump.mock_calls[0][1] == (occupied_sites[0], site, "A", "B", "C")
+                assert mock_Jump.mock_calls[0][2] == {"params": PARAMS}
+                assert mock_Jump.mock_calls[1][1] == (occupied_sites[1], site, "A", "B", "C")
+                assert mock_Jump.mock_calls[1][2] == {"params": PARAMS}
                 mock_site_with_id.assert_has_calls([call(2), call(3)])
 
     def test_update(self):
@@ -171,19 +172,19 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.cell_lengths = np.array([1.0, 2.0, 3.0])
         self.lattice.update(jump)
         jump.dr.assert_called_with(self.lattice.cell_lengths)
-        self.assertEqual(jump.final_site.occupation, atom.number)
-        self.assertEqual(jump.initial_site.occupation, 0)
-        self.assertEqual(jump.initial_site.atom, None)
-        self.assertEqual(jump.final_site.atom, atom)
-        self.assertEqual(jump.final_site.is_occupied, True)
-        self.assertEqual(jump.initial_site.is_occupied, False)
-        self.assertEqual(atom.site, jump.final_site)
-        self.assertEqual(atom.number_of_hops, 5)
+        assert jump.final_site.occupation == atom.number
+        assert jump.initial_site.occupation == 0
+        assert jump.initial_site.atom is None
+        assert jump.final_site.atom == atom
+        assert jump.final_site.is_occupied is True
+        assert jump.initial_site.is_occupied is False
+        assert atom.site == jump.final_site
+        assert atom.number_of_hops == 5
         np.testing.assert_array_equal(atom.dr, np.array([3.0, 5.0, 7.0]))
-        self.assertEqual(atom.summed_dr2, 30.3)
+        assert atom.summed_dr2 == 30.3
 
     def test_populate_sites_raises_ValueError_with_too_many_atoms(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             self.lattice.populate_sites(number_of_atoms=10)
 
     def test_populate_sites(self):
@@ -194,9 +195,9 @@ class LatticeTestCase(unittest.TestCase):
                 mock_random_sample.return_value = mock_sites
                 mock_Atom.return_value = [Mock(spec=Atom), Mock(spec=Atom)]
                 self.lattice.populate_sites(2)
-                self.assertEqual(mock_Atom.mock_calls[0][2]["initial_site"], mock_sites[0])
-                self.assertEqual(mock_Atom.mock_calls[1][2]["initial_site"], mock_sites[1])
-                self.assertEqual(self.lattice.number_of_occupied_sites, number_of_atoms)
+                assert mock_Atom.mock_calls[0][2]["initial_site"] == mock_sites[0]
+                assert mock_Atom.mock_calls[1][2]["initial_site"] == mock_sites[1]
+                assert self.lattice.number_of_occupied_sites == number_of_atoms
 
     def test_populate_sites_with_selected_sites(self):
         with patch("random.sample") as mock_random_sample:
@@ -206,7 +207,7 @@ class LatticeTestCase(unittest.TestCase):
                 mock_Atom.return_value = [Mock(spec=Atom), Mock(spec=Atom)]
                 self.lattice.populate_sites(2, selected_sites=["A"])
                 for site in mock_random_sample.call_args[0][0]:
-                    self.assertEqual(site.label, "A")
+                    assert site.label == "A"
 
     @patch("lattice_mc.transitions.Transitions")
     def test_jump(self, mock_Transitions):
@@ -225,18 +226,18 @@ class LatticeTestCase(unittest.TestCase):
         mock_Transitions.assert_called_with(potential_jumps, params=PARAMS)
         self.lattice.update.assert_called_with(selected_jump)
         self.lattice.update_site_occupation_times.assert_called_with(5.0)
-        self.assertEqual(self.lattice.time, 2.0 + 5.0)
+        assert self.lattice.time == 2.0 + 5.0
 
     def test_potential_jumps_raises_RuntimeError_if_params_not_set(self):
         self.lattice.number_of_occupied_sites = 1
         self.lattice.params = None
-        with self.assertRaises(RuntimeError):
+        with pytest.raises(RuntimeError):
             self.lattice.potential_jumps()
 
     def test_jump_raises_BlockedLatticeError_if_no_possible_jumps(self):
         potential_jumps = []
         self.lattice.potential_jumps = Mock(return_value=potential_jumps)
-        with self.assertRaises(BlockedLatticeError):
+        with pytest.raises(BlockedLatticeError):
             self.lattice.jump()
 
     def test_update_site_occupation_times(self):
@@ -245,8 +246,8 @@ class LatticeTestCase(unittest.TestCase):
         occupied_sites[1].time_occupied = 3.2
         self.lattice.occupied_sites = Mock(return_value=occupied_sites)
         self.lattice.update_site_occupation_times(4.2)
-        self.assertEqual(occupied_sites[0].time_occupied, 2.0 + 4.2)
-        self.assertEqual(occupied_sites[1].time_occupied, 3.2 + 4.2)
+        assert occupied_sites[0].time_occupied == 2.0 + 4.2
+        assert occupied_sites[1].time_occupied == 3.2 + 4.2
 
     def test_site_occupation_statistics(self):
         self.lattice.site_labels = ["A", "B"]
@@ -258,7 +259,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.sites = sites
         self.lattice.time = 4.0
         occupation_stats = self.lattice.site_occupation_statistics()
-        self.assertEqual(occupation_stats, {"A": 0.5, "B": 0.8})
+        assert occupation_stats == {"A": 0.5, "B": 0.8}
 
     def test_set_site_energies(self):
         site_energies = {"A": 0.2, "B": 0.4}
@@ -267,12 +268,12 @@ class LatticeTestCase(unittest.TestCase):
         sites[1].label = "B"
         self.lattice.sites = sites
         self.lattice.set_site_energies(site_energies)
-        self.assertEqual(sites[0].energy, 0.2)
-        self.assertEqual(sites[1].energy, 0.4)
+        assert sites[0].energy == 0.2
+        assert sites[1].energy == 0.4
 
     def test_set_nn_energy(self):
         self.lattice.set_nn_energy("foo")
-        self.assertEqual(self.lattice.nn_energy, "foo")
+        assert self.lattice.nn_energy == "foo"
 
     def test_set_cn_energies(self):
         cn_energies = {"A": 0.5, "B": 0.3}
@@ -285,7 +286,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.set_cn_energies(cn_energies)
         sites[0].set_cn_occupation_energies.assert_called_with(0.5)
         sites[1].set_cn_occupation_energies.assert_called_with(0.3)
-        self.assertEqual(self.lattice.cn_energies, cn_energies)
+        assert self.lattice.cn_energies == cn_energies
 
     def test_site_coordination_numbers(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
@@ -295,7 +296,7 @@ class LatticeTestCase(unittest.TestCase):
         sites[1].neighbours = [1, 2, 3, 4, 5, 6]
         self.lattice.sites = sites
         self.lattice.site_labels = ("A", "B")
-        self.assertEqual(self.lattice.site_coordination_numbers(), {"A": {4}, "B": {6}})
+        assert self.lattice.site_coordination_numbers() == {"A": {4}, "B": {6}}
 
     def test_site_coordination_numbers_for_varied_coordination_numbers(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
@@ -305,12 +306,12 @@ class LatticeTestCase(unittest.TestCase):
         sites[1].neighbours = [1, 2]
         self.lattice.sites = sites
         self.lattice.site_labels = {"A"}
-        self.assertEqual(self.lattice.site_coordination_numbers(), {"A": {2, 4}})
+        assert self.lattice.site_coordination_numbers() == {"A": {2, 4}}
 
     def test_max_site_coordination_numbers(self):
         with patch("lattice_mc.lattice.Lattice.site_coordination_numbers") as mock_site_coordination_numbers:
             mock_site_coordination_numbers.return_value = {"A": {4}, "B": {2, 4}}
-            self.assertEqual(self.lattice.max_site_coordination_numbers(), {"A": 4, "B": 4})
+            assert self.lattice.max_site_coordination_numbers() == {"A": 4, "B": 4}
 
     def test_site_specific_coordination_numbers(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
@@ -319,7 +320,7 @@ class LatticeTestCase(unittest.TestCase):
         sites[0].site_specific_neighbours = Mock(return_value="foo")
         sites[1].site_specific_neighbours = Mock(return_value="bar")
         self.lattice.sites = sites
-        self.assertEqual(self.lattice.site_specific_coordination_numbers(), {"A": "foo", "B": "bar"})
+        assert self.lattice.site_specific_coordination_numbers() == {"A": "foo", "B": "bar"}
 
     def test_connected_site_pairs(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
@@ -328,7 +329,7 @@ class LatticeTestCase(unittest.TestCase):
         sites[0].p_neighbours = [sites[1]]
         sites[1].p_neighbours = [sites[0]]
         self.lattice.sites = sites
-        self.assertEqual(self.lattice.connected_site_pairs(), {"A": ["B"], "B": ["A"]})
+        assert self.lattice.connected_site_pairs() == {"A": ["B"], "B": ["A"]}
 
     def test_connected_site_pairs_combines_all_connections(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -339,7 +340,7 @@ class LatticeTestCase(unittest.TestCase):
         sites[2].p_neighbours = [sites[0]]
         sites[3].p_neighbours = [sites[1]]
         self.lattice.sites = sites
-        self.assertEqual(self.lattice.connected_site_pairs()["A"], ["A", "B", "C"])
+        assert self.lattice.connected_site_pairs()["A"] == ["A", "B", "C"]
 
     @patch("random.sample")
     def test_transmute_sites_selects_from_old_site_label(self, mock_random_sample):
@@ -351,8 +352,8 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.site_labels = set([s.label for s in self.lattice.sites])
         self.lattice.select_sites = Mock(return_value=[sites[1]])
         self.lattice.transmute_sites("B", "C", 1)
-        self.assertEqual(set([s.label for s in self.lattice.sites]), set(["A", "C"]))
-        self.assertEqual(self.lattice.site_labels, set(["A", "C"]))
+        assert set([s.label for s in self.lattice.sites]) == set(["A", "C"])
+        assert self.lattice.site_labels == set(["A", "C"])
         mock_random_sample.assert_called_with([sites[1]], 1)
 
     @patch("lattice_mc.cluster.Cluster")
@@ -372,7 +373,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.sites = sites
         initial_clusters[0].is_neighbouring.return_value = True
         initial_clusters[0].merge.return_value = merged_cluster
-        self.assertEqual(self.lattice.connected_sites(), [merged_cluster])
+        assert self.lattice.connected_sites() == [merged_cluster]
 
     @patch("lattice_mc.cluster.Cluster")
     def test_connected_sites_with_site_labels(self, mock_cluster):
@@ -388,7 +389,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.select_sites = Mock(return_value=[sites[0]])
         initial_clusters[0].is_neighbouring.return_value = False
         site_labels = "B"
-        self.assertEqual(self.lattice.connected_sites(site_labels), initial_clusters)
+        assert self.lattice.connected_sites(site_labels) == initial_clusters
         self.lattice.select_sites.assert_called_with(site_labels)
 
     def test_select_sites(self):
@@ -398,9 +399,9 @@ class LatticeTestCase(unittest.TestCase):
         sites[2].label = "B"
         self.lattice.site_labels = set([s.label for s in sites])
         self.lattice.sites = sites
-        self.assertEqual(self.lattice.select_sites("A"), [sites[0]])
-        self.assertEqual(self.lattice.select_sites("AA"), [sites[1]])
-        self.assertEqual(self.lattice.select_sites(["A", "B"]), [sites[0], sites[2]])
+        assert self.lattice.select_sites("A") == [sites[0]]
+        assert self.lattice.select_sites("AA") == [sites[1]]
+        assert self.lattice.select_sites(["A", "B"]) == [sites[0], sites[2]]
 
     def test_detached_sites(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
@@ -414,7 +415,7 @@ class LatticeTestCase(unittest.TestCase):
         self.lattice.site_labels = set([s.label for s in sites])
         self.lattice.connected_sites = Mock(return_value=clusters)
         self.lattice.sites = sites
-        self.assertEqual(self.lattice.detached_sites(), [sites[1]])
+        assert self.lattice.detached_sites() == [sites[1]]
 
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")
@@ -431,7 +432,7 @@ class LatticeTestCase(unittest.TestCase):
         lattice.sites[0].is_occupied = True
         lattice.sites[1].is_occupied = True
         lattice.number_of_occupied_sites = 1
-        self.assertEqual(lattice.is_blocked(), True)
+        assert lattice.is_blocked() is True
 
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")
@@ -448,8 +449,4 @@ class LatticeTestCase(unittest.TestCase):
         lattice.sites[0].is_occupied = True
         lattice.sites[1].is_occupied = True
         lattice.number_of_occupied_sites = 1
-        self.assertEqual(lattice.is_blocked(), False)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert lattice.is_blocked() is False
