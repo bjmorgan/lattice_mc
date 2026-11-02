@@ -14,11 +14,11 @@ def metropolis(delta_E: float, kT: float) -> float:
     Boltzmann probability factor for an event with an energy change `delta_E`, following the Metropolis algorithm.
 
     Args:
-        delta_E (Float): The change in energy.
-        kT (Float): Thermal energy kT in eV.
+        delta_E: The change in energy.
+        kT: Thermal energy kT in eV.
 
     Returns:
-        (Float): Metropolis relative probability for this event.
+        Metropolis relative probability for this event.
     """
     if delta_E <= 0.0:
         return 1.0
@@ -36,12 +36,12 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Initialise a LookupTable object instance.
 
         Args:
-            lattice (lattice_mc.Lattice): The lattice object, used to define the allowed jumps.
-            hamiltonian (Str): The model Hamiltonian used to define the jump energies.
-                Allowed values = `nearest-neighbour`
+            lattice: The lattice object, used to define the allowed jumps.
+            hamiltonian: The model Hamiltonian used to define the jump energies. The only
+                supported value is 'nearest-neighbour'.
 
-        Returns:
-            None
+        Raises:
+            ValueError: If `hamiltonian` is not supported.
         """
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
@@ -65,13 +65,13 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         The relative probability for a jump between two sites with specific site types and coordination numbers.
 
         Args:
-            l1 (Str): Site label for the initial site.
-            l2 (Str): Site label for the final site.
-            c1 (Int): Coordination number for the initial site.
-            c2 (Int): Coordination number for the final site.
+            l1: Site label for the initial site.
+            l2: Site label for the final site.
+            c1: Coordination number for the initial site.
+            c2: Coordination number for the final site.
 
         Returns:
-            (Float): The relative probability of this jump occurring.
+            The relative probability of this jump occurring.
         """
         if self.site_energies:
             site_delta_E = self.site_energies[l2] - self.site_energies[l1]
@@ -85,12 +85,6 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
     def generate_nearest_neighbour_lookup_table(self) -> None:
         """
         Construct a look-up table of relative jump probabilities for a nearest-neighbour interaction Hamiltonian.
-
-        Args:
-            None.
-
-        Returns:
-            None.
         """
         self.jump_probability: dict[str, dict[str, dict[int, dict[int, float]]]] = {}
         for site_label_1 in self.connected_site_pairs:

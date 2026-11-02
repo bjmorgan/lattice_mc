@@ -13,7 +13,7 @@ class BlockedLatticeError(Error):
     """Exception raised if there are no possible moves.
 
     Attributes:
-        message: explanation of the error
+        message: Explanation of the error.
     """
 
     def __init__(self, message: str) -> None:

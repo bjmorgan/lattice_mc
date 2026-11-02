@@ -26,11 +26,8 @@ class Transitions:
         Initialise a Transitions object.
 
         Args:
-            jumps (List(Jump)): List of jumps to be contained in this Transitions object.
-            params (SimulationParameters): Simulation parameters (temperature, rate prefactor).
-
-        Returns:
-            None
+            jumps: List of jumps to be contained in this Transitions object.
+            params: Simulation parameters (temperature, rate prefactor).
         """
         self.jumps: list[Jump] = jumps
         self.params: SimulationParameters = params
@@ -40,11 +37,8 @@ class Transitions:
         """
         Cumulative sum of the relative probabilities for all possible jumps.
 
-        Args:
-            None
-
         Returns:
-            (np.array): Cumulative sum of relative jump probabilities.
+            Cumulative sum of relative jump probabilities.
         """
         partition_function = np.sum(self.p)
         return np.cumsum(self.p) / partition_function
@@ -53,11 +47,8 @@ class Transitions:
         """
         Select a jump at random with appropriate relative probabilities.
 
-        Args:
-            None
-
         Returns:
-            (Jump): The randomly selected Jump.
+            The randomly selected Jump.
         """
         j = np.searchsorted(self.cumulative_probabilities(), random.random())
         return self.jumps[j]
@@ -66,11 +57,8 @@ class Transitions:
         """
         The timestep until the next jump.
 
-        Args:
-            None
-
         Returns:
-            (Float): The timestep until the next jump.
+            The timestep until the next jump.
         """
         k_tot = self.params.rate_prefactor * np.sum(self.p)
         return -(1.0 / k_tot) * math.log(random.random())

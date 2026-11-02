@@ -16,13 +16,10 @@ class Cluster:
 
     def __init__(self, sites: Iterable[Site]) -> None:
         """
-        Initialise an Cluster instance.
+        Initialise a Cluster instance.
 
         Args:
-            sites (List(Site): The list of sites that make up the cluster.
-
-        Returns:
-            None
+            sites: The sites that make up the cluster.
         """
         self.sites: set[Site] = set(sites)
         self.neighbours: set[Site] = set()
@@ -36,10 +33,10 @@ class Cluster:
         Combine two clusters into a single cluster.
 
         Args:
-            other_cluster (Cluster): The second cluster to combine.
+            other_cluster: The second cluster to combine.
 
         Returns:
-            (Cluster):   The combination of both clusters.
+            The combination of both clusters.
         """
         new_cluster = Cluster(self.sites | other_cluster.sites)
         new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
@@ -50,10 +47,10 @@ class Cluster:
         Logical check whether the neighbour list for cluster A includes any sites in cluster B.
 
         Args:
-            other_cluster (Cluster): the other cluster we are testing for neighbour connectivity
+            other_cluster: The other cluster to test for neighbour connectivity.
 
         Returns:
-            (Bool): True if the other cluster neighbours this cluster.
+            True if the other cluster neighbours this cluster.
         """
         return bool(self.neighbours & other_cluster.sites)
 
@@ -61,11 +58,8 @@ class Cluster:
         """
         Number of sites in this cluster.
 
-        Args:
-            None
-
         Returns:
-            (Int): The number of sites in this cluster.
+            The number of sites in this cluster.
         """
         return len(self.sites)
 
@@ -73,11 +67,8 @@ class Cluster:
         """
         Finds the six sites with the maximum and minimum coordinates along x, y, and z.
 
-        Args:
-            None
-
         Returns:
-             (List(List)): In the order [ +x, -x, +y, -y, +z, -z ]
+            The six sites, in the order [+x, -x, +y, -y, +z, -z].
         """
         min_x = min([s.r[0] for s in self.sites])
         max_x = max([s.r[0] for s in self.sites])
@@ -97,11 +88,8 @@ class Cluster:
         """
         Logical check whether a cluster connects with itself across the periodic boundaries.
 
-        Args:
-            none
-
         Returns:
-            ( Bool, Bool, Bool ): Contiguity along the x, y, and z coordinate axes
+            Contiguity along the x, y, and z coordinate axes.
         """
         edges = self.sites_at_edges()
         along_x = any([s2 in (s1.p_neighbours or []) for s1 in edges[0] for s2 in edges[1]])
@@ -114,10 +102,7 @@ class Cluster:
         Removes sites from the set of neighbouring sites if these have labels in remove_labels.
 
         Args:
-            remove_labels (List) or (Str): List of Site labels to be removed from the cluster neighbour set.
-
-        Returns:
-            None
+            remove_labels: Site labels, or a single site label, to remove from the cluster neighbour set.
         """
         if type(remove_labels) is str:
             remove_labels = [remove_labels]
