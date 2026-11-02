@@ -143,7 +143,8 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
             energy: <site occupation energy>
 
         Site numbers are arbitrary integers. The energy line is optional, and
-        defaults to 0.0. Lines within a block can be in any order. Both
+        defaults to 0.0. Energies must be plain decimals with a single space after
+        the colon (see https://github.com/bjmorgan/lattice_mc/issues/31). Lines within a block can be in any order. Both
         centre/center and neighbours/neighbors are accepted. A full example is
         ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
     """

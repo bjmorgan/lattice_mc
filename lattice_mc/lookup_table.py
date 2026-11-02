@@ -14,7 +14,7 @@ def metropolis(delta_E: float, kT: float) -> float:
     Boltzmann probability factor for an event with an energy change `delta_E`, following the Metropolis algorithm.
 
     Args:
-        delta_E: The change in energy.
+        delta_E: The change in energy, in eV.
         kT: Thermal energy kT in eV.
 
     Returns:
@@ -36,7 +36,8 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Initialise a LookupTable object instance.
 
         Args:
-            lattice: The lattice object, used to define the allowed jumps.
+            lattice: The lattice object, used to define the allowed jumps. Its `params` must
+                have been set.
             hamiltonian: The model Hamiltonian used to define the jump energies. The only
                 supported value is 'nearest-neighbour'.
 

@@ -126,7 +126,7 @@ class Simulation:
 
         Args:
             nn_energy: Interaction energy, in eV, for each pair of occupied nearest-neighbour
-                sites. If None, the lattice is left unchanged.
+                sites. A positive energy is a repulsion. If None, the lattice is left unchanged.
         """
         assert self.lattice is not None
         if nn_energy is not None:
@@ -140,11 +140,20 @@ class Simulation:
             cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
                 the label of its neighbouring sites, then by the number of those neighbours that
                 are occupied. The energy of an occupied site is the sum of the energies for each
-                neighbouring label; vacant sites contribute no energy. If None, the lattice is left unchanged. For example, on a honeycomb lattice
-                built with ``alternating_sites=True``, every 'A' site has three 'B' neighbours::
+                neighbouring label; vacant sites contribute no energy. If None, the lattice is left
+                unchanged. The dict must be complete:
+                every site label, every label of a neighbouring site, and every count from 0 to the
+                number of those neighbours, or the simulation raises a KeyError. For example, on a
+                honeycomb lattice built with ``alternating_sites=True``, every 'A' site has three
+                'B' neighbours::
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
                     {'A': {'B': cn}, 'B': {'A': cn}}
+
+        Notes:
+            On lattices where a site can neighbour both ends of a jump (lattices with
+            triangles), the energy change for such a site is miscounted when both ends have
+            the same label. See https://github.com/bjmorgan/lattice_mc/issues/30.
         """
         assert self.lattice is not None
         if cn_energies is not None:
@@ -184,7 +193,8 @@ class Simulation:
         Args:
             for_time: If given, run until the simulation time reaches this value, instead of for
                 the number of jumps set by `set_number_of_jumps`. Any equilibration jumps are run
-                first. Defaults to None.
+                first, and the time is counted from the end of equilibration. After the run,
+                `number_of_jumps` is the number of jumps made. Defaults to None.
 
         Raises:
             AttributeError: If the simulation has not been initialised.

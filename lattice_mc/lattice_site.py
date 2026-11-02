@@ -35,7 +35,7 @@ class Site:
             number: An identifying number for this site.
             coordinates: The coordinates of this site.
             neighbours: A list of the id numbers of the neighbouring sites.
-            energy: On-site occupation energy.
+            energy: On-site occupation energy, in eV.
             label: Label for classifying this as a specific site type.
             cn_energies: Coordination-number dependent energies, in eV, for this site,
                 nested by the label of its neighbouring sites, then by the number of those
@@ -111,7 +111,8 @@ class Site:
 
         Args:
             delta_occupation: A change in the number of occupied neighbours with each label, for
-                example ``{'A': 1, 'B': -1}``. If this is not None, the coordination-number dependent energy is calculated including these changes in neighbour-site occupations. Defaults to None.
+                example ``{'A': 1, 'B': -1}``. If this is not None, the energy is calculated
+                including these changes in neighbour-site occupations. Defaults to None.
 
         Returns:
             The coordination-number dependent energy for this site.

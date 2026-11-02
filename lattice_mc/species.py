@@ -28,10 +28,10 @@ class Species:
 
     def sites_occupied(self) -> list[int]:
         """
-        Returns a list of sites occupied by these atoms.
+        Returns the numbers of the sites occupied by these atoms.
 
         Returns:
-            List of sites occupied by these atoms.
+            The id numbers of the sites occupied by these atoms.
         """
         return [atom.site.number for atom in self.atoms]
 
@@ -50,6 +50,9 @@ class Species:
 
         Returns:
             The square of the summed total displacements for these atoms.
+
+        Raises:
+            ValueError: If there are no atoms.
         """
         if not self.atoms:
             raise ValueError("Cannot compute collective displacement for empty Species.")

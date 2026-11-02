@@ -24,6 +24,9 @@ class Atom:
 
         Args:
             initial_site: Lattice site initially occupied by this Atom.
+
+        Raises:
+            ValueError: If `initial_site` is already occupied.
         """
         Atom.atom_number += 1
         self.number: int = Atom.atom_number
