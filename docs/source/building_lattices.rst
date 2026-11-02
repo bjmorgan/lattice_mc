@@ -115,5 +115,5 @@ assigns the lattice to a simulation.
 
 A full real-world example, the lithium sublattice of the garnet LLZO studied in
 [Morgan2017]_, is `llzo_lattice_site_list.dat
-<https://github.com/bjmorgan/lattice_mc/blob/master/examples/llzo_lattice_site_list.dat>`_
+<https://github.com/bjmorgan/lattice_mc/blob/main/examples/llzo_lattice_site_list.dat>`_
 in the ``examples`` directory of the repository.
