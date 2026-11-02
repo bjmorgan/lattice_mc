@@ -85,7 +85,9 @@ Each block gives:
     0.0.
 
 Lines within a block can be in any order. The cell lengths are given separately. Set
-the z cell length to 0 for a two-dimensional lattice:
+the z cell length to 0 for a two-dimensional lattice. In this example, ``DATA_DIR`` is
+the directory that holds the file; replace the path with the location of your own
+sites file:
 
 .. testcode::
 

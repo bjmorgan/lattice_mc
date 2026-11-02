@@ -37,7 +37,8 @@ Non-interacting atoms
 ---------------------
 
 By default, the only interaction is volume exclusion: two atoms cannot occupy the
-same site. Every allowed jump has :math:`\Delta E = 0`.
+same site. Unless the sites have occupation energies (see `Site energies`_), every
+allowed jump has :math:`\Delta E = 0`.
 
 .. testcode::
 
@@ -70,19 +71,25 @@ each pair of occupied neighbouring sites. A positive energy is a repulsion.
 :meth:`~lattice_mc.simulation.Simulation.setup_lookup_table` is optional. It
 precalculates the probability of every possible jump, which speeds up simulations
 with nearest-neighbour interactions. Without a table, probabilities are calculated
-as they are needed. The table includes the site energies and the nearest-neighbour
-energy set when it is created, so set those first. It does not include
-coordination-number energies.
+as they are needed. The table includes the energies set with
+:meth:`~lattice_mc.simulation.Simulation.set_site_energies` and the nearest-neighbour
+energy, as set when the table is created, so set those first.
+
+.. warning::
+
+    A lookup table ignores per-site energies read from a sites file, and
+    coordination-number energies. Do not use a table with either: the simulation runs,
+    but without those energies.
 
 Coordination-number energies
 ----------------------------
 
-:meth:`~lattice_mc.simulation.Simulation.set_cn_energies` gives each site an energy
-that depends on how many of its neighbours are occupied. The energies are nested by
-site label, then by the label of the neighbouring sites, then by the number of those
-neighbours that are occupied. The energy of a site is the sum of its energies for each
-neighbouring label, and must be given for every possible number of occupied
-neighbours.
+:meth:`~lattice_mc.simulation.Simulation.set_cn_energies` gives each occupied site
+an energy that depends on how many of its neighbours are occupied; vacant sites
+contribute no energy. The energies are nested by site label, then by the label of the
+neighbouring sites, then by the number of those neighbours that are occupied. The
+energy of an occupied site is the sum of its energies for each neighbouring label, and
+must be given for every possible number of occupied neighbours.
 
 .. testcode::
 
@@ -96,8 +103,7 @@ neighbours.
 
     True
 
-Do not use a lookup table with coordination-number energies, because the table does
-not include them.
+Do not use a lookup table with coordination-number energies (see the warning above).
 
 Site energies
 -------------
@@ -118,4 +124,5 @@ given label an occupation energy. Here ``'B'`` sites are 0.1 eV less favourable 
     True
 
 Site energies can also be given per site in a sites file (see
-:doc:`building_lattices`).
+:doc:`building_lattices`). Do not use a lookup table with energies from a sites file
+(see the warning above).

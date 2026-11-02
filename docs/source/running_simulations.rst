@@ -92,7 +92,10 @@ from their random starting positions, and are not included in the results.
     equilibrated.run()
 
 :meth:`~lattice_mc.simulation.Simulation.reset` sets the time and the atom
-displacements back to zero, leaving the atoms where they are.
+displacements back to zero, leaving the atoms where they are. Call
+:meth:`~lattice_mc.simulation.Simulation.run` again before reading the results: after a
+reset, the diffusion coefficients and correlation factors cannot be calculated until
+time has passed. A second run continues from the current atom positions.
 
 Results
 -------
