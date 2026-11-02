@@ -8,6 +8,19 @@ from lattice_mc import init_lattice
 # TODO write integration tests for creating lattices
 
 
+class InitLatticeDimensionalityTestCase(unittest.TestCase):
+    """Tests for the dimensionality of lattices built by the initialisation routines"""
+
+    def test_square_lattice_is_two_dimensional(self):
+        self.assertEqual(init_lattice.square_lattice(2, 3, 1.0).dimensionality, 2)
+
+    def test_honeycomb_lattice_is_two_dimensional(self):
+        self.assertEqual(init_lattice.honeycomb_lattice(2, 2, 1.0).dimensionality, 2)
+
+    def test_cubic_lattice_is_three_dimensional(self):
+        self.assertEqual(init_lattice.cubic_lattice(2, 2, 2, 1.0).dimensionality, 3)
+
+
 class InitLatticeTestCase(unittest.TestCase):
     """Test for Specific Lattice initialisation routines"""
 

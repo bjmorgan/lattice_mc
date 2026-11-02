@@ -25,7 +25,7 @@ def square_lattice(a: int, b: int, spacing: float) -> lattice.Lattice:
         (Lattice): The new lattice
 
     Notes:
-        The returned lattice is 3D periodic, but all sites and edges lie in the xy plane.
+        The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
     """
     grid = np.array(list(range(1, a * b + 1))).reshape(a, b, order="F")
     it = np.nditer(grid, flags=["multi_index"])
@@ -58,7 +58,7 @@ def honeycomb_lattice(a: int, b: int, spacing: float, alternating_sites: bool = 
         (Lattice): The new lattice
 
     Notes:
-        The returned lattice is 3D periodic, but all sites and edges lie in the xy plane.
+        The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
     """
     if alternating_sites:
         site_labels = ["A", "B", "A", "B"]
@@ -128,6 +128,7 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Args:
         site_file (Str): Filename for the file containing the site information.
         cell_lengths (List(Float,Float,Float)): A list containing the [ x, y, z ] cell lengths.
+            Set the z cell length to 0 for a two-dimensional lattice.
 
     Returns:
         (Lattice): The new lattice
