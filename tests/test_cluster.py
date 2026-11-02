@@ -1,4 +1,3 @@
-import unittest
 from unittest.mock import Mock
 
 import numpy as np
@@ -7,7 +6,7 @@ from lattice_mc.cluster import Cluster
 from lattice_mc.lattice_site import Site
 
 
-class ClusterTestCase(unittest.TestCase):
+class TestCluster:
     """Test for Cluster class"""
 
     def test_cluster_is_initialised(self):
@@ -17,8 +16,8 @@ class ClusterTestCase(unittest.TestCase):
         sites[0].p_neighbours = [sites[1], sites[2], sites[3]]
         sites[1].p_neighbours = [sites[0], sites[2]]
         cluster = Cluster(cluster_sites)
-        self.assertEqual(cluster.sites, set(cluster_sites))
-        self.assertEqual(cluster.neighbours, set(neighbour_sites))
+        assert cluster.sites == set(cluster_sites)
+        assert cluster.neighbours == set(neighbour_sites)
 
     def test_cluster_merge(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -27,8 +26,8 @@ class ClusterTestCase(unittest.TestCase):
         cluster1 = Cluster([sites[0]])
         cluster2 = Cluster([sites[2]])
         combined_cluster = cluster1.merge(cluster2)
-        self.assertEqual(combined_cluster.sites, set([sites[0], sites[2]]))
-        self.assertEqual(combined_cluster.neighbours, set([sites[1], sites[3]]))
+        assert combined_cluster.sites == set([sites[0], sites[2]])
+        assert combined_cluster.neighbours == set([sites[1], sites[3]])
 
     def test_cluster_merge_with_blocked_neighbour(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -38,31 +37,31 @@ class ClusterTestCase(unittest.TestCase):
         cluster2 = Cluster([sites[2]])
         cluster1.neighbours = cluster1.neighbours - set([sites[1]])
         combined_cluster = cluster1.merge(cluster2)
-        self.assertEqual(combined_cluster.sites, set([sites[0], sites[2]]))
-        self.assertEqual(combined_cluster.neighbours, set([sites[3]]))
+        assert combined_cluster.sites == set([sites[0], sites[2]])
+        assert combined_cluster.neighbours == set([sites[3]])
 
     def test_cluster_is_neighbouring(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [sites[1]]
         sites[1].p_neighbours = [sites[0]]
         clusters = [Cluster([sites[0]]), Cluster([sites[1]])]
-        self.assertEqual(clusters[0].is_neighbouring(clusters[1]), True)
-        self.assertEqual(clusters[1].is_neighbouring(clusters[0]), True)
+        assert clusters[0].is_neighbouring(clusters[1]) is True
+        assert clusters[1].is_neighbouring(clusters[0]) is True
 
     def test_cluster_is_not_neighbouring(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [Mock(spec=Site)]
         sites[1].p_neighbours = [Mock(spec=Site)]
         clusters = [Cluster([sites[0]]), Cluster([sites[1]])]
-        self.assertEqual(clusters[0].is_neighbouring(clusters[1]), False)
-        self.assertEqual(clusters[1].is_neighbouring(clusters[0]), False)
+        assert clusters[0].is_neighbouring(clusters[1]) is False
+        assert clusters[1].is_neighbouring(clusters[0]) is False
 
     def test_cluster_size(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [Mock(spec=Site)]
         sites[1].p_neighbours = [Mock(spec=Site)]
         cluster = Cluster(sites)
-        self.assertEqual(cluster.size(), 2)
+        assert cluster.size() == 2
 
     def test_cluster_edges(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -82,17 +81,17 @@ class ClusterTestCase(unittest.TestCase):
         max_z = (sites[0], sites[2])
         cluster = Cluster(sites)
         for s in cluster.sites_at_edges()[0]:
-            self.assertEqual(s in max_x, True)
+            assert s in max_x
         for s in cluster.sites_at_edges()[1]:
-            self.assertEqual(s in min_x, True)
+            assert s in min_x
         for s in cluster.sites_at_edges()[2]:
-            self.assertEqual(s in max_y, True)
+            assert s in max_y
         for s in cluster.sites_at_edges()[3]:
-            self.assertEqual(s in min_y, True)
+            assert s in min_y
         for s in cluster.sites_at_edges()[4]:
-            self.assertEqual(s in max_z, True)
+            assert s in max_z
         for s in cluster.sites_at_edges()[5]:
-            self.assertEqual(s in min_z, True)
+            assert s in min_z
 
     def test_cluster_is_periodically_contiguous(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -103,7 +102,7 @@ class ClusterTestCase(unittest.TestCase):
         sites[1].p_neighbours = [sites[0], sites[2]]
         sites[2].p_neighbours = [sites[0], sites[1]]
         cluster = Cluster(sites)
-        self.assertEqual(cluster.is_periodically_contiguous()[0], True)
+        assert cluster.is_periodically_contiguous()[0] is True
 
     def test_cluster_is_not_periodically_contiguous(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -114,7 +113,7 @@ class ClusterTestCase(unittest.TestCase):
         sites[1].p_neighbours = [sites[0], sites[2]]
         sites[2].p_neighbours = [sites[1]]
         cluster = Cluster(sites)
-        self.assertEqual(cluster.is_periodically_contiguous()[0], False)
+        assert cluster.is_periodically_contiguous()[0] is False
 
     def test_cluster_remove_sites_from_neighbours(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -123,10 +122,6 @@ class ClusterTestCase(unittest.TestCase):
         sites[2].label = "B"
         cluster = Cluster([sites[0]])
         cluster.remove_sites_from_neighbours("A")
-        self.assertEqual(cluster.neighbours, set([sites[2]]))
+        assert cluster.neighbours == set([sites[2]])
         cluster.remove_sites_from_neighbours(["B"])
-        self.assertEqual(cluster.neighbours, set())
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert cluster.neighbours == set()
