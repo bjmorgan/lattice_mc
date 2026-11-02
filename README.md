@@ -34,7 +34,7 @@ pip install -e ".[dev]"
 
 ## Documentation
 
-Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/main/examples/lattice_mc_examples.ipynb).
+Documentation, including a user guide and API reference, is at [lattice-mc.readthedocs.io](https://lattice-mc.readthedocs.io/).
 
 ## Tests
 

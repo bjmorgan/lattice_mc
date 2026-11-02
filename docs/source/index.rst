@@ -5,7 +5,10 @@ lattice_mc: A Python Lattice-Gas Monte Carlo Module
    :maxdepth: 2
    :caption: Contents:
 
-   readme
+   introduction
+   building_lattices
+   running_simulations
+   interaction_models
    blocked_lattice
    modules
 
