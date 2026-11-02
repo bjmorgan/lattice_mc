@@ -15,10 +15,7 @@ frequency of individual ions [HowardLidiard1964]_ [Harding1989]_. Practical soli
 electrolytes have high mobile ion concentrations, and interactions between the
 mobile ions give deviations from dilute random-walk behaviour. In general the size
 of these deviations cannot be calculated analytically, but it can be calculated
-directly from lattice-gas Monte Carlo simulations. Even with no interaction energies,
-volume exclusion alone correlates the jumps of individual atoms at finite
-concentrations, so the tracer correlation factor is less than 1, while the
-collective correlation factor stays exactly 1 [Kutner1981]_.
+directly from lattice-gas Monte Carlo simulations.
 
 ``lattice_mc`` models a lattice of sites, some of which are occupied by mobile atoms.
 Each atom can jump to a neighbouring vacant site. The rate of each jump depends on
@@ -99,9 +96,6 @@ References
 
 .. [Murch1982] G. E. Murch, *Solid State Ionics* **7**, 177 (1982).
    https://doi.org/10.1016/0167-2738(82)90050-9
-
-.. [Kutner1981] R. Kutner, *Phys. Lett. A* **81**, 239 (1981).
-   https://doi.org/10.1016/0375-9601(81)90251-6
 
 .. [Voter2007] A. F. Voter, Introduction to the Kinetic Monte Carlo Method, in
    *Radiation Effects in Solids*, ed. K. E. Sickafus *et al.*, Springer (2007).
