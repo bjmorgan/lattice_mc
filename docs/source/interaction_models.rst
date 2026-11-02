@@ -105,8 +105,8 @@ Site energies
 -------------
 
 :meth:`~lattice_mc.simulation.Simulation.set_site_energies` gives every site with a
-given label an occupation energy. Here ``'B'`` sites are 0.1 eV less favourable than
-``'A'`` sites, so atoms spend more time on ``'A'`` sites:
+given label an occupation energy. Here ``'B'`` sites have an occupation energy
+0.1 eV higher than ``'A'`` sites:
 
 .. testcode::
 

@@ -132,7 +132,3 @@ The diffusion coefficients and correlation factors are defined in :doc:`introduc
     f   = ...
     f_I = ...
     ['L']
-
-The results of a single run are noisy. Converged values come from averaging over
-many independent simulations, and from longer runs on larger lattices than these
-examples use.
