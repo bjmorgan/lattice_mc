@@ -1,8 +1,7 @@
 lattice_mc: A Python Lattice-Gas Monte Carlo Module
 ===================================================
 
-``lattice_mc`` runs kinetic lattice-gas Monte Carlo simulations of atoms jumping
-between sites on a lattice, and calculates their transport coefficients.
+``lattice_mc`` runs lattice-gas Monte Carlo simulations.
 
 Capabilities
 ------------
