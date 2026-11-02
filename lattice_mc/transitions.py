@@ -1,3 +1,5 @@
+"""Selection of jumps, and of the time between them, in the kinetic Monte Carlo scheme."""
+
 from __future__ import annotations
 
 import math
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 
 class Transitions:
     """
-    Transitions class
+    Transition rates for a set of jumps.
 
     Contains methods that operate on sets of Jumps.
     """

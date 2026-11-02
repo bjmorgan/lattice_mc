@@ -1,3 +1,5 @@
+"""Lattice-gas Monte Carlo simulations of ionic transport."""
+
 import warnings
 from importlib.metadata import PackageNotFoundError, version
 

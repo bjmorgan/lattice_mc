@@ -1,3 +1,5 @@
+"""Collections of atoms, and the displacement statistics computed over them."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

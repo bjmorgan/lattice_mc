@@ -1,3 +1,5 @@
+"""Clusters of contiguously connected lattice sites."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -45,7 +47,7 @@ class Cluster:
 
     def is_neighbouring(self, other_cluster: Cluster) -> bool:
         """
-        logical check whether the neighbour list for cluster A includes any sites in cluster B
+        Logical check whether the neighbour list for cluster A includes any sites in cluster B.
 
         Args:
             other_cluster (Cluster): the other cluster we are testing for neighbour connectivity
@@ -93,13 +95,12 @@ class Cluster:
 
     def is_periodically_contiguous(self) -> tuple[bool, bool, bool]:
         """
-        logical check whether a cluster connects with itself across the
-        simulation periodic boundary conditions.
+        Logical check whether a cluster connects with itself across the periodic boundaries.
 
         Args:
             none
 
-        Returns
+        Returns:
             ( Bool, Bool, Bool ): Contiguity along the x, y, and z coordinate axes
         """
         edges = self.sites_at_edges()
@@ -113,7 +114,7 @@ class Cluster:
         Removes sites from the set of neighbouring sites if these have labels in remove_labels.
 
         Args:
-            Remove_labels (List) or (Str): List of Site labels to be removed from the cluster neighbour set.
+            remove_labels (List) or (Str): List of Site labels to be removed from the cluster neighbour set.
 
         Returns:
             None

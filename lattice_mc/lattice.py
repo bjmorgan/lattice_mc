@@ -1,3 +1,5 @@
+"""The simulation lattice: its sites, the atoms occupying them, and the possible jumps."""
+
 from __future__ import annotations
 
 import itertools
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 class Lattice:
     """
-    Lattice class
+    A periodic lattice of sites, and the atoms that occupy them.
     """
 
     def __init__(self, sites: list[Site], cell_lengths: npt.NDArray[np.float64]) -> None:
@@ -73,6 +75,7 @@ class Lattice:
     def enforce_periodic_boundary_conditions(self) -> None:
         """
         Ensure that all lattice sites are within the central periodic image of the simulation cell.
+
         Sites that are outside the central simulation cell are mapped back into this cell.
 
         Args:
@@ -90,7 +93,7 @@ class Lattice:
 
     def reset(self) -> None:
         """
-        Reset all time-dependent counters for this lattice and its constituent sites
+        Reset all time-dependent counters for this lattice and its constituent sites.
 
         Args:
             None
@@ -178,8 +181,9 @@ class Lattice:
 
     def potential_jumps(self) -> list[Jump]:
         """
-        All nearest-neighbour jumps not blocked by volume exclusion
-        (i.e. from occupied to neighbouring unoccupied sites).
+        All nearest-neighbour jumps not blocked by volume exclusion.
+
+        These are jumps from occupied sites to neighbouring unoccupied sites.
 
         Args:
             None
@@ -218,7 +222,7 @@ class Lattice:
 
     def update(self, accepted_jump: Jump) -> None:
         """
-        Update the lattice state by accepting a specific jump
+        Update the lattice state by accepting a specific jump.
 
         Args:
             accepted_jump (Jump): The jump that has been accepted.
@@ -287,7 +291,7 @@ class Lattice:
 
     def update_site_occupation_times(self, delta_t: float) -> None:
         """
-        Increase the time occupied for all occupied sites by delta t
+        Increase the time occupied for all occupied sites by delta t.
 
         Args:
             delta_t (Float): Timestep.
@@ -300,7 +304,7 @@ class Lattice:
 
     def site_occupation_statistics(self) -> dict[str, float] | None:
         """
-        Average site occupation for each site type
+        Average site occupation for each site type.
 
         Args:
             None
@@ -367,7 +371,9 @@ class Lattice:
 
     def site_coordination_numbers(self) -> dict[str, set[int]]:
         """
-        Returns a dictionary of the coordination numbers for each site label. e.g.::
+        Returns a dictionary of the coordination numbers for each site label.
+
+        For example::
 
             { 'A' : { 4 }, 'B' : { 2, 4 } }
 
@@ -386,7 +392,8 @@ class Lattice:
     def max_site_coordination_numbers(self) -> dict[str, int]:
         """
         Returns a dictionary of the maximum coordination number for each site label.
-        e.g.::
+
+        For example::
 
             { 'A' : 4, 'B' : 4 }
 
@@ -418,8 +425,9 @@ class Lattice:
 
     def connected_site_pairs(self) -> dict[str, list[str]]:
         """
-        Returns a dictionary of all connections between pair of sites (by site label).
-        e.g. for a linear lattice A-B-C will return::
+        Returns a dictionary of all connections between pairs of sites (by site label).
+
+        For example, for a linear lattice A-B-C this returns::
 
             { 'A' : [ 'B' ], 'B' : [ 'A', 'C' ], 'C' : [ 'B' ] }
 
@@ -459,6 +467,7 @@ class Lattice:
     def connected_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[cluster.Cluster]:
         """
         Searches the lattice to find sets of sites that are contiguously neighbouring.
+
         Mutually exclusive sets of contiguous sites are returned as Cluster objects.
 
         Args:
@@ -519,8 +528,9 @@ class Lattice:
 
     def detached_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[Site]:
         """
-        Returns all sites in the lattice (optionally from the set of sites with specific labels)
-        that are not part of a percolating network.
+        Returns all sites in the lattice that are not part of a percolating network.
+
+        The search can optionally be restricted to sites with specific labels.
         This is determined from clusters of connected sites that do not wrap round to
         themselves through a periodic boundary.
 

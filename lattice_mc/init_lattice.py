@@ -1,3 +1,5 @@
+"""Functions that build lattices, either programmatically or from a sites file."""
+
 from __future__ import annotations
 
 import re

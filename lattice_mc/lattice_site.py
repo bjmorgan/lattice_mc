@@ -1,3 +1,5 @@
+"""Individual lattice sites and their occupation energies."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 class Site:
     """
-    Site class
+    A single lattice site, its neighbours, and its occupation.
     """
 
     index: int = 0

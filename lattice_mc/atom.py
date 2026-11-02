@@ -1,3 +1,5 @@
+"""Mobile atoms that occupy lattice sites."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

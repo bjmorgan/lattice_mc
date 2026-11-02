@@ -1,3 +1,5 @@
+"""Set-up, running, and results of lattice-gas Monte Carlo simulations."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -15,6 +17,9 @@ class SimulationParameters:
     rate_prefactor: float
 
     def __post_init__(self) -> None:
+        """
+        Check that the temperature and rate prefactor are positive.
+        """
         if self.temperature <= 0:
             raise ValueError(
                 f"temperature must be positive; got {self.temperature!r}."
@@ -32,7 +37,7 @@ class SimulationParameters:
 
 class Simulation:
     """
-    Simulation class
+    A lattice-gas Monte Carlo simulation.
     """
 
     def __init__(self, params: SimulationParameters) -> None:
@@ -113,7 +118,8 @@ class Simulation:
     def define_lattice_from_file(self, filename: str, cell_lengths: list[float]) -> None:
         """
         Set up the simulation lattice from a file containing site data.
-            Uses `init_lattice.lattice_from_sites_file`, which defines the site file spec.
+
+        Uses `init_lattice.lattice_from_sites_file`, which defines the site file spec.
 
         Args:
             filename (Str): sites file filename.
@@ -162,6 +168,7 @@ class Simulation:
         Args:
             site_energies (Dict(Str:Float)): Dict of energies for each site type.
                 e.g. { 'A' : 0.0,. 'B' : 1.0 }
+
         Returns:
             None
         """
@@ -261,7 +268,7 @@ class Simulation:
     @property
     def collective_correlation(self) -> float | None:
         """
-        Returns the collective correlation factor, f_I
+        Returns the collective correlation factor, f_I.
 
         Args:
             None

@@ -1,3 +1,5 @@
+"""Jumps of atoms between neighbouring lattice sites."""
+
 from __future__ import annotations
 
 import math
@@ -19,6 +21,10 @@ A Jump describes a possible move by a particle from one site to another site.
 
 
 class Jump:
+    """
+    A possible jump of an atom from an occupied site to a neighbouring vacant site.
+    """
+
     def __init__(
         self,
         initial_site: Site,
@@ -147,12 +153,12 @@ class Jump:
 
     def dr(self, cell_lengths: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
-        Particle displacement vector for this jump
+        Particle displacement vector for this jump.
 
         Args:
             cell_lengths (np.array(x,y,z)): Cell lengths for the orthogonal simulation cell.
 
-        Returns
+        Returns:
             (np.array(x,y,z)): dr
         """
         half_cell_lengths = cell_lengths / 2.0
@@ -182,6 +188,9 @@ class Jump:
 
     @property
     def relative_probability(self) -> float:
+        """
+        Relative probability of this jump.
+        """
         return self._relative_probability
 
     @relative_probability.setter

@@ -1,3 +1,5 @@
+"""Exceptions raised by lattice_mc."""
+
 from __future__ import annotations
 
 
@@ -15,5 +17,11 @@ class BlockedLatticeError(Error):
     """
 
     def __init__(self, message: str) -> None:
+        """
+        Initialise a BlockedLatticeError.
+
+        Args:
+            message: Explanation of the error.
+        """
         super().__init__(message)
         self.message = message

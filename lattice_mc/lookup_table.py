@@ -1,3 +1,5 @@
+"""Precomputed jump probabilities for the nearest-neighbour Hamiltonian."""
+
 from __future__ import annotations
 
 import math
@@ -26,7 +28,7 @@ def metropolis(delta_E: float, kT: float) -> float:
 
 class LookupTable:  # TODO if nearest-neighbour and coordination number dependent look-up tables have different data structures, they should each subclass this general class: the different implementations for setting these up and accessing the jump probabilities can then be self-contained
     """
-    LookupTable class
+    Precomputed relative jump probabilities.
     """
 
     def __init__(self, lattice: Lattice, hamiltonian: str) -> None:
