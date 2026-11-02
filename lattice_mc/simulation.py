@@ -238,8 +238,9 @@ class Simulation:
         """
         Tracer diffusion coefficient, D*.
 
-        Calculated from the Einstein relation, <r^2> = 2 d D* t, where d is the
-        dimensionality of the lattice.
+        Calculated from the Einstein relation, <r^2> = 2 d D* t, where <r^2> is
+        the mean squared displacement over all atoms and d is the dimensionality
+        of the lattice.
 
         Args:
             None
@@ -279,8 +280,10 @@ class Simulation:
         """
         Returns the collective or "jump" diffusion coefficient, D_J.
 
-        Calculated from the Einstein relation, <R^2> = 2 d D_J t, where R is the
-        net displacement of all atoms and d is the dimensionality of the lattice.
+        Calculated from the Einstein relation, <R^2> = 2 d D_J t, where
+        R = sum_i dr_i is the summed displacement of all atoms (not the centre of
+        mass displacement) and d is the dimensionality of the lattice. No 1/N
+        normalisation is applied; see `collective_diffusion_coefficient_per_atom`.
 
         Args:
             None
