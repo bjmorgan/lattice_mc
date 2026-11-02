@@ -38,6 +38,10 @@ dev = [
     "ruff",
     "scipy-stubs",
 ]
+docs = [
+    "sphinx>=7",
+    "sphinx-rtd-theme>=2",
+]
 
 [project.urls]
 Homepage = "https://github.com/bjmorgan/lattice_mc"
