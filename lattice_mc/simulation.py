@@ -68,6 +68,11 @@ class Simulation:
     def reset(self) -> None:
         """
         Reset all counters for this simulation.
+
+        Notes:
+            Reading the diffusion coefficients or correlation factors after a reset, before
+            running again, raises a ZeroDivisionError. See
+            https://github.com/bjmorgan/lattice_mc/issues/32.
         """
         assert self.lattice is not None
         assert self.atoms is not None
