@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lattice_mc"
-version = "1.0.3"
+dynamic = ["version"]
 description = "A lattice-gas Monte-Carlo simulation tool"
 readme = "README.md"
 license = "MIT"
@@ -70,6 +70,9 @@ convention = "google"
 
 [tool.mypy]
 strict = true
+
+[tool.setuptools.dynamic]
+version = { attr = "lattice_mc.__version__" }
 
 [tool.setuptools.package-data]
 lattice_mc = ["py.typed"]

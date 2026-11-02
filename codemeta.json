@@ -19,5 +19,5 @@
   "keywords": "monte-carlo, lattice-gas, correlation-factors",
   "license": "MIT",
   "title": "lattice_mc",
-  "version": "1.0.2"
+  "version": "1.0.4"
 }
