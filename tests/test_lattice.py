@@ -43,6 +43,13 @@ class LatticeTestCase(unittest.TestCase):
         self.assertEqual(self.mock_sites[3].p_neighbours, [7])
         self.assertEqual(self.mock_sites[4].p_neighbours, [8])
 
+    def test_dimensionality_is_three_for_three_non_zero_cell_lengths(self):
+        self.assertEqual(self.lattice.dimensionality, 3)
+
+    def test_dimensionality_excludes_zero_cell_lengths(self):
+        self.lattice.cell_lengths = np.array([7.0, 8.0, 0.0])
+        self.assertEqual(self.lattice.dimensionality, 2)
+
     def test_enforce_periodice_boundary_consitions(self):
         site_coordinates = [np.array([-1.0, 11.0, 3.0]), np.array([2.0, -3.0, 12.0])]
         mock_sites = [Mock(spec=Site, r=r) for r in site_coordinates]

@@ -184,7 +184,18 @@ class SimulationResultsTestCase(unittest.TestCase):
         s.number_of_atoms = 5
         s.lattice = Mock(spec=Lattice)
         s.lattice.time = 12.0
+        s.lattice.dimensionality = 3
         self.assertEqual(s.tracer_diffusion_coefficient, 15.0 / (6.0 * 5.0 * 12.0))
+
+    def test_tracer_diffusion_coefficient_in_two_dimensions(self):
+        s = self.simulation
+        s.atoms = Mock(spec=Species)
+        s.atoms.sum_dr_squared = Mock(return_value=15.0)
+        s.number_of_atoms = 5
+        s.lattice = Mock(spec=Lattice)
+        s.lattice.time = 12.0
+        s.lattice.dimensionality = 2
+        self.assertEqual(s.tracer_diffusion_coefficient, 15.0 / (4.0 * 5.0 * 12.0))
 
     def test_collective_correlation(self):
         s = self.simulation
@@ -198,7 +209,17 @@ class SimulationResultsTestCase(unittest.TestCase):
         s.atoms.collective_dr_squared = Mock(return_value=36.0)
         s.lattice = Mock(spec=Lattice)
         s.lattice.time = 2.0
+        s.lattice.dimensionality = 3
         self.assertEqual(s.collective_diffusion_coefficient, 3.0)
+
+    def test_collective_diffusion_coefficient_in_two_dimensions(self):
+        s = self.simulation
+        s.atoms = Mock(spec=Species)
+        s.atoms.collective_dr_squared = Mock(return_value=36.0)
+        s.lattice = Mock(spec=Lattice)
+        s.lattice.time = 2.0
+        s.lattice.dimensionality = 2
+        self.assertEqual(s.collective_diffusion_coefficient, 4.5)
 
     def test_collective_diffusion_coefficient_per_atom(self):
         s = self.simulation

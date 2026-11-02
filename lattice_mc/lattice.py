@@ -53,6 +53,19 @@ class Lattice:
             site.p_neighbours = [self.site_with_id(i) for i in site.neighbours]
         self.reset()
 
+    @property
+    def dimensionality(self) -> int:
+        """
+        Number of dimensions spanned by the lattice.
+
+        A cell length of zero means the lattice has no extent along that axis,
+        so a two-dimensional lattice is defined with a z cell length of 0.
+
+        Returns:
+            (Int): The number of non-zero cell lengths.
+        """
+        return int(np.count_nonzero(self.cell_lengths))
+
     def enforce_periodic_boundary_conditions(self) -> None:
         """
         Ensure that all lattice sites are within the central periodic image of the simulation cell.

@@ -128,6 +128,7 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Args:
         site_file (Str): Filename for the file containing the site information.
         cell_lengths (List(Float,Float,Float)): A list containing the [ x, y, z ] cell lengths.
+            Set the z cell length to 0 for a two-dimensional lattice.
 
     Returns:
         (Lattice): The new lattice

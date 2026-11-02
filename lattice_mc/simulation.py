@@ -118,6 +118,7 @@ class Simulation:
         Args:
             filename (Str): sites file filename.
             cell_lengths (List(x,y,z)): cell lengths for the simulation cell.
+                Set the z cell length to 0 for a two-dimensional lattice.
 
         Returns:
             None
@@ -237,6 +238,9 @@ class Simulation:
         """
         Tracer diffusion coefficient, D*.
 
+        Calculated from the Einstein relation, <r^2> = 2 d D* t, where d is the
+        dimensionality of the lattice.
+
         Args:
             None
 
@@ -247,7 +251,9 @@ class Simulation:
             assert self.atoms is not None
             assert self.lattice is not None
             assert self.number_of_atoms is not None
-            return self.atoms.sum_dr_squared() / (6.0 * float(self.number_of_atoms) * self.lattice.time)
+            return self.atoms.sum_dr_squared() / (
+                2.0 * self.lattice.dimensionality * float(self.number_of_atoms) * self.lattice.time
+            )
         else:
             return None
 
@@ -273,6 +279,9 @@ class Simulation:
         """
         Returns the collective or "jump" diffusion coefficient, D_J.
 
+        Calculated from the Einstein relation, <R^2> = 2 d D_J t, where R is the
+        net displacement of all atoms and d is the dimensionality of the lattice.
+
         Args:
             None
 
@@ -282,7 +291,7 @@ class Simulation:
         if self.has_run:
             assert self.atoms is not None
             assert self.lattice is not None
-            return self.atoms.collective_dr_squared() / (6.0 * self.lattice.time)
+            return self.atoms.collective_dr_squared() / (2.0 * self.lattice.dimensionality * self.lattice.time)
         else:
             return None
 
