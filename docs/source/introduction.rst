@@ -70,7 +70,7 @@ Or install the latest development version directly from GitHub:
 
     pip install git+https://github.com/bjmorgan/lattice_mc.git
 
-``lattice_mc`` requires Python 3.11 or above.
+``lattice_mc`` requires Python 3.12 or above.
 
 References
 ----------

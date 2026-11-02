@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.15"
 
       - name: Install dependencies
         run: |
@@ -25,15 +25,12 @@ jobs:
       - name: Lint
         run: ruff check lattice_mc/ tests/
 
-      - name: Type check
-        run: mypy lattice_mc/
-
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.12", "3.13", "3.14", "3.15"]
 
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +48,9 @@ jobs:
       - name: Run tests
         run: pytest --cov=lattice_mc --cov-report=term-missing --cov-fail-under=95
 
+      - name: Type check
+        run: mypy lattice_mc/
+
   docs:
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.15"
 
       - name: Install dependencies
         run: |
