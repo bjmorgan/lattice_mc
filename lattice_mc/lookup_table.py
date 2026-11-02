@@ -67,8 +67,8 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Args:
             l1: Site label for the initial site.
             l2: Site label for the final site.
-            c1: Coordination number for the initial site.
-            c2: Coordination number for the final site.
+            c1: Number of occupied neighbours of the initial site.
+            c2: Number of occupied neighbours of the final site, counting the jumping atom.
 
         Returns:
             The relative probability of this jump occurring.

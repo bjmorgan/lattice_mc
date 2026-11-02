@@ -129,10 +129,10 @@ class Simulation:
         Set the coordination-number dependent energies for this simulation.
 
         Args:
-            cn_energies: Energies, in eV, for each site, nested by site label, then by the label
-                of its neighbouring sites, then by the number of those neighbours that are
-                occupied. The energy of a site is the sum of the energies for each neighbouring
-                label. If None, the lattice is left unchanged. For example, on a honeycomb lattice
+            cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
+                the label of its neighbouring sites, then by the number of those neighbours that
+                are occupied. The energy of an occupied site is the sum of the energies for each
+                neighbouring label; vacant sites contribute no energy. If None, the lattice is left unchanged. For example, on a honeycomb lattice
                 built with ``alternating_sites=True``, every 'A' site has three 'B' neighbours::
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
@@ -304,9 +304,9 @@ class Simulation:
         Create a look-up table of jump probabilities, to speed up the simulation.
 
         Without a table, the probability of each jump is calculated as it is needed. The table
-        includes site energies and the nearest-neighbour energy, as set when the table is created,
-        so set those first. It does not include coordination-number energies, so do not use a
-        table with `set_cn_energies`.
+        includes the energies set with `set_site_energies` and the nearest-neighbour energy, as
+        set when the table is created, so set those first. It ignores per-site energies read from
+        a sites file, and coordination-number energies, so do not use a table with either.
 
         Args:
             hamiltonian: The model Hamiltonian. The only supported value is 'nearest-neighbour'.

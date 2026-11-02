@@ -65,10 +65,11 @@ class Cluster:
 
     def sites_at_edges(self) -> tuple[list[Site], list[Site], list[Site], list[Site], list[Site], list[Site]]:
         """
-        Finds the six sites with the maximum and minimum coordinates along x, y, and z.
+        Finds the sites with the maximum and minimum coordinates along x, y, and z.
 
         Returns:
-            The six sites, in the order [+x, -x, +y, -y, +z, -z].
+            Six lists of sites, those at the maximum and minimum coordinate along each axis, in
+            the order [+x, -x, +y, -y, +z, -z].
         """
         min_x = min([s.r[0] for s in self.sites])
         max_x = max([s.r[0] for s in self.sites])

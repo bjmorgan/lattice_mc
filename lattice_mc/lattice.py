@@ -305,10 +305,10 @@ class Lattice:
         Set the coordination-number dependent energies for this lattice.
 
         Args:
-            cn_energies: Energies, in eV, for each site, nested by site label, then by the label
-                of its neighbouring sites, then by the number of those neighbours that are
-                occupied. The energy of a site is the sum of the energies for each neighbouring
-                label. For example, on a honeycomb lattice built with ``alternating_sites=True``,
+            cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
+                the label of its neighbouring sites, then by the number of those neighbours that
+                are occupied. The energy of an occupied site is the sum of the energies for each
+                neighbouring label; vacant sites contribute no energy. For example, on a honeycomb lattice built with ``alternating_sites=True``,
                 every 'A' site has three 'B' neighbours::
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
