@@ -1,3 +1,5 @@
+"""The simulation lattice: its sites, the atoms occupying them, and the possible jumps."""
+
 from __future__ import annotations
 
 import itertools
@@ -22,7 +24,7 @@ if TYPE_CHECKING:
 
 class Lattice:
     """
-    Lattice class
+    A periodic lattice of sites, and the atoms that occupy them.
     """
 
     def __init__(self, sites: list[Site], cell_lengths: npt.NDArray[np.float64]) -> None:
@@ -30,12 +32,9 @@ class Lattice:
         Initialise a Lattice instance.
 
         Args:
-            sites (List(Site)): List of sites contained in the lattice.
-            cell_lengths (np.array(x,y,z)): Vector of cell lengths for the simulation cell.
+            sites: The sites contained in the lattice.
+            cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
                 A cell length of 0 means the lattice has no extent along that axis.
-
-        Returns:
-            None
         """
         self.cell_lengths: npt.NDArray[np.float64] = cell_lengths
         self.sites: list[Site] = sites
@@ -62,24 +61,16 @@ class Lattice:
         A cell length of zero means the lattice has no extent along that axis,
         so a two-dimensional lattice is defined with a z cell length of 0.
 
-        Args:
-            None
-
         Returns:
-            (Int): The number of non-zero cell lengths.
+            The number of non-zero cell lengths.
         """
         return int(np.count_nonzero(self.cell_lengths))
 
     def enforce_periodic_boundary_conditions(self) -> None:
         """
         Ensure that all lattice sites are within the central periodic image of the simulation cell.
+
         Sites that are outside the central simulation cell are mapped back into this cell.
-
-        Args:
-            None
-
-        Returns:
-            None
         """
         for s in self.sites:
             for i in range(3):
@@ -90,13 +81,7 @@ class Lattice:
 
     def reset(self) -> None:
         """
-        Reset all time-dependent counters for this lattice and its constituent sites
-
-        Args:
-            None
-
-        Returns:
-            None
+        Reset all time-dependent counters for this lattice and its constituent sites.
         """
         self.time: float = 0.0
         for site in self.sites:
@@ -104,13 +89,9 @@ class Lattice:
 
     def initialise_site_lookup_table(self) -> None:
         """
-        Create a lookup table allowing sites in this lattice to be queried using `self.site_lookup[n]` where `n` is the identifying site numbe.
+        Create a lookup table of sites by number.
 
-        Args:
-            None
-
-        Returns:
-            None
+        After this, `self.site_lookup[n]` is the site whose identifying number is `n`.
         """
         self.site_lookup: dict[int, Site] = {}
         for site in self.sites:
@@ -121,34 +102,28 @@ class Lattice:
         Select the site with a specific id number.
 
         Args:
-            number (Int): The identifying number for a specific site.
+            number: The identifying number for a specific site.
 
         Returns:
-            (Site): The site with id number equal to `number`
+            The site with id number equal to `number`.
         """
         return self.site_lookup[number]
 
     def vacant_sites(self) -> Iterator[Site]:
         """
-        The set of sites not occupied by atoms.
-
-        Args:
-            None
+        The sites not occupied by atoms.
 
         Returns:
-            List(Site): List of sites that are vacant.
+            An iterator over the vacant sites.
         """
         return (site for site in self.sites if not site.is_occupied)
 
     def occupied_sites(self) -> Iterator[Site]:
         """
-        The set of sites occupied by atoms.
-
-        Args:
-            None
+        The sites occupied by atoms.
 
         Returns:
-            List(Site): List of sites that are occupied.
+            An iterator over the occupied sites.
         """
         return (site for site in self.sites if site.is_occupied)
 
@@ -156,11 +131,8 @@ class Lattice:
         """
         List of site id numbers for all sites that are vacant.
 
-        Args:
-            None
-
         Returns:
-            List(Int): List of site id numbers for vacant sites.
+            The id numbers of the vacant sites.
         """
         return [site.number for site in self.sites if not site.is_occupied]
 
@@ -168,24 +140,22 @@ class Lattice:
         """
         List of site id numbers for all sites that are occupied.
 
-        Args:
-            None
-
         Returns:
-            List(Int): List of site id numbers for occupied sites.
+            The id numbers of the occupied sites.
         """
         return [site.number for site in self.sites if site.is_occupied]
 
     def potential_jumps(self) -> list[Jump]:
         """
-        All nearest-neighbour jumps not blocked by volume exclusion
-        (i.e. from occupied to neighbouring unoccupied sites).
+        All nearest-neighbour jumps not blocked by volume exclusion.
 
-        Args:
-            None
+        These are jumps from occupied sites to neighbouring unoccupied sites.
 
         Returns:
-            (List(Jump)): List of possible jumps.
+            The possible jumps.
+
+        Raises:
+            RuntimeError: If `self.params` has not been set.
         """
         if self.params is None:
             raise RuntimeError("Lattice.params must be set before computing jumps")
@@ -218,13 +188,10 @@ class Lattice:
 
     def update(self, accepted_jump: Jump) -> None:
         """
-        Update the lattice state by accepting a specific jump
+        Update the lattice state by accepting a specific jump.
 
         Args:
-            accepted_jump (Jump): The jump that has been accepted.
-
-        Returns:
-            None.
+            accepted_jump: The jump that has been accepted.
         """
         jumping_atom = accepted_jump.initial_site.atom
         assert jumping_atom is not None
@@ -246,11 +213,16 @@ class Lattice:
         Populate the lattice sites with a specific number of atoms.
 
         Args:
-            number_of_atoms (Int): The number of atoms to populate the lattice sites with.
-            selected_sites (:obj:List, optional): List of site labels if only some sites are to be occupied. Defaults to None.
+            number_of_atoms: The number of atoms to populate the lattice sites with.
+            selected_sites: Site labels to populate with atoms. If None, atoms are placed on
+                randomly chosen sites of any label. Defaults to None.
 
         Returns:
-            None
+            The new atoms.
+
+        Raises:
+            ValueError: If there are more atoms than sites, or than sites with the labels in
+                `selected_sites`.
         """
         if number_of_atoms > self.number_of_sites:
             raise ValueError
@@ -268,11 +240,9 @@ class Lattice:
         """
         Select a jump at random from all potential jumps, then update the lattice state.
 
-        Args:
-            None
-
-        Returns:
-            None
+        Raises:
+            BlockedLatticeError: If no jumps are possible.
+            RuntimeError: If `self.params` has not been set.
         """
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
@@ -287,28 +257,21 @@ class Lattice:
 
     def update_site_occupation_times(self, delta_t: float) -> None:
         """
-        Increase the time occupied for all occupied sites by delta t
+        Increase the time occupied for all occupied sites by delta t.
 
         Args:
-            delta_t (Float): Timestep.
-
-        Returns:
-            None
+            delta_t: The time step.
         """
         for site in self.occupied_sites():
             site.time_occupied += delta_t
 
     def site_occupation_statistics(self) -> dict[str, float] | None:
         """
-        Average site occupation for each site type
-
-        Args:
-            None
+        Average site occupation for each site label.
 
         Returns:
-            (Dict(Str:Float)): Dictionary of occupation statistics, e.g.::
-
-                { 'A' : 2.5, 'B' : 25.3 }
+            The time-averaged number of atoms on the sites with each label, for example
+            ``{'A': 2.5, 'B': 25.3}``, or None if no time has elapsed.
         """
         if self.time == 0.0:
             return None
@@ -324,12 +287,8 @@ class Lattice:
         Set the energies for every site in the lattice according to the site labels.
 
         Args:
-            energies (Dict(Str:Float): Dictionary of energies for each site label, e.g.::
-
-                { 'A' : 1.0, 'B', 0.0 }
-
-        Returns:
-            None
+            energies: Occupation energy, in eV, for each site label, for example
+                ``{'A': 1.0, 'B': 0.0}``.
         """
         self.site_energies = energies
         for site_label in energies:
@@ -342,24 +301,32 @@ class Lattice:
         Set the lattice nearest-neighbour energy.
 
         Args:
-            delta_E (Float): The nearest-neighbour energy E_nn.
-
-        Returns:
-            None
+            delta_E: Interaction energy, in eV, for each pair of occupied nearest-neighbour sites.
+                A positive energy is a repulsion.
         """
         self.nn_energy = delta_E
 
     def set_cn_energies(self, cn_energies: dict[str, dict[str, dict[int, float]]]) -> None:
         """
-        Set the coordination number dependent energies for this lattice.
+        Set the coordination-number dependent energies for this lattice.
 
         Args:
-            cn_energies (Dict(Str:Dict(Int:Float))): Dictionary of dictionaries specifying the coordination number dependent energies for each site type. e.g.::
+            cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
+                the label of its neighbouring sites, then by the number of those neighbours that
+                are occupied. The energy of an occupied site is the sum of the energies for each
+                neighbouring label; vacant sites contribute no energy. The dict must be complete:
+                every site label, every label of a neighbouring site, and every count from 0 to the
+                number of those neighbours, or the simulation raises a KeyError. For example, on a
+                honeycomb lattice built with ``alternating_sites=True``, every 'A' site has three
+                'B' neighbours::
 
-                { 'A' : { 0 : 0.0, 1 : 1.0, 2 : 2.0 }, 'B' : { 0 : 0.0, 1 : 2.0 } }
+                    cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
+                    {'A': {'B': cn}, 'B': {'A': cn}}
 
-        Returns:
-            None
+        Notes:
+            On lattices where a site can neighbour both ends of a jump (lattices with
+            triangles), the energy change for such a site is miscounted when both ends have
+            the same label. See https://github.com/bjmorgan/lattice_mc/issues/30.
         """
         for site in self.sites:
             site.set_cn_occupation_energies(cn_energies[site.label])
@@ -367,16 +334,14 @@ class Lattice:
 
     def site_coordination_numbers(self) -> dict[str, set[int]]:
         """
-        Returns a dictionary of the coordination numbers for each site label. e.g.::
+        Returns a dictionary of the coordination numbers for each site label.
+
+        For example::
 
             { 'A' : { 4 }, 'B' : { 2, 4 } }
 
-        Args:
-            none
-
         Returns:
-            coordination_numbers (Dict(Str:Set(Int))): dictionary of coordination
-                                                       numbers for each site label.
+            The set of coordination numbers found for the sites with each label.
         """
         coordination_numbers = {}
         for label in self.site_labels:
@@ -386,30 +351,26 @@ class Lattice:
     def max_site_coordination_numbers(self) -> dict[str, int]:
         """
         Returns a dictionary of the maximum coordination number for each site label.
-        e.g.::
+
+        For example::
 
             { 'A' : 4, 'B' : 4 }
 
-        Args:
-            none
-
         Returns:
-            max_coordination_numbers (Dict(Str:Int)): dictionary of maxmimum coordination
-                                                      number for each site label.
+            The maximum coordination number for the sites with each label.
         """
         return {label: max(c) for label, c in self.site_coordination_numbers().items()}
 
     def site_specific_coordination_numbers(self) -> dict[str, dict[str, int]]:
         """
-        Returns a dictionary of coordination numbers for each site type.
+        Returns the number of neighbours with each label, for each site label.
 
-        Args:
-            None
+        The counts for each site label are taken from one site with that label, so this
+        assumes that all sites with the same label have the same neighbours.
 
         Returns:
-            (Dict(Str:List(Int))) : Dictionary of coordination numbers for each site type, e.g.::
-
-                { 'A' : [ 2, 4 ], 'B' : [ 2 ] }
+            For each site label, the number of neighbouring sites with each label, for example
+            ``{'A': {'B': 3}, 'B': {'A': 3}}``.
         """
         specific_coordination_numbers = {}
         for site in self.sites:
@@ -418,16 +379,14 @@ class Lattice:
 
     def connected_site_pairs(self) -> dict[str, list[str]]:
         """
-        Returns a dictionary of all connections between pair of sites (by site label).
-        e.g. for a linear lattice A-B-C will return::
+        Returns a dictionary of all connections between pairs of sites (by site label).
+
+        For example, for a linear lattice A-B-C this returns::
 
             { 'A' : [ 'B' ], 'B' : [ 'A', 'C' ], 'C' : [ 'B' ] }
 
-        Args:
-            None
-
         Returns:
-            site_connections (Dict{Str List[Str]}): A dictionary of neighbouring site types in the lattice.
+            For each site label, the labels of its neighbouring sites.
         """
         site_connections: dict[str, list[str]] = {}
         for initial_site in self.sites:
@@ -444,12 +403,9 @@ class Lattice:
         Selects a random subset of sites with a specific label and gives them a different label.
 
         Args:
-            old_site_label (String or List(String)): Site label(s) of the sites to be modified..
-            new_site_label (String):                 Site label to be applied to the modified sites.
-            n_sites_to_change (Int):                 Number of sites to modify.
-
-        Returns:
-            None
+            old_site_label: Site label, or labels, of the sites that can be modified.
+            new_site_label: Site label to apply to the modified sites.
+            n_sites_to_change: Number of sites to modify.
         """
         selected_sites = self.select_sites(old_site_label)
         for site in random.sample(selected_sites, n_sites_to_change):
@@ -459,24 +415,16 @@ class Lattice:
     def connected_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[cluster.Cluster]:
         """
         Searches the lattice to find sets of sites that are contiguously neighbouring.
+
         Mutually exclusive sets of contiguous sites are returned as Cluster objects.
 
         Args:
-            site_labels (:obj:(List(Str)|Set(Str)|Str), optional): Labels for sites to be considered in the search.
-                This can be a list::
-
-                    [ 'A', 'B' ]
-
-                a set::
-
-                    ( 'A', 'B' )
-
-                or a string::
-
-                    'A'.
+            site_labels: Labels of the sites to consider in the search: a list or set of labels,
+                such as ``['A', 'B']``, or a single label, such as ``'A'``. If None, all sites
+                are considered. Defaults to None.
 
         Returns:
-            (List(Cluster)): List of Cluster objects for groups of contiguous sites.
+            The clusters of contiguous sites.
         """
         if site_labels:
             selected_sites = self.select_sites(site_labels)
@@ -503,11 +451,14 @@ class Lattice:
         Selects sites in the lattice with specified labels.
 
         Args:
-            site_labels (List(Str)|Set(Str)|Str): Labels of sites to select.
-                This can be a List [ 'A', 'B' ], a Set ( 'A', 'B' ), or a String 'A'.
+            site_labels: Labels of the sites to select: a list or set of labels, such as
+                ``['A', 'B']``, or a single label, such as ``'A'``.
 
         Returns:
-            (List(Site)): List of sites with labels given by `site_labels`.
+            The sites with labels given by `site_labels`.
+
+        Raises:
+            ValueError: If `site_labels` is not a list, set or string.
         """
         if isinstance(site_labels, (list, set)):
             selected_sites = [s for s in self.sites if s.label in site_labels]
@@ -519,16 +470,22 @@ class Lattice:
 
     def detached_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[Site]:
         """
-        Returns all sites in the lattice (optionally from the set of sites with specific labels)
-        that are not part of a percolating network.
-        This is determined from clusters of connected sites that do not wrap round to
-        themselves through a periodic boundary.
+        Returns all sites in the lattice that are not part of a percolating network.
+
+        These are the sites in clusters of connected sites that do not wrap round to themselves
+        through a periodic boundary. The search can optionally be restricted to sites with
+        specific labels.
 
         Args:
-            site_labels (String or List(String)): Lables of sites to be considered.
+            site_labels: Labels of the sites to consider. If None, all sites are considered.
+                Defaults to None.
 
         Returns:
-            (List(Site)): List of sites not in a periodic percolating network.
+            List of sites not in a periodic percolating network.
+
+        Notes:
+            Clusters can be wrongly reported as percolating. See
+            https://github.com/bjmorgan/lattice_mc/issues/2.
         """
         clusters = self.connected_sites(site_labels=site_labels)
         island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
@@ -538,11 +495,12 @@ class Lattice:
         """
         Check whether there are any possible jumps.
 
-        Args:
-            None
-
         Returns:
-            (Bool): True if there are no possible jumps. Otherwise returns False.
+            True if there are no possible jumps, otherwise False.
+
+        Raises:
+            RuntimeError: If `self.params` has not been set. `Simulation.run` and
+                `Simulation.setup_lookup_table` set it.
         """
         if not self.potential_jumps():
             return True

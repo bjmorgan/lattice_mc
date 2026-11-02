@@ -1,3 +1,5 @@
+"""Functions that build lattices, either programmatically or from a sites file."""
+
 from __future__ import annotations
 
 import re
@@ -7,22 +9,18 @@ import numpy as np
 
 from lattice_mc import lattice, lattice_site
 
-"""
-Functions for constructing lattices.
-"""
-
 
 def square_lattice(a: int, b: int, spacing: float) -> lattice.Lattice:
     """
     Generate a square lattice.
 
     Args:
-        a (Int):         Number of lattice repeat units along x.
-        b (Int):         Number of lattice repeat units along y.
-        spacing (Float): Distance between lattice sites.
+        a: Number of lattice repeat units along x.
+        b: Number of lattice repeat units along y.
+        spacing: Distance between lattice sites.
 
     Returns:
-        (Lattice): The new lattice
+        The new lattice.
 
     Notes:
         The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
@@ -49,13 +47,14 @@ def honeycomb_lattice(a: int, b: int, spacing: float, alternating_sites: bool = 
     Generate a honeycomb lattice.
 
     Args:
-        a (Int):         Number of lattice repeat units along x.
-        b (Int):         Number of lattice repeat units along y.
-        spacing (Float): Distance between lattice sites.
-        alternating_sites (Bool, optional): Label alternating sites with 'A' and 'B'. Defaults to False.
+        a: Number of lattice repeat units along x.
+        b: Number of lattice repeat units along y.
+        spacing: Distance between lattice sites.
+        alternating_sites: If True, label alternating sites 'A' and 'B', so that every 'A' site
+            has only 'B' neighbours. Otherwise every site is labelled 'L'. Defaults to False.
 
     Returns:
-        (Lattice): The new lattice
+        The new lattice.
 
     Notes:
         The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
@@ -94,13 +93,13 @@ def cubic_lattice(a: int, b: int, c: int, spacing: float) -> lattice.Lattice:
     Generate a cubic lattice.
 
     Args:
-        a (Int):         Number of lattice repeat units along x.
-        b (Int):         Number of lattice repeat units along y.
-        c (Int):         Number of lattice repeat units along z.
-        spacing (Float): Distance between lattice sites.
+        a: Number of lattice repeat units along x.
+        b: Number of lattice repeat units along y.
+        c: Number of lattice repeat units along z.
+        spacing: Distance between lattice sites.
 
     Returns:
-        (Lattice): The new lattice
+        The new lattice.
     """
     grid = np.array(list(range(1, a * b * c + 1))).reshape(a, b, c, order="F")
     it = np.nditer(grid, flags=["multi_index"])
@@ -126,26 +125,28 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Generate a lattice from a sites file.
 
     Args:
-        site_file (Str): Filename for the file containing the site information.
-        cell_lengths (List(Float,Float,Float)): A list containing the [ x, y, z ] cell lengths.
+        site_file: Path to the file containing the site information.
+        cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
             Set the z cell length to 0 for a two-dimensional lattice.
 
     Returns:
-        (Lattice): The new lattice
+        The new lattice.
 
     Notes:
-        | The site information file format is:
-        |     <number_of_sites> (Int).
-        | Followed by blocks of data separated by double linebreaks; one block per site.
-        |     site: <site number> (Int).
-        |     centre: <x> <y> <z> (Float,Float,Float).
-        |     neighbours: <list of site numbers of neighbouring sites> (List[Int]).
-        |     label: <site group labal> (Str).
-        |     energy: <site occupation energy> (Float).
-        | The energy is optional, and will be set to 0.0 if not included.
-        | Line order within each block is not meaningful.
-        | British and American English spellings for centre|center and neighbour|neighbor are accepted.
-        | An example file can be found in the examples directory.
+        The file starts with the number of sites, followed by one block per site.
+        Blocks are separated by a blank line. Each block gives::
+
+            site: <site number>
+            centre: <x> <y> <z>
+            neighbours: <site numbers of neighbouring sites>
+            label: <site label>
+            energy: <site occupation energy>
+
+        Site numbers are arbitrary integers. The energy line is optional, and
+        defaults to 0.0. Energies must be plain decimals with a single space after
+        the colon (see https://github.com/bjmorgan/lattice_mc/issues/31). Lines within a block can be in any order. Both
+        centre/center and neighbours/neighbors are accepted. A full example is
+        ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
     """
     sites: list[lattice_site.Site] = []
     site_re = re.compile(r"site:\s+([-+]?\d+)")

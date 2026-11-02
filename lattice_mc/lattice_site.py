@@ -1,3 +1,5 @@
+"""Individual lattice sites and their occupation energies."""
+
 from __future__ import annotations
 
 from collections import Counter
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 class Site:
     """
-    Site class
+    A single lattice site, its neighbours, and its occupation.
     """
 
     index: int = 0
@@ -30,15 +32,15 @@ class Site:
         Initialise a lattice Site object.
 
         Args:
-            number (Int): An identifying number for this site.
-            coordinates (np.array(x,y,z)): The coordinates of this site.
-            neighbours (List(Int)): A list of the id numbers of the neighbouring sites.
-            energy (Float): On-site occupation energy.
-            label (Str): Label for classifying this as a specific site type.
-            cn_energies (:obj:Dict(Int:Float), optional): Dictionary of coordination-number dependent energies, e.g. { 0 : 0.0, 1 : 0.5, 2 : 2.0 }. Defaults to None.
-
-        Returns:
-            None
+            number: An identifying number for this site.
+            coordinates: The coordinates of this site.
+            neighbours: A list of the id numbers of the neighbouring sites.
+            energy: On-site occupation energy, in eV.
+            label: Label for classifying this as a specific site type.
+            cn_energies: Coordination-number dependent energies, in eV, for this site,
+                nested by the label of its neighbouring sites, then by the number of those
+                neighbours that are occupied, for example ``{'B': {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}}``.
+                Defaults to None.
 
         Notes:
             There should be a 1:1 mapping between sites and site numbers.
@@ -61,11 +63,8 @@ class Site:
         """
         The number of occupied nearest-neighbour sites.
 
-        Args:
-            None
-
         Returns:
-            (Int): The number of occupied nearest-neighbour sites.
+            The number of occupied nearest-neighbour sites.
         """
         assert self.p_neighbours is not None
         return sum([site.is_occupied for site in self.p_neighbours])
@@ -74,11 +73,9 @@ class Site:
         """
         Returns the number of occupied nearest neighbour sites, classified by site type.
 
-        Args:
-            None
-
         Returns:
-            (Dict(Str:Int)): Dictionary of nearest-neighbour occupied site numbers, classified by site label, e.g. { 'A' : 2, 'B' : 1 }.
+            The number of occupied neighbouring sites with each label, for example
+            ``{'A': 2, 'B': 1}``.
         """
         assert self.p_neighbours is not None
         to_return = {label: 0 for label in set((site.label for site in self.p_neighbours))}
@@ -91,11 +88,8 @@ class Site:
         """
         Returns the number of neighbouring sites, classified by site type.
 
-        Args:
-            None
-
         Returns:
-            (Dict(Str:Int)): Dictionary of neighboring sites, classified by site label, e.g. { 'A' : 1, 'B' : 1 }.
+            The number of neighbouring sites with each label, for example ``{'A': 1, 'B': 1}``.
         """
         assert self.p_neighbours is not None
         return dict(Counter((site.label for site in self.p_neighbours)))
@@ -105,10 +99,9 @@ class Site:
         Set the coordination-number dependent energies for this site.
 
         Args:
-            cn_energies (Dict(Int:Float)): Dictionary of coordination number dependent site energies, e.g. { 0 : 0.0, 1 : 0.5 }.
-
-        Returns:
-            None
+            cn_energies: Coordination-number dependent energies, in eV, for this site,
+                nested by the label of its neighbouring sites, then by the number of those
+                neighbours that are occupied, for example ``{'B': {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}}``.
         """
         self.cn_occupation_energies = cn_energies
 
@@ -117,11 +110,12 @@ class Site:
         The coordination-number dependent energy for this site.
 
         Args:
-            delta_occupation (:obj:Dict(Str:Int), optional): A dictionary of a change in (site-type specific) coordination number, e.g. { 'A' : 1, 'B' : -1 }.
-                If this is not None, the coordination-number dependent energy is calculated including these changes in neighbour-site occupations. Defaults to None
+            delta_occupation: A change in the number of occupied neighbours with each label, for
+                example ``{'A': 1, 'B': -1}``. If this is not None, the energy is calculated
+                including these changes in neighbour-site occupations. Defaults to None.
 
         Returns:
-            (Float): The coordination-number dependent energy for this site.
+            The coordination-number dependent energy for this site.
         """
         nn_occupations = self.site_specific_nn_occupation()
         if delta_occupation:

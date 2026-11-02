@@ -51,8 +51,20 @@ line-length = 120
 skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
-ignore = ["E501"]  # Long lines in docstrings; will be addressed with type hints PR
+select = ["E", "F", "I", "W", "D"]
+ignore = [
+    "E501",  # Long lines in docstrings; will be addressed with type hints PR
+    "D200",  # Function and class docstrings keep the closing quotes on their own line
+    "D212",  # Function and class docstrings put the summary on the line after the opening quotes
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+"docs/**" = ["D"]
+"examples/**" = ["D"]
 
 [tool.mypy]
 python_version = "3.11"
