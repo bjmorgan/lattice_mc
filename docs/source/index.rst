@@ -7,6 +7,7 @@ lattice_mc: A Python Lattice-Gas Monte Carlo Module
 
    introduction
    building_lattices
+   running_simulations
    blocked_lattice
    modules
 
