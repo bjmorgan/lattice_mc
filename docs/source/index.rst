@@ -48,4 +48,4 @@ A simulation of 50 atoms on a 10 x 10 square lattice:
    running_simulations
    interaction_models
    blocked_lattice
-   modules
+   api
