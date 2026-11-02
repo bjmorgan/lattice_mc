@@ -13,16 +13,15 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# Make the package importable from the repository root, independent of the
+# working directory Sphinx is run from.
 #
 import sys
 from pathlib import Path
 
 DOCS_SOURCE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(DOCS_SOURCE_DIR.parents[1]))
-from lattice_mc import __version__
+from lattice_mc import __version__  # noqa: E402
 
 # -- General configuration ------------------------------------------------
 

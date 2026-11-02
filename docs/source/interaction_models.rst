@@ -73,13 +73,9 @@ precalculates the probability of every possible jump, which speeds up simulation
 with nearest-neighbour interactions. Without a table, probabilities are calculated
 as they are needed. The table includes the energies set with
 :meth:`~lattice_mc.simulation.Simulation.set_site_energies` and the nearest-neighbour
-energy, as set when the table is created, so set those first.
-
-.. warning::
-
-    A lookup table ignores per-site energies read from a sites file, and
-    coordination-number energies. Do not use a table with either: the simulation runs,
-    but without those energies.
+energy, as set when the table is created, so set those first. A lookup table supports
+nearest-neighbour interactions only, so do not use one with coordination-number
+energies.
 
 Coordination-number energies
 ----------------------------
@@ -103,7 +99,7 @@ must be given for every possible number of occupied neighbours.
 
     True
 
-Do not use a lookup table with coordination-number energies (see the warning above).
+Lookup tables do not support coordination-number energies.
 
 Site energies
 -------------
@@ -124,5 +120,5 @@ given label an occupation energy. Here ``'B'`` sites are 0.1 eV less favourable 
     True
 
 Site energies can also be given per site in a sites file (see
-:doc:`building_lattices`). Do not use a lookup table with energies from a sites file
-(see the warning above).
+:doc:`building_lattices`). ``set_site_energies`` overwrites any energies read from a
+sites file for the labels it is given.

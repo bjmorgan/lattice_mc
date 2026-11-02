@@ -1,4 +1,4 @@
-Blocked Lattices
+Blocked lattices
 ================
 
 It is possible to construct a simulation lattice where there are no possible jumps;

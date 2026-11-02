@@ -63,8 +63,8 @@ Until the simulation has run, its results are ``None``:
 
     True
 
-Instead of a number of jumps, a simulation can run until a set simulation time, in
-seconds, has passed:
+Instead of a number of jumps, a simulation can run until its simulation time, in
+seconds, reaches a set value:
 
 .. testcode::
 
@@ -78,9 +78,10 @@ seconds, has passed:
 
     True
 
-Atoms can be restricted to sites with particular labels, and a number of
-equilibration jumps can be run first. Equilibration jumps let the atoms move away
-from their random starting positions, and are not included in the results.
+Atoms can be placed initially on sites with particular labels. They can then jump to
+any neighbouring vacant site, whatever its label. A number of equilibration jumps can
+be run first, to let the atoms move away from their starting positions; these are
+not included in the results.
 
 .. testcode::
 
@@ -91,11 +92,13 @@ from their random starting positions, and are not included in the results.
     equilibrated.set_number_of_equilibration_jumps(50)
     equilibrated.run()
 
-:meth:`~lattice_mc.simulation.Simulation.reset` sets the time and the atom
-displacements back to zero, leaving the atoms where they are. Call
-:meth:`~lattice_mc.simulation.Simulation.run` again before reading the results: after a
-reset, the diffusion coefficients and correlation factors cannot be calculated until
-time has passed. A second run continues from the current atom positions.
+Calling :meth:`~lattice_mc.simulation.Simulation.run` again continues from the
+current state. Without equilibration jumps, the time and displacements keep adding
+up across runs, and a time-limited run counts towards the same total time. With
+equilibration jumps, each run repeats the equilibration and then starts the results
+again. :meth:`~lattice_mc.simulation.Simulation.reset` sets the time, the atom
+displacements and the other counters back to zero, leaving the atoms where they
+are. Run the simulation again after a reset before reading the results.
 
 Results
 -------
@@ -112,7 +115,7 @@ After a run, the simulation reports:
 - :attr:`~lattice_mc.simulation.Simulation.average_site_occupations`: the
   time-averaged number of atoms on the sites with each label.
 
-These quantities are defined in :doc:`introduction`.
+The diffusion coefficients and correlation factors are defined in :doc:`introduction`.
 
 .. testcode::
 

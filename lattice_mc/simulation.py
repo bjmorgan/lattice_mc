@@ -323,8 +323,12 @@ class Simulation:
 
         Without a table, the probability of each jump is calculated as it is needed. The table
         includes the energies set with `set_site_energies` and the nearest-neighbour energy, as
-        set when the table is created, so set those first. It ignores per-site energies read from
-        a sites file, and coordination-number energies, so do not use a table with either.
+        set when the table is created, so set those first. It supports nearest-neighbour
+        interactions only, so do not use a table with coordination-number energies.
+
+        Notes:
+            The table ignores per-site energies read from a sites file. See
+            https://github.com/bjmorgan/lattice_mc/issues/28.
 
         Args:
             hamiltonian: The model Hamiltonian. The only supported value is 'nearest-neighbour'.

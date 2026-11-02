@@ -25,18 +25,23 @@ A square lattice of 4 x 4 sites:
 
     16 2 ['L']
 
-A cubic lattice of 2 x 2 x 2 sites:
+A cubic lattice of 3 x 3 x 3 sites:
 
 .. testcode::
 
-    lattice = init_lattice.cubic_lattice(2, 2, 2, 1.0)
+    lattice = init_lattice.cubic_lattice(3, 3, 3, 1.0)
     print(lattice.number_of_sites, lattice.dimensionality)
 
 .. testoutput::
 
-    8 3
+    27 3
 
-Every site in these lattices is labelled ``'L'``. A honeycomb lattice can instead
+Use at least 3 repeat units along each axis of square and cubic lattices, and at
+least 2 along each axis of honeycomb lattices. With fewer, a site's neighbours on
+either side along an axis are the same site, so it is listed as a neighbour twice.
+
+Each repeat unit of a honeycomb lattice contains 4 sites. Every site in these
+lattices is labelled ``'L'``. A honeycomb lattice can instead
 have alternating ``'A'`` and ``'B'`` sites, so that every ``'A'`` site has only
 ``'B'`` neighbours. This is useful for giving the two sublattices different energies
 (see :doc:`interaction_models`).
@@ -56,7 +61,8 @@ Two-dimensional lattices
 Square and honeycomb lattices lie in the xy plane, and have a z cell length of 0.
 :attr:`~lattice_mc.lattice.Lattice.dimensionality` is the number of non-zero cell
 lengths, and is used as :math:`d` in the Einstein relations for the diffusion
-coefficients (see :doc:`introduction`).
+coefficients (see :doc:`introduction`). A cubic lattice with one repeat unit along
+z still has a non-zero z cell length, so it counts as three-dimensional.
 
 Lattices from a sites file
 --------------------------
@@ -84,7 +90,10 @@ Each block gives:
     The occupation energy of the site, in eV. This line is optional, and defaults to
     0.0.
 
-Lines within a block can be in any order. The cell lengths are given separately. Set
+Lines within a block can be in any order. The blank lines must be empty, including
+the one after the number of sites, and site numbers must be unique. Neighbour lists
+are used as given, and are not checked for symmetry. The cell lengths are given
+separately, and must match the periodicity built into the neighbour lists. Set
 the z cell length to 0 for a two-dimensional lattice. In this example, ``DATA_DIR`` is
 the directory that holds the file; replace the path with the location of your own
 sites file:

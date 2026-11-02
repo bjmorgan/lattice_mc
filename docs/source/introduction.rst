@@ -15,7 +15,10 @@ frequency of individual ions [HowardLidiard1964]_ [Harding1989]_. Practical soli
 electrolytes have high mobile ion concentrations, and interactions between the
 mobile ions give deviations from dilute random-walk behaviour. In general the size
 of these deviations cannot be calculated analytically, but it can be calculated
-directly from lattice-gas Monte Carlo simulations.
+directly from lattice-gas Monte Carlo simulations. Even with no interaction energies,
+volume exclusion alone correlates the jumps of individual atoms at finite
+concentrations, so the tracer correlation factor is less than 1, while the
+collective correlation factor stays exactly 1 [Kutner1981]_.
 
 ``lattice_mc`` models a lattice of sites, some of which are occupied by mobile atoms.
 Each atom can jump to a neighbouring vacant site. The rate of each jump depends on
@@ -30,29 +33,32 @@ What ``lattice_mc`` calculates
 For atoms with displacements :math:`\mathbf{r}_i` after a simulation time :math:`t`:
 
 Tracer diffusion coefficient, :math:`D^*`
-    The mean squared displacement of individual atoms, from the Einstein relation
+    Calculated from the mean squared displacement of individual atoms, through the
+    Einstein relation
 
     .. math::
 
         \langle r_i^2 \rangle = 2 d D^* t.
 
 Collective, or "jump", diffusion coefficient, :math:`D_\mathrm{J}`
-    The squared displacement of the summed atom displacements,
+    Calculated from the squared sum of the atom displacements,
 
     .. math::
 
         \left\langle \left( \sum_i \mathbf{r}_i \right)^2 \right\rangle = 2 d D_\mathrm{J} t.
 
-    :math:`D_\mathrm{J}` is proportional to the mobility, and hence to the
-    conductivity for charged particles [VanDerVen2013]_. No :math:`1/N`
-    normalisation is applied; the per-atom value is also available.
+    No :math:`1/N` normalisation is applied, so :math:`D_\mathrm{J}` is
+    proportional to the conductivity of charged particles at a fixed volume and
+    temperature. The per-atom value, :math:`D_\mathrm{J}/N`, is proportional to
+    the mobility [VanDerVen2013]_.
 
 Tracer correlation factor, :math:`f`, and collective correlation factor, :math:`f_\mathrm{I}`
     The ratios of the tracer and collective squared displacements to the sum of the
     squared lengths of the individual jumps [Murch1982]_. Both are 1 for uncorrelated
     random walks.
 
-In the Einstein relations, :math:`d` is the dimensionality of the lattice, given by
+Diffusion coefficients are in units of (site spacing)\ :sup:`2` s\ :sup:`-1`. In
+the Einstein relations, :math:`d` is the dimensionality of the lattice, given by
 :attr:`Lattice.dimensionality <lattice_mc.lattice.Lattice.dimensionality>`: the
 number of non-zero cell lengths. Two-dimensional lattices, such as square and
 honeycomb lattices, have a z cell length of 0, so :math:`d = 2`.
@@ -75,7 +81,7 @@ Or install the latest development version directly from GitHub:
 References
 ----------
 
-.. [Catlow1983] C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).
+.. [Catlow1983] C. R. A. Catlow, *Solid State Ionics* **8**, 89 (1983).
    https://doi.org/10.1016/0167-2738(83)90069-3
 
 .. [HowardLidiard1964] R. E. Howard and A. B. Lidiard, *Rep. Prog. Phys.* **27**, 161 (1964).
@@ -91,8 +97,11 @@ References
 .. [VanDerVen2013] A. Van der Ven *et al.*, *Acc. Chem. Res.* **46**, 1216 (2013).
    https://doi.org/10.1021/ar200329r
 
-.. [Murch1982] G. E. Murch, *Sol. Stat. Ionics* **7**, 177 (1982).
+.. [Murch1982] G. E. Murch, *Solid State Ionics* **7**, 177 (1982).
    https://doi.org/10.1016/0167-2738(82)90050-9
+
+.. [Kutner1981] R. Kutner, *Phys. Lett. A* **81**, 239 (1981).
+   https://doi.org/10.1016/0375-9601(81)90251-6
 
 .. [Voter2007] A. F. Voter, Introduction to the Kinetic Monte Carlo Method, in
    *Radiation Effects in Solids*, ed. K. E. Sickafus *et al.*, Springer (2007).
