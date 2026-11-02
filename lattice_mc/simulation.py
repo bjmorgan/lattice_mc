@@ -45,11 +45,8 @@ class Simulation:
         Initialise a Simulation object.
 
         Args:
-            params (SimulationParameters): Physical parameters for the simulation
+            params: Physical parameters for the simulation
                 (temperature, rate prefactor).
-
-        Returns:
-            None
         """
         self.params: SimulationParameters = params
         self.lattice: Lattice | None = None
@@ -63,12 +60,6 @@ class Simulation:
     def reset(self) -> None:
         """
         Reset all counters for this simulation.
-
-        Args:
-            None
-
-        Returns:
-            None
         """
         assert self.lattice is not None
         assert self.atoms is not None
@@ -81,11 +72,9 @@ class Simulation:
         Set the number of atoms for the simulation, and populate the simulation lattice.
 
         Args:
-            n (Int): Number of atoms for this simulation.
-            selected_sites (:obj:(List|Set|String), optional): Selects a subset of site types to be populated with atoms. Defaults to None.
-
-        Returns:
-            None
+            n: Number of atoms for this simulation.
+            selected_sites: Site labels to populate with atoms. If None, atoms are placed on
+                randomly chosen sites of any label. Defaults to None.
         """
         assert self.lattice is not None
         self.number_of_atoms = n
@@ -96,10 +85,7 @@ class Simulation:
         Set the number of jumps for this simulation.
 
         Args:
-            n (Int): number of jumps
-
-        Returns:
-            None
+            n: Number of jumps.
         """
         self.number_of_jumps = n
 
@@ -108,10 +94,8 @@ class Simulation:
         Set the number of equilibration jumps for this simulation.
 
         Args:
-            n (Int): number of equilibration jumps
-
-        Returns:
-            None
+            n: Number of equilibration jumps, run (and then discarded) before the jumps that are
+                analysed.
         """
         self.number_of_equilibration_jumps = n
 
@@ -122,12 +106,9 @@ class Simulation:
         Uses `init_lattice.lattice_from_sites_file`, which defines the site file spec.
 
         Args:
-            filename (Str): sites file filename.
-            cell_lengths (List(x,y,z)): cell lengths for the simulation cell.
+            filename: Path to the sites file.
+            cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
                 Set the z cell length to 0 for a two-dimensional lattice.
-
-        Returns:
-            None
         """
         self.lattice = init_lattice.lattice_from_sites_file(filename, cell_lengths=cell_lengths)
 
@@ -136,10 +117,8 @@ class Simulation:
         Set the nearest-neighbour energy for this simulation.
 
         Args:
-            nn_energy (Float): nearest-neighbour energy.
-
-        Returns:
-            None
+            nn_energy: Interaction energy, in eV, for each pair of occupied nearest-neighbour
+                sites. If None, the lattice is left unchanged.
         """
         assert self.lattice is not None
         if nn_energy is not None:
@@ -150,12 +129,14 @@ class Simulation:
         Set the coordination-number dependent energies for this simulation.
 
         Args:
-            cn_energies	(Dict(Str:Dict(Int:Float))): Dict of Dicts specficying the coordination-number dependent energies.
-                e.g. {'A': {0: 0.0, 1: 0.5},
-                      'B': {0: -0.5, 1: -2.0}}
+            cn_energies: Energies, in eV, for each site, nested by site label, then by the label
+                of its neighbouring sites, then by the number of those neighbours that are
+                occupied. The energy of a site is the sum of the energies for each neighbouring
+                label. If None, the lattice is left unchanged. For example, on a honeycomb lattice
+                built with ``alternating_sites=True``, every 'A' site has three 'B' neighbours::
 
-        Returns:
-            None
+                    cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
+                    {'A': {'B': cn}, 'B': {'A': cn}}
         """
         assert self.lattice is not None
         if cn_energies is not None:
@@ -166,11 +147,8 @@ class Simulation:
         Set the on-site energies for this simulation.
 
         Args:
-            site_energies (Dict(Str:Float)): Dict of energies for each site type.
-                e.g. { 'A' : 0.0,. 'B' : 1.0 }
-
-        Returns:
-            None
+            site_energies: Occupation energy, in eV, for each site label, for example
+                ``{'A': 0.0, 'B': 1.0}``. If None, the lattice is left unchanged.
         """
         assert self.lattice is not None
         if site_energies is not None:
@@ -180,11 +158,9 @@ class Simulation:
         """
         Check whether the simulation has been initialised.
 
-        Args:
-            None
-
-        Returns:
-            None
+        Raises:
+            AttributeError: If the lattice or the atoms have not been set, or if neither a number
+                of jumps nor a run time has been set.
         """
         if not self.lattice:
             raise AttributeError("Running a simulation needs the lattice to be initialised")
@@ -198,10 +174,13 @@ class Simulation:
         Run the simulation.
 
         Args:
-            for_time (:obj:Float, optional): If `for_time` is set, then run the simulation until a set amount of time has passed. Otherwise, run the simulation for a set number of jumps. Defaults to None.
+            for_time: If given, run until the simulation time reaches this value, instead of for
+                the number of jumps set by `set_number_of_jumps`. Any equilibration jumps are run
+                first. Defaults to None.
 
-        Returns:
-            None
+        Raises:
+            AttributeError: If the simulation has not been initialised.
+            BlockedLatticeError: If no jumps are possible on the lattice.
         """
         self.for_time = for_time
         self.is_initialised()
@@ -228,11 +207,8 @@ class Simulation:
         """
         Tracer correlation factor, f.
 
-        Args:
-            None
-
         Returns:
-            (Float): The tracer correlation factor, f.
+            The tracer correlation factor, f, or None if the simulation has not been run.
         """
         if self.has_run:
             assert self.atoms is not None
@@ -249,11 +225,8 @@ class Simulation:
         the mean squared displacement over all atoms and d is the dimensionality
         of the lattice.
 
-        Args:
-            None
-
         Returns:
-            (Float): The tracer diffusion coefficient, D*.
+            The tracer diffusion coefficient, D*, or None if the simulation has not been run.
         """
         if self.has_run:
             assert self.atoms is not None
@@ -268,13 +241,10 @@ class Simulation:
     @property
     def collective_correlation(self) -> float | None:
         """
-        Returns the collective correlation factor, f_I.
-
-        Args:
-            None
+        Collective correlation factor, f_I.
 
         Returns:
-            (Float): The collective correlation factor, f_I.
+            The collective correlation factor, f_I, or None if the simulation has not been run.
         """
         if self.has_run:
             assert self.atoms is not None
@@ -285,18 +255,15 @@ class Simulation:
     @property
     def collective_diffusion_coefficient(self) -> float | None:
         """
-        Returns the collective or "jump" diffusion coefficient, D_J.
+        Collective, or "jump", diffusion coefficient, D_J.
 
         Calculated from the Einstein relation, <R^2> = 2 d D_J t, where
         R = sum_i dr_i is the summed displacement of all atoms (not the centre of
         mass displacement) and d is the dimensionality of the lattice. No 1/N
         normalisation is applied; see `collective_diffusion_coefficient_per_atom`.
 
-        Args:
-            None
-
         Returns:
-            (Float): The collective diffusion coefficient, D_J.
+            The collective diffusion coefficient, D_J, or None if the simulation has not been run.
         """
         if self.has_run:
             assert self.atoms is not None
@@ -308,13 +275,10 @@ class Simulation:
     @property
     def collective_diffusion_coefficient_per_atom(self) -> float | None:
         """
-        The collective diffusion coefficient per atom. D_J / n_atoms.
-
-        Args:
-            None
+        Collective diffusion coefficient per atom, D_J / n_atoms.
 
         Returns:
-            (Float): The collective diffusion coefficient per atom, D_J / n_atoms.
+            The collective diffusion coefficient per atom, or None if the simulation has not been run.
         """
         if self.has_run:
             assert self.number_of_atoms is not None
@@ -328,26 +292,28 @@ class Simulation:
         """
         Average site occupation numbers.
 
-        Args:
-            None
-
         Returns:
-            (Dict(Str:Float)): Average site occupation numbers for each site label,
-                e.g. { 'A' : 12.4, 'B' : 231.2 }
+            Average site occupation numbers for each site label, for example
+            ``{'A': 12.4, 'B': 231.2}``.
         """
         assert self.lattice is not None
         return self.lattice.site_occupation_statistics()
 
     def setup_lookup_table(self, hamiltonian: str = "nearest-neighbour") -> None:
         """
-        Create a jump-probability look-up table corresponding to the appropriate Hamiltonian.
+        Create a look-up table of jump probabilities, to speed up the simulation.
+
+        Without a table, the probability of each jump is calculated as it is needed. The table
+        includes site energies and the nearest-neighbour energy, as set when the table is created,
+        so set those first. It does not include coordination-number energies, so do not use a
+        table with `set_cn_energies`.
 
         Args:
-            hamiltonian (Str, optional): String specifying the simulation Hamiltonian.
-                Valid values are 'nearest-neighbour' (default).
+            hamiltonian: The model Hamiltonian. The only supported value is 'nearest-neighbour'.
+                Defaults to 'nearest-neighbour'.
 
-        Returns:
-            None
+        Raises:
+            ValueError: If `hamiltonian` is not supported.
         """
         expected_hamiltonian_values = ["nearest-neighbour"]
         if hamiltonian not in expected_hamiltonian_values:
