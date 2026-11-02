@@ -42,7 +42,6 @@ class Site:
                 neighbours that are occupied, for example ``{'B': {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}}``.
                 Defaults to None.
 
-
         Notes:
             There should be a 1:1 mapping between sites and site numbers.
         """

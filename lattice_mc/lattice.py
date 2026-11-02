@@ -221,7 +221,8 @@ class Lattice:
             The new atoms.
 
         Raises:
-            ValueError: If there are more atoms than sites.
+            ValueError: If there are more atoms than sites, or than sites with the labels in
+                `selected_sites`.
         """
         if number_of_atoms > self.number_of_sites:
             raise ValueError

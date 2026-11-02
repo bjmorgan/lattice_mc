@@ -13,10 +13,6 @@ if TYPE_CHECKING:
     from lattice_mc.lookup_table import LookupTable
     from lattice_mc.simulation import SimulationParameters
 
-"""
-A Jump describes a possible move by a particle from one site to another site.
-"""
-
 # TODO (maybe) does it make more sense to subclass Jump (and other classes) depending on the type of Hamiltonian?
 
 

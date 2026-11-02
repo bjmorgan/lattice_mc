@@ -11,10 +11,18 @@ from lattice_mc.lattice import Lattice
 
 @dataclass(frozen=True)
 class SimulationParameters:
-    """Immutable container for the physical parameters of a simulation."""
+    """
+    Immutable container for the physical parameters of a simulation.
+
+    Raises:
+        ValueError: If `temperature` or `rate_prefactor` is not positive.
+    """
 
     temperature: float
+    """Temperature, in K. Must be positive."""
+
     rate_prefactor: float
+    """Jump rate prefactor, nu_0, in s^-1. Must be positive."""
 
     def __post_init__(self) -> None:
         """
@@ -294,7 +302,7 @@ class Simulation:
 
         Returns:
             Average site occupation numbers for each site label, for example
-            ``{'A': 12.4, 'B': 231.2}``.
+            ``{'A': 12.4, 'B': 231.2}``, or None if no simulation time has elapsed.
         """
         assert self.lattice is not None
         return self.lattice.site_occupation_statistics()
