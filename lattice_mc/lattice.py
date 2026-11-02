@@ -501,6 +501,10 @@ class Lattice:
         Raises:
             RuntimeError: If `self.params` has not been set. `Simulation.run` and
                 `Simulation.setup_lookup_table` set it.
+
+        Notes:
+            Checking for a blocked lattice should not need the simulation parameters. See
+            https://github.com/bjmorgan/lattice_mc/issues/29.
         """
         if not self.potential_jumps():
             return True

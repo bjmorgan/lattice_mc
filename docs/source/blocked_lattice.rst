@@ -36,9 +36,3 @@ the :meth:`~lattice_mc.lattice.Lattice.is_blocked` method:
 .. testoutput::
 
     True
-
-:meth:`~lattice_mc.lattice.Lattice.is_blocked` needs the simulation parameters to be
-attached to the lattice. :meth:`Simulation.run <lattice_mc.simulation.Simulation.run>`
-and :meth:`Simulation.setup_lookup_table
-<lattice_mc.simulation.Simulation.setup_lookup_table>` both attach them, so call
-``is_blocked()`` after one of these. Before that, it raises a ``RuntimeError``.
