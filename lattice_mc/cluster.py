@@ -84,6 +84,8 @@ class Cluster:
 
         Args:
             cell_lengths: Cell lengths for the orthorhombic simulation cell.
+                An axis with a zero cell length (e.g. z for a two-dimensional
+                lattice) is not periodic, and is never reported as contiguous.
 
         Returns:
             Contiguity along the x, y, and z axes.
@@ -104,7 +106,9 @@ class Cluster:
             for neighbour in site.p_neighbours:
                 if neighbour not in self.sites:
                     continue
-                bond_wrap = np.round((neighbour.r - site.r) / cell_lengths).astype(int)
+                bond_wrap = np.round(
+                    np.divide(neighbour.r - site.r, cell_lengths, out=np.zeros(3), where=cell_lengths != 0)
+                ).astype(int)
                 neighbour_image = images[site] - bond_wrap
                 if neighbour in images:
                     winds |= images[neighbour] != neighbour_image

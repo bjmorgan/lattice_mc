@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from unittest.mock import Mock
 
 import numpy as np
@@ -96,6 +97,22 @@ class ClusterTestCase(unittest.TestCase):
         cluster = Cluster(sites)
         cell_lengths = np.array([10.0, 10.0, 3.0])
         self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, True))
+
+    def test_cluster_is_periodically_contiguous_with_a_zero_cell_length(self):
+        # Regression: a zero z cell length (as for two-dimensional lattices)
+        # gave 0/0 in the bond wrap calculation, and the NaN cast to int is
+        # platform dependent. Warnings are errors so this fails on every platform.
+        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
+        sites[0].r = np.array([0.0, 0.0, 0.0])
+        sites[1].r = np.array([1.0, 0.0, 0.0])
+        sites[2].r = np.array([2.0, 0.0, 0.0])
+        for s in sites:
+            s.p_neighbours = [other for other in sites if other is not s]
+        cluster = Cluster(sites)
+        cell_lengths = np.array([3.0, 10.0, 0.0])
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (True, False, False))
 
     def test_cluster_is_not_periodically_contiguous_for_a_fully_connected_cluster(self):
         # Regression: a 4-clique has neighbouring coordinate-extreme sites on
