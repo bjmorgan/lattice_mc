@@ -43,7 +43,7 @@ Tests can be run using
 pytest
 ```
 
-The code requires Python 3.11 or above.
+The code requires Python 3.12 or above.
 
 ## References
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)
