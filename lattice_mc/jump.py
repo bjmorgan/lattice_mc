@@ -41,7 +41,8 @@ class Jump:
                 nearest-neighbour sites. Defaults to None.
             coordination_number_energy: Coordination-number dependent energies, in the form taken by
                 `Lattice.set_cn_energies`. Defaults to None.
-            jump_lookup_table: If the jump relative probabilities have been precalculated and stored in a lookup-table, this table should be passed in here. If not, jump probabilities are calculated on the fly. Defaults to None.
+            jump_lookup_table: A lookup table of precalculated relative jump probabilities. If
+                None, the jump probability is calculated on the fly. Defaults to None.
             params: Simulation parameters (temperature, rate prefactor).
         """
         self.initial_site: Site = initial_site

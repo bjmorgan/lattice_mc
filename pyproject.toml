@@ -54,8 +54,8 @@ skip-magic-trailing-comma = true
 select = ["E", "F", "I", "W", "D"]
 ignore = [
     "E501",  # Long lines in docstrings; will be addressed with type hints PR
-    "D200",  # House style keeps the closing quotes on their own line, even for one-line docstrings
-    "D212",  # House style puts the docstring summary on the line after the opening quotes
+    "D200",  # Function and class docstrings keep the closing quotes on their own line
+    "D212",  # Function and class docstrings put the summary on the line after the opening quotes
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -63,6 +63,8 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["D"]
+"docs/**" = ["D"]
+"examples/**" = ["D"]
 
 [tool.mypy]
 python_version = "3.11"

@@ -239,6 +239,10 @@ class Lattice:
     def jump(self) -> None:
         """
         Select a jump at random from all potential jumps, then update the lattice state.
+
+        Raises:
+            BlockedLatticeError: If no jumps are possible.
+            RuntimeError: If `self.params` has not been set.
         """
         potential_jumps = self.potential_jumps()
         if not potential_jumps:
@@ -298,6 +302,7 @@ class Lattice:
 
         Args:
             delta_E: Interaction energy, in eV, for each pair of occupied nearest-neighbour sites.
+                A positive energy is a repulsion.
         """
         self.nn_energy = delta_E
 
@@ -309,11 +314,19 @@ class Lattice:
             cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
                 the label of its neighbouring sites, then by the number of those neighbours that
                 are occupied. The energy of an occupied site is the sum of the energies for each
-                neighbouring label; vacant sites contribute no energy. For example, on a honeycomb lattice built with ``alternating_sites=True``,
-                every 'A' site has three 'B' neighbours::
+                neighbouring label; vacant sites contribute no energy. The dict must be complete:
+                every site label, every label of a neighbouring site, and every count from 0 to the
+                number of those neighbours, or the simulation raises a KeyError. For example, on a
+                honeycomb lattice built with ``alternating_sites=True``, every 'A' site has three
+                'B' neighbours::
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
                     {'A': {'B': cn}, 'B': {'A': cn}}
+
+        Notes:
+            On lattices where a site can neighbour both ends of a jump (lattices with
+            triangles), the energy change for such a site is miscounted when both ends have
+            the same label. See https://github.com/bjmorgan/lattice_mc/issues/30.
         """
         for site in self.sites:
             site.set_cn_occupation_energies(cn_energies[site.label])
@@ -469,6 +482,10 @@ class Lattice:
 
         Returns:
             List of sites not in a periodic percolating network.
+
+        Notes:
+            Clusters can be wrongly reported as percolating. See
+            https://github.com/bjmorgan/lattice_mc/issues/2.
         """
         clusters = self.connected_sites(site_labels=site_labels)
         island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
