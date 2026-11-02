@@ -80,18 +80,13 @@ class TestCluster:
         min_z = (sites[1], sites[3])
         max_z = (sites[0], sites[2])
         cluster = Cluster(sites)
-        for s in cluster.sites_at_edges()[0]:
-            assert s in max_x
-        for s in cluster.sites_at_edges()[1]:
-            assert s in min_x
-        for s in cluster.sites_at_edges()[2]:
-            assert s in max_y
-        for s in cluster.sites_at_edges()[3]:
-            assert s in min_y
-        for s in cluster.sites_at_edges()[4]:
-            assert s in max_z
-        for s in cluster.sites_at_edges()[5]:
-            assert s in min_z
+        edges = cluster.sites_at_edges()
+        assert set(edges[0]) == set(max_x)
+        assert set(edges[1]) == set(min_x)
+        assert set(edges[2]) == set(max_y)
+        assert set(edges[3]) == set(min_y)
+        assert set(edges[4]) == set(max_z)
+        assert set(edges[5]) == set(min_z)
 
     def test_cluster_is_periodically_contiguous(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]

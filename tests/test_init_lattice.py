@@ -40,7 +40,7 @@ class TestInitLattice:
             [5, np.array([0.0, 2.0, 0.0]), [6, 6, 3, 1], 0.0, "L"],
             [6, np.array([1.0, 2.0, 0.0]), [5, 5, 4, 2], 0.0, "L"],
         ]
-        for c, e in zip(mock_site.mock_calls, expected_site_calls):
+        for c, e in zip(mock_site.mock_calls, expected_site_calls, strict=True):
             assert c[1][0] == e[0]  # site number
             np.testing.assert_array_equal(c[1][1], e[1])  # site coordinates
             assert c[1][2] == e[2]  # neighbour lists
@@ -68,10 +68,10 @@ class TestInitLattice:
             [7, np.array([2.59807621, 1.5, 0.0]), [8, 6, 4], 0.0, "L"],
             [8, np.array([1.73205081, 2.0, 0.0]), [3, 5, 7], 0.0, "L"],
         ]
-        for c, e in zip(mock_site.mock_calls, expected_site_calls):
+        for c, e in zip(mock_site.mock_calls, expected_site_calls, strict=True):
             assert c[1][0] == e[0]  # site number
             np.testing.assert_array_almost_equal(c[1][1], e[1])  # site coordinates
-            assert c[1][2].sort() == e[2].sort()  # neighbour lists
+            assert sorted(c[1][2]) == sorted(e[2])  # neighbour lists
             assert c[1][3] == e[3]  # ?
             assert c[1][4] == e[4]  # site label
         assert mock_lattice.mock_calls[0][1][0] == list(range(2 * 1 * 4))
@@ -93,7 +93,7 @@ class TestInitLattice:
             site_number = c[1][0]
             if site_number in expected_neighbours:
                 site_neighbours = c[1][2]
-                assert site_neighbours.sort() == expected_neighbours[site_number].sort()
+                assert sorted(site_neighbours) == sorted(expected_neighbours[site_number])
 
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
@@ -128,7 +128,7 @@ class TestInitLattice:
             [7, np.array([0.0, 1.0, 1.0]), [8, 8, 5, 5, 3, 3], 0.0, "L"],
             [8, np.array([1.0, 1.0, 1.0]), [7, 7, 6, 6, 4, 4], 0.0, "L"],
         ]
-        for call, e in zip(mock_site.mock_calls, expected_site_calls):
+        for call, e in zip(mock_site.mock_calls, expected_site_calls, strict=True):
             assert call[1][0] == e[0]  # site number
             np.testing.assert_array_equal(call[1][1], e[1])  # site coordinates
             assert call[1][2] == e[2]  # neighbour lists

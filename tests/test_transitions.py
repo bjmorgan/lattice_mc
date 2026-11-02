@@ -28,7 +28,6 @@ class TestTransitions:
 
     @patch("random.random")
     def test_random(self, mock_random):
-        self.cumulative_probabilities = Mock(return_value=np.array([0.1, 0.3, 0.6, 1.0]))
         mock_random.return_value = 0.05
         assert self.transitions.random() is self.jumps[0]
         mock_random.return_value = 0.3

@@ -58,11 +58,9 @@ class TestSite:
 
     def test_unchanged_cn_occupation_energy(self):
         self.site.p_neighbours = self.neighbouring_sites
-        self.site_specific_nn_occupation = Mock(return_value={"A": 2, "B": 2})
         assert self.site.cn_occupation_energy() == 6.0
 
     def test_changed_cn_occupation_energy(self):
         delta_occupation = {"A": 1, "B": -1}
         self.site.p_neighbours = self.neighbouring_sites
-        self.site_specific_nn_occupation = Mock(return_value={"A": 2, "B": 2})
         assert self.site.cn_occupation_energy(delta_occupation=delta_occupation) == 5.0
