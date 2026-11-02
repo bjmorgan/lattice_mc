@@ -1,3 +1,5 @@
+"""Jumps of atoms between neighbouring lattice sites."""
+
 from __future__ import annotations
 
 import math
@@ -11,14 +13,14 @@ if TYPE_CHECKING:
     from lattice_mc.lookup_table import LookupTable
     from lattice_mc.simulation import SimulationParameters
 
-"""
-A Jump describes a possible move by a particle from one site to another site.
-"""
-
 # TODO (maybe) does it make more sense to subclass Jump (and other classes) depending on the type of Hamiltonian?
 
 
 class Jump:
+    """
+    A possible jump of an atom from an occupied site to a neighbouring vacant site.
+    """
+
     def __init__(
         self,
         initial_site: Site,
@@ -33,15 +35,15 @@ class Jump:
         Initialise a Jump instance.
 
         Args:
-            initial_site (Site): Lattice site occupied before the jump.
-            final_site (Site): Lattice site occupied after the jump.
-            nearest_neighbour_energy (float | None, optional): Nearest-neighbour interaction energy. Defaults to None.
-            coordination_number_energy (dict | None, optional): Coordination-number dependent energy. Defaults to None.
-            jump_lookup_table (:obj:`LookupTable`, optional): If the jump relative probabilities have been precalculated and stored in a lookup-table, this table should be passed in here. If not, jump probabilities are calculated on the fly. Defaults to None.
-            params (SimulationParameters): Simulation parameters (temperature, rate prefactor).
-
-        Returns:
-            None
+            initial_site: Lattice site occupied before the jump.
+            final_site: Lattice site occupied after the jump.
+            nearest_neighbour_energy: Interaction energy, in eV, for each pair of occupied
+                nearest-neighbour sites. Defaults to None.
+            coordination_number_energy: Coordination-number dependent energies, in the form taken by
+                `Lattice.set_cn_energies`. Defaults to None.
+            jump_lookup_table: A lookup table of precalculated relative jump probabilities. If
+                None, the jump probability is calculated on the fly. Defaults to None.
+            params: Simulation parameters (temperature, rate prefactor).
         """
         self.initial_site: Site = initial_site
         self.final_site: Site = final_site
@@ -57,11 +59,8 @@ class Jump:
         """
         Average rate for this jump. Calculated as v_0 * P_jump.
 
-        Args:
-            None
-
         Returns:
-            (Float): The average rate for this jump.
+            The average rate for this jump.
         """
         return self.params.rate_prefactor * self.relative_probability
 
@@ -69,11 +68,8 @@ class Jump:
         """
         Boltzmann probability factor for accepting this jump, following the Metropolis algorithm.
 
-        Args:
-            None
-
         Returns:
-            (Float): Metropolis relative probability of accepting this jump.
+            Metropolis relative probability of accepting this jump.
         """
         if self.delta_E() <= 0.0:
             return 1.0
@@ -84,11 +80,8 @@ class Jump:
         """
         The change in system energy if this jump were accepted.
 
-        Args:
-            None
-
         Returns:
-            (Float): delta E
+            The change in energy, in eV.
         """
         site_delta_E = self.final_site.energy - self.initial_site.energy
         if self.nearest_neighbour_energy:
@@ -101,11 +94,8 @@ class Jump:
         """
         Nearest-neighbour interaction contribution to the change in system energy if this jump were accepted.
 
-        Args:
-            None
-
         Returns:
-            (Float): delta E (nearest-neighbour)
+            The nearest-neighbour contribution to the change in energy, in eV.
         """
         delta_nn = (
             self.final_site.nn_occupation() - self.initial_site.nn_occupation() - 1
@@ -115,13 +105,10 @@ class Jump:
 
     def coordination_number_delta_E(self) -> float:
         """
-        Coordination-number dependent energy conrtibution to the change in system energy if this jump were accepted.
-
-        Args:
-            None
+        Coordination-number dependent energy contribution to the change in system energy if this jump were accepted.
 
         Returns:
-            (Float): delta E (coordination-number)
+            The coordination-number contribution to the change in energy, in eV.
         """
         assert self.initial_site.p_neighbours is not None
         assert self.final_site.p_neighbours is not None
@@ -147,13 +134,13 @@ class Jump:
 
     def dr(self, cell_lengths: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
-        Particle displacement vector for this jump
+        Particle displacement vector for this jump.
 
         Args:
-            cell_lengths (np.array(x,y,z)): Cell lengths for the orthogonal simulation cell.
+            cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
 
-        Returns
-            (np.array(x,y,z)): dr
+        Returns:
+            The displacement vector of the jumping atom, using the minimum-image convention.
         """
         half_cell_lengths = cell_lengths / 2.0
         this_dr = self.final_site.r - self.initial_site.r
@@ -169,10 +156,10 @@ class Jump:
         Relative probability of accepting this jump from a lookup-table.
 
         Args:
-            jump_lookup_table (LookupTable): the lookup table to be used for this jump.
+            jump_lookup_table: The lookup table to use for this jump.
 
         Returns:
-            (Float): relative probability of accepting this jump.
+            The relative probability of accepting this jump.
         """
         l1 = self.initial_site.label
         l2 = self.final_site.label
@@ -182,6 +169,9 @@ class Jump:
 
     @property
     def relative_probability(self) -> float:
+        """
+        Relative probability of this jump.
+        """
         return self._relative_probability
 
     @relative_probability.setter

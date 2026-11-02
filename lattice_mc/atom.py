@@ -1,3 +1,5 @@
+"""Mobile atoms that occupy lattice sites."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -21,10 +23,10 @@ class Atom:
         Initialise an Atom instance.
 
         Args:
-            initial_site (Site): Lattice site initially occupied by this Atom.
+            initial_site: Lattice site initially occupied by this Atom.
 
-        Returns:
-            None
+        Raises:
+            ValueError: If `initial_site` is already occupied.
         """
         Atom.atom_number += 1
         self.number: int = Atom.atom_number
@@ -41,12 +43,6 @@ class Atom:
     def reset(self) -> None:
         """
         Reinitialise the stored displacements, number of hops, and list of sites visited for this `Atom`.
-
-        Args:
-            None
-
-        Returns:
-            None
         """
         self.number_of_hops: int = 0
         self.dr: npt.NDArray[np.float64] = np.array([0.0, 0.0, 0.0])
@@ -57,11 +53,8 @@ class Atom:
         """
         :math:`|dr|^2`, where :math:`dr` is the total displacement vector for this `Atom`.
 
-        Args:
-            None
-
         Returns:
-            dr_squared (float): :math:`|dr|^2`.
+            The squared total displacement, :math:`|dr|^2`.
         """
         return float(np.dot(self.dr, self.dr))
 

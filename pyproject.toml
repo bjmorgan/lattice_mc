@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lattice_mc"
-version = "1.0.3"
+dynamic = ["version"]
 description = "A lattice-gas Monte-Carlo simulation tool"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     { name = "Benjamin J. Morgan", email = "b.j.morgan@bath.ac.uk" },
 ]
@@ -17,16 +17,14 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
     "numpy",
-    "matplotlib",
-    "pandas",
     "scipy",
 ]
 
@@ -38,24 +36,43 @@ dev = [
     "ruff",
     "scipy-stubs",
 ]
+docs = [
+    "sphinx>=7",
+    "sphinx-rtd-theme>=2",
+]
 
 [project.urls]
 Homepage = "https://github.com/bjmorgan/lattice_mc"
 Repository = "https://github.com/bjmorgan/lattice_mc"
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 120
 
 [tool.ruff.format]
 skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
-ignore = ["E501"]  # Long lines in docstrings; will be addressed with type hints PR
+select = ["E", "F", "I", "W", "D"]
+ignore = [
+    "E501",  # Long lines in docstrings; will be addressed with type hints PR
+    "D200",  # Function and class docstrings keep the closing quotes on their own line
+    "D212",  # Function and class docstrings put the summary on the line after the opening quotes
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]
+"docs/**" = ["D"]
+"examples/**" = ["D"]
 
 [tool.mypy]
 strict = true
+
+[tool.setuptools.dynamic]
+version = { attr = "lattice_mc.__version__" }
 
 [tool.setuptools.package-data]
 lattice_mc = ["py.typed"]

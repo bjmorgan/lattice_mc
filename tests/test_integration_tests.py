@@ -1,5 +1,3 @@
-import unittest
-
 import numpy as np
 
 import lattice_mc
@@ -7,7 +5,7 @@ import lattice_mc
 PARAMS = lattice_mc.SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class IntegrationTestCase(unittest.TestCase):
+class TestIntegration:
     def test_simulation_runs_with_selected_sites(self):
         a, b, c = 4, 4, 4
         spacing = 1.0
@@ -18,20 +16,21 @@ class IntegrationTestCase(unittest.TestCase):
         s.lattice = lattice_mc.init_lattice.cubic_lattice(a, b, c, spacing)
         s.lattice.transmute_sites("L", "X", n_atoms)
         s.set_number_of_atoms(n_atoms, selected_sites=selected_sites)
-        [self.assertEqual(site.label, selected_sites) for site in s.lattice.occupied_sites()]
+        for site in s.lattice.occupied_sites():
+            assert site.label == selected_sites
         s.setup_lookup_table()
         s.set_number_of_jumps(number_of_jumps)
-        self.assertEqual(s.tracer_correlation, None)
-        self.assertEqual(s.collective_correlation, None)
-        self.assertEqual(s.tracer_diffusion_coefficient, None)
-        self.assertEqual(s.collective_diffusion_coefficient_per_atom, None)
-        self.assertEqual(s.average_site_occupations, None)
+        assert s.tracer_correlation is None
+        assert s.collective_correlation is None
+        assert s.tracer_diffusion_coefficient is None
+        assert s.collective_diffusion_coefficient_per_atom is None
+        assert s.average_site_occupations is None
         s.run()
-        self.assertNotEqual(s.tracer_correlation, None)
-        self.assertNotEqual(s.collective_correlation, None)
-        self.assertNotEqual(s.tracer_diffusion_coefficient, None)
-        self.assertNotEqual(s.collective_diffusion_coefficient_per_atom, None)
-        self.assertNotEqual(s.average_site_occupations, None)
+        assert s.tracer_correlation is not None
+        assert s.collective_correlation is not None
+        assert s.tracer_diffusion_coefficient is not None
+        assert s.collective_diffusion_coefficient_per_atom is not None
+        assert s.average_site_occupations is not None
 
     def test_simulation_runs_with_cn_energies(self):
         s = lattice_mc.Simulation(PARAMS)
@@ -46,7 +45,7 @@ class IntegrationTestCase(unittest.TestCase):
         s.set_number_of_atoms(1)
         s.set_number_of_jumps(10)
         s.run()
-        self.assertIsNotNone(s.tracer_correlation)
+        assert s.tracer_correlation is not None
 
     def test_simulation_runs_with_variable_coordination_numbers(self):
         s = lattice_mc.Simulation(PARAMS)
@@ -61,7 +60,3 @@ class IntegrationTestCase(unittest.TestCase):
         s.setup_lookup_table()
         s.set_number_of_jumps(10)
         s.run()
-
-
-if __name__ == "__main__":
-    unittest.main()

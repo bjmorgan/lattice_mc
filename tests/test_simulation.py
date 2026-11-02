@@ -1,7 +1,7 @@
-import unittest
 from unittest.mock import Mock, PropertyMock, patch
 
 import numpy as np
+import pytest
 
 from lattice_mc.atom import Atom
 from lattice_mc.lattice import Lattice
@@ -11,19 +11,19 @@ from lattice_mc.species import Species
 PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class SimulationTestCase(unittest.TestCase):
+class TestSimulation:
     """Tests for Simulation class"""
 
     def test_simulation_is_initialised(self):
         simulation = Simulation(PARAMS)
-        self.assertIs(simulation.params, PARAMS)
-        self.assertEqual(simulation.lattice, None)
-        self.assertEqual(simulation.number_of_atoms, None)
-        self.assertEqual(simulation.number_of_equilibration_jumps, 0)
-        self.assertEqual(simulation.number_of_jumps, None)
-        self.assertEqual(simulation.for_time, None)
-        self.assertEqual(simulation.number_of_atoms, None)
-        self.assertEqual(simulation.has_run, False)
+        assert simulation.params is PARAMS
+        assert simulation.lattice is None
+        assert simulation.number_of_atoms is None
+        assert simulation.number_of_equilibration_jumps == 0
+        assert simulation.number_of_jumps is None
+        assert simulation.for_time is None
+        assert simulation.number_of_atoms is None
+        assert simulation.has_run is False
 
     def test_reset(self):
         simulation = Simulation(PARAMS)
@@ -31,9 +31,9 @@ class SimulationTestCase(unittest.TestCase):
         simulation.atoms = Mock(spec=Species)
         simulation.atoms.atoms = [Mock(spec=Atom), Mock(spec=Atom)]
         simulation.reset()
-        self.assertEqual(simulation.lattice.reset.call_count, 1)
-        self.assertEqual(simulation.atoms.atoms[0].reset.call_count, 1)
-        self.assertEqual(simulation.atoms.atoms[1].reset.call_count, 1)
+        assert simulation.lattice.reset.call_count == 1
+        assert simulation.atoms.atoms[0].reset.call_count == 1
+        assert simulation.atoms.atoms[1].reset.call_count == 1
 
     def test_set_number_of_atoms(self):
         simulation = Simulation(PARAMS)
@@ -43,8 +43,8 @@ class SimulationTestCase(unittest.TestCase):
         with patch("lattice_mc.species.Species") as mock_Species:
             mock_Species.return_value = "some atoms"
             simulation.set_number_of_atoms(3)
-            self.assertEqual(simulation.number_of_atoms, 3)
-            self.assertEqual(simulation.atoms, "some atoms")
+            assert simulation.number_of_atoms == 3
+            assert simulation.atoms == "some atoms"
             mock_Species.assert_called_with(mock_atoms)
 
     def test_set_number_of_atoms_with_specific_sites(self):
@@ -55,17 +55,17 @@ class SimulationTestCase(unittest.TestCase):
         with patch("lattice_mc.species.Species") as mock_Species:
             mock_Species.return_value = "some atoms"
             simulation.set_number_of_atoms(3, selected_sites=["A"])
-            self.assertEqual(simulation.lattice.populate_sites.call_args[1]["selected_sites"], ["A"])
+            assert simulation.lattice.populate_sites.call_args[1]["selected_sites"] == ["A"]
 
     def test_set_number_of_jumps(self):
         simulation = Simulation(PARAMS)
         simulation.set_number_of_jumps(32)
-        self.assertEqual(simulation.number_of_jumps, 32)
+        assert simulation.number_of_jumps == 32
 
     def test_set_number_of_equilibration_jumps(self):
         simulation = Simulation(PARAMS)
         simulation.set_number_of_equilibration_jumps(32)
-        self.assertEqual(simulation.number_of_equilibration_jumps, 32)
+        assert simulation.number_of_equilibration_jumps == 32
 
     def test_define_lattice_from_file(self):
         with patch("lattice_mc.init_lattice.lattice_from_sites_file") as mock_lattice_from_file:
@@ -73,7 +73,7 @@ class SimulationTestCase(unittest.TestCase):
             simulation = Simulation(PARAMS)
             cell_lengths = np.array([1.0, 2.0, 3.0])
             simulation.define_lattice_from_file("filename", cell_lengths)
-            self.assertEqual(simulation.lattice, "foo")
+            assert simulation.lattice == "foo"
             mock_lattice_from_file.assert_called_with("filename", cell_lengths=cell_lengths)
 
     def test_set_nn_energy(self):
@@ -102,7 +102,7 @@ class SimulationTestCase(unittest.TestCase):
         simulation.atoms = "foo"
         simulation.number_of_jumps = "bar"
         simulation.lattice = None
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             simulation.is_initialised()
 
     def test_is_initialised_fails_with_no_atoms(self):
@@ -110,7 +110,7 @@ class SimulationTestCase(unittest.TestCase):
         simulation.atoms = None
         simulation.number_of_jumps = "bar"
         simulation.lattice = "foo"
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             simulation.is_initialised()
 
     def test_is_initilaised_fails_with_no_number_of_jumps(self):
@@ -118,13 +118,13 @@ class SimulationTestCase(unittest.TestCase):
         simulation.atoms = "bar"
         simulation.number_of_jumps = None
         simulation.lattice = "foo"
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             simulation.is_initialised()
 
     def test_run_raises_error_if_not_initialised(self):
         simulation = Simulation(PARAMS)
         simulation.is_initialised = Mock(side_effect=AttributeError("test"))
-        with self.assertRaises(AttributeError):
+        with pytest.raises(AttributeError):
             simulation.run()
 
     def test_run_without_equilibration_steps(self):
@@ -135,7 +135,7 @@ class SimulationTestCase(unittest.TestCase):
         simulation.lattice.jump = Mock()
         simulation.number_of_jumps = 10
         simulation.run()
-        self.assertEqual(simulation.lattice.jump.call_count, 10)
+        assert simulation.lattice.jump.call_count == 10
 
     def test_run_for_time(self):
         simulation = Simulation(PARAMS)
@@ -149,8 +149,8 @@ class SimulationTestCase(unittest.TestCase):
 
         simulation.lattice.jump = fake_jump_method
         simulation.run(for_time=10.0)
-        self.assertEqual(simulation.lattice.time, 10.0)
-        self.assertEqual(simulation.number_of_jumps, 10)
+        assert simulation.lattice.time == 10.0
+        assert simulation.number_of_jumps == 10
 
     def test_run_with_equilibration_steps(self):
         simulation = Simulation(PARAMS)
@@ -162,12 +162,13 @@ class SimulationTestCase(unittest.TestCase):
         simulation.number_of_equilibration_jumps = 20
         simulation.number_of_jumps = 30
         simulation.run()
-        self.assertEqual(simulation.lattice.jump.call_count, 20 + 30)
-        self.assertEqual(simulation.reset.call_count, 1)
+        assert simulation.lattice.jump.call_count == 20 + 30
+        assert simulation.reset.call_count == 1
 
 
-class SimulationResultsTestCase(unittest.TestCase):
-    def setUp(self):
+class TestSimulationResults:
+    @pytest.fixture(autouse=True)
+    def set_up(self):
         self.simulation = Simulation(PARAMS)
         self.simulation.has_run = True
 
@@ -175,7 +176,7 @@ class SimulationResultsTestCase(unittest.TestCase):
         s = self.simulation
         s.atoms = Mock(spec=Species)
         s.atoms.tracer_correlation = Mock(return_value=3.3)
-        self.assertEqual(s.tracer_correlation, 3.3)
+        assert s.tracer_correlation == 3.3
 
     def test_tracer_diffusion_coefficient(self):
         s = self.simulation
@@ -184,13 +185,24 @@ class SimulationResultsTestCase(unittest.TestCase):
         s.number_of_atoms = 5
         s.lattice = Mock(spec=Lattice)
         s.lattice.time = 12.0
-        self.assertEqual(s.tracer_diffusion_coefficient, 15.0 / (6.0 * 5.0 * 12.0))
+        s.lattice.dimensionality = 3
+        assert s.tracer_diffusion_coefficient == 15.0 / (6.0 * 5.0 * 12.0)
+
+    def test_tracer_diffusion_coefficient_in_two_dimensions(self):
+        s = self.simulation
+        s.atoms = Mock(spec=Species)
+        s.atoms.sum_dr_squared = Mock(return_value=15.0)
+        s.number_of_atoms = 5
+        s.lattice = Mock(spec=Lattice)
+        s.lattice.time = 12.0
+        s.lattice.dimensionality = 2
+        assert s.tracer_diffusion_coefficient == 15.0 / (4.0 * 5.0 * 12.0)
 
     def test_collective_correlation(self):
         s = self.simulation
         s.atoms = Mock(spec=Species)
         s.atoms.collective_correlation = Mock(return_value=3.0)
-        self.assertEqual(s.collective_correlation, 3.0)
+        assert s.collective_correlation == 3.0
 
     def test_collective_diffusion_coefficient(self):
         s = self.simulation
@@ -198,7 +210,17 @@ class SimulationResultsTestCase(unittest.TestCase):
         s.atoms.collective_dr_squared = Mock(return_value=36.0)
         s.lattice = Mock(spec=Lattice)
         s.lattice.time = 2.0
-        self.assertEqual(s.collective_diffusion_coefficient, 3.0)
+        s.lattice.dimensionality = 3
+        assert s.collective_diffusion_coefficient == 3.0
+
+    def test_collective_diffusion_coefficient_in_two_dimensions(self):
+        s = self.simulation
+        s.atoms = Mock(spec=Species)
+        s.atoms.collective_dr_squared = Mock(return_value=36.0)
+        s.lattice = Mock(spec=Lattice)
+        s.lattice.time = 2.0
+        s.lattice.dimensionality = 2
+        assert s.collective_diffusion_coefficient == 4.5
 
     def test_collective_diffusion_coefficient_per_atom(self):
         s = self.simulation
@@ -207,13 +229,13 @@ class SimulationResultsTestCase(unittest.TestCase):
         ) as mock_cdc:
             mock_cdc.return_value = 8.0
             s.number_of_atoms = 2
-            self.assertEqual(s.collective_diffusion_coefficient_per_atom, 4.0)
+            assert s.collective_diffusion_coefficient_per_atom == 4.0
 
     def test_average_site_occupations(self):
         s = self.simulation
         s.lattice = Mock(spec=Lattice)
         s.lattice.site_occupation_statistics = Mock(return_value="foo")
-        self.assertEqual(s.average_site_occupations, "foo")
+        assert s.average_site_occupations == "foo"
 
     def test_setup_lookup_table(self):
         s = self.simulation
@@ -221,41 +243,37 @@ class SimulationResultsTestCase(unittest.TestCase):
         with patch("lattice_mc.lookup_table.LookupTable") as mock_lookup_table:
             mock_lookup_table.return_value = "foo"
             s.setup_lookup_table()
-            self.assertEqual(s.lattice.jump_lookup_table, "foo")
+            assert s.lattice.jump_lookup_table == "foo"
             mock_lookup_table.assert_called_with(s.lattice, "nearest-neighbour")
 
     def test_setup_lookup_table_with_unsupported_hamiltonian(self):
         s = self.simulation
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             s.setup_lookup_table(hamiltonian="coordination_number")
 
     def test_setup_lookup_table_with_invalid_hamiltonian(self):
         s = self.simulation
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             s.setup_lookup_table(hamiltonian="bar")
 
 
-class SimulationNoResultsTestCase(unittest.TestCase):
+class TestSimulationNoResults:
     def test_tracer_correlation(self):
         s = Simulation(PARAMS)
-        self.assertEqual(s.tracer_correlation, None)
+        assert s.tracer_correlation is None
 
     def test_tracer_diffusion_coefficient(self):
         s = Simulation(PARAMS)
-        self.assertEqual(s.tracer_diffusion_coefficient, None)
+        assert s.tracer_diffusion_coefficient is None
 
     def test_collective_correlation(self):
         s = Simulation(PARAMS)
-        self.assertEqual(s.collective_correlation, None)
+        assert s.collective_correlation is None
 
     def test_collective_diffusion_coefficient(self):
         s = Simulation(PARAMS)
-        self.assertEqual(s.collective_diffusion_coefficient, None)
+        assert s.collective_diffusion_coefficient is None
 
     def test_collective_diffusion_coefficient_per_atom(self):
         s = Simulation(PARAMS)
-        self.assertEqual(s.collective_diffusion_coefficient_per_atom, None)
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert s.collective_diffusion_coefficient_per_atom is None

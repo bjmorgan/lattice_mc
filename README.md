@@ -34,7 +34,7 @@ pip install -e ".[dev]"
 
 ## Documentation
 
-Full documentation and examples are contained in a [Jupyter notebook](http://jupyter-notebook.readthedocs.io/en/latest/#) at [examples/lattice_mc_example.ipynb](examples/lattice_mc_example.ipynb). The example notebook is also hosted on [GitHub](https://github.com/bjmorgan/lattice_mc/blob/main/examples/lattice_mc_examples.ipynb).
+Documentation, including a user guide and API reference, is at [lattice-mc.readthedocs.io](https://lattice-mc.readthedocs.io/).
 
 ## Tests
 
@@ -43,7 +43,7 @@ Tests can be run using
 pytest
 ```
 
-The code requires Python 3.11 or above.
+The code requires Python 3.12 or above.
 
 ## References
 1. <a name="Catlow_SolStatIonics1983" />[C. R. A. Catlow, *Sol. Stat. Ionics* **8**, 89 (1983).](https://doi.org/10.1016/0167-2738%2883%2990069-3)

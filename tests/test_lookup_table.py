@@ -1,6 +1,7 @@
 import math
-import unittest
 from unittest.mock import Mock, call, patch
+
+import pytest
 
 from lattice_mc.lattice import Lattice
 from lattice_mc.lookup_table import LookupTable, metropolis
@@ -9,20 +10,21 @@ from lattice_mc.simulation import SimulationParameters
 PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
 
 
-class LookupTableSupportFunctionsTestCase(unittest.TestCase):
+class TestLookupTableSupportFunctions:
     def test_metropolis_returns_one_for_negative_delta_E(self):
-        self.assertEqual(metropolis(-0.02, PARAMS.kT), 1.0)
+        assert metropolis(-0.02, PARAMS.kT) == 1.0
 
     def test_metropolis_returns_boltzmann_factor_for_positive_delta_E(self):
         expected = math.exp(-0.02 / PARAMS.kT)
-        self.assertAlmostEqual(metropolis(+0.02, PARAMS.kT), expected)
+        assert metropolis(+0.02, PARAMS.kT) == pytest.approx(expected, abs=5e-8)
 
 
-class LookupTableTestCase(unittest.TestCase):
+class TestLookupTable:
     """Tests for LookupTable class"""
 
+    @pytest.fixture(autouse=True)
     @patch("lattice_mc.lookup_table.LookupTable.generate_nearest_neighbour_lookup_table")
-    def setUp(self, mock_generate_nearest_neighbour_lookup_table):
+    def set_up(self, mock_generate_nearest_neighbour_lookup_table):
         self.lattice = Mock(spec=Lattice)
         self.lattice.params = PARAMS
         self.lattice.site_energies = "foo"
@@ -38,16 +40,16 @@ class LookupTableTestCase(unittest.TestCase):
     def test_nearest_neighbour_lookup_table_is_initialised(self, mock_generate_nearest_neighbour_lookup_table):
         hamiltonian = "nearest-neighbour"
         lookup_table = LookupTable(self.lattice, hamiltonian)
-        self.assertEqual(lookup_table.site_energies, "foo")
-        self.assertEqual(lookup_table.nn_energy, "bar")
-        self.assertEqual(lookup_table.cn_energy, "baz")
-        self.assertEqual(lookup_table.connected_site_pairs, "qux")
-        self.assertEqual(lookup_table.site_specific_coordination_per_site, "quux")
-        self.assertEqual(mock_generate_nearest_neighbour_lookup_table.call_count, 1)
+        assert lookup_table.site_energies == "foo"
+        assert lookup_table.nn_energy == "bar"
+        assert lookup_table.cn_energy == "baz"
+        assert lookup_table.connected_site_pairs == "qux"
+        assert lookup_table.site_specific_coordination_per_site == "quux"
+        assert mock_generate_nearest_neighbour_lookup_table.call_count == 1
 
     def test_lookup_table_init_with_invalid_hamiltonian_keywork_raises_ValueError(self):
         hamiltonian = "foo"
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             LookupTable(self.lattice, hamiltonian)
 
     @patch("lattice_mc.lookup_table.metropolis")
@@ -76,21 +78,12 @@ class LookupTableTestCase(unittest.TestCase):
         self.table.max_coordination_per_site = {"A": 2, "B": 3}
         self.table.relative_probability = Mock(side_effect=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
         self.table.generate_nearest_neighbour_lookup_table()
-        self.assertEqual(
-            self.table.jump_probability, {"A": {"B": {0: {1: 1.0, 2: 2.0, 3: 3.0}, 1: {1: 4.0, 2: 5.0, 3: 6.0}}}}
-        )
-        self.assertEqual(
-            self.table.relative_probability.mock_calls,
-            [
-                call("A", "B", 0, 1),
-                call("A", "B", 0, 2),
-                call("A", "B", 0, 3),
-                call("A", "B", 1, 1),
-                call("A", "B", 1, 2),
-                call("A", "B", 1, 3),
-            ],
-        )
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert self.table.jump_probability == {"A": {"B": {0: {1: 1.0, 2: 2.0, 3: 3.0}, 1: {1: 4.0, 2: 5.0, 3: 6.0}}}}
+        assert self.table.relative_probability.mock_calls == [
+            call("A", "B", 0, 1),
+            call("A", "B", 0, 2),
+            call("A", "B", 0, 3),
+            call("A", "B", 1, 1),
+            call("A", "B", 1, 2),
+            call("A", "B", 1, 3),
+        ]

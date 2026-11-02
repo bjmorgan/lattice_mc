@@ -4,7 +4,6 @@ __pycache__/
 build/
 dist/
 *.egg-info/
-examples/.ipynb_checkpoints/
 **/.DS_Store
 
 # Ignore markdown files in root by default, then whitelist tracked ones

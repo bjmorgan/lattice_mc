@@ -1,19 +1,20 @@
-import unittest
 from unittest.mock import Mock, patch
 
 import numpy as np
+import pytest
 
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 
 
-class LatticeIntegrationTestCase(unittest.TestCase):
+class TestLatticeIntegration:
     """Tests for integration of Lattice class with the rest of the code"""
 
+    @pytest.fixture(autouse=True)
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")
     @patch("lattice_mc.lattice.Lattice.enforce_periodic_boundary_conditions")
-    def setUp(self, pbc, islt, site_id):
+    def set_up(self, pbc, islt, site_id):
         site_id.side_effect = (1, 2, 3, 4, 5, 6, 7, 8)
         self.site_id = site_id
         site_labels = ["A", "A", "A", "A", "A"]
@@ -30,10 +31,10 @@ class LatticeIntegrationTestCase(unittest.TestCase):
             s.label = "A"
         self.lattice.sites = sites
         connected_sites = self.lattice.connected_sites()
-        self.assertEqual(len(connected_sites), 1)
+        assert len(connected_sites) == 1
         for s in sites:
-            self.assertEqual(s in connected_sites[0].sites, True)
-        self.assertEqual(list(connected_sites[0].neighbours), [])
+            assert s in connected_sites[0].sites
+        assert list(connected_sites[0].neighbours) == []
 
     def test_connected_sites_2(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -45,13 +46,13 @@ class LatticeIntegrationTestCase(unittest.TestCase):
             s.label = "A"
         self.lattice.sites = sites
         connected_sites = self.lattice.connected_sites()
-        self.assertEqual(len(connected_sites), 2)
+        assert len(connected_sites) == 2
         for c in connected_sites:
             if sites[0] in c.sites:
-                self.assertEqual(sites[1] in c.sites, True)
+                assert sites[1] in c.sites
             else:
-                self.assertEqual(sites[2] in c.sites, True)
-                self.assertEqual(sites[3] in c.sites, True)
+                assert sites[2] in c.sites
+                assert sites[3] in c.sites
 
     def test_connected_sites_3(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -64,19 +65,19 @@ class LatticeIntegrationTestCase(unittest.TestCase):
         for s in sites:
             s.label = "A"
         connected_sites = self.lattice.connected_sites()
-        self.assertEqual(len(connected_sites), 2)
+        assert len(connected_sites) == 2
         for c in connected_sites:
             if sites[0] in c.sites:
-                self.assertEqual(sites[1] in c.sites, True)
-                self.assertEqual(sites[2] in c.sites, True)
-                self.assertEqual(c.size(), 3)
+                assert sites[1] in c.sites
+                assert sites[2] in c.sites
+                assert c.size() == 3
             else:
-                self.assertEqual(sites[3] in c.sites, True)
-                self.assertEqual(sites[4] in c.sites, True)
-                self.assertEqual(c.size(), 2)
+                assert sites[3] in c.sites
+                assert sites[4] in c.sites
+                assert c.size() == 2
 
 
-class DetachedSitesIntegrationTestCase(unittest.TestCase):
+class TestDetachedSitesIntegration:
     """Regression tests for Lattice.detached_sites using real Site objects.
 
     The old coordinate-extremes heuristic in Cluster.is_periodically_contiguous
@@ -102,7 +103,7 @@ class DetachedSitesIntegrationTestCase(unittest.TestCase):
                 neighbours = [n for n in numbers if n != number]
                 sites.append(Site(number=number, coordinates=r + offset, neighbours=neighbours, energy=0.0, label="A"))
         lattice = Lattice(sites, cell_lengths=np.array([10.0, 10.0, 10.0]))
-        self.assertEqual({s.number for s in lattice.detached_sites()}, {s.number for s in sites})
+        assert {s.number for s in lattice.detached_sites()} == {s.number for s in sites}
 
     def test_winding_ring_has_no_detached_sites(self):
         sites = [
@@ -111,8 +112,4 @@ class DetachedSitesIntegrationTestCase(unittest.TestCase):
             Site(number=3, coordinates=np.array([2.0, 0.0, 0.0]), neighbours=[1, 2], energy=0.0, label="A"),
         ]
         lattice = Lattice(sites, cell_lengths=np.array([3.0, 10.0, 10.0]))
-        self.assertEqual(lattice.detached_sites(), [])
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert lattice.detached_sites() == []

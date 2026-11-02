@@ -1,14 +1,13 @@
-import unittest
-import warnings
 from unittest.mock import Mock
 
 import numpy as np
+import pytest
 
 from lattice_mc.cluster import Cluster
 from lattice_mc.lattice_site import Site
 
 
-class ClusterTestCase(unittest.TestCase):
+class TestCluster:
     """Test for Cluster class"""
 
     def test_cluster_is_initialised(self):
@@ -18,8 +17,8 @@ class ClusterTestCase(unittest.TestCase):
         sites[0].p_neighbours = [sites[1], sites[2], sites[3]]
         sites[1].p_neighbours = [sites[0], sites[2]]
         cluster = Cluster(cluster_sites)
-        self.assertEqual(cluster.sites, set(cluster_sites))
-        self.assertEqual(cluster.neighbours, set(neighbour_sites))
+        assert cluster.sites == set(cluster_sites)
+        assert cluster.neighbours == set(neighbour_sites)
 
     def test_cluster_merge(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -28,8 +27,8 @@ class ClusterTestCase(unittest.TestCase):
         cluster1 = Cluster([sites[0]])
         cluster2 = Cluster([sites[2]])
         combined_cluster = cluster1.merge(cluster2)
-        self.assertEqual(combined_cluster.sites, set([sites[0], sites[2]]))
-        self.assertEqual(combined_cluster.neighbours, set([sites[1], sites[3]]))
+        assert combined_cluster.sites == set([sites[0], sites[2]])
+        assert combined_cluster.neighbours == set([sites[1], sites[3]])
 
     def test_cluster_merge_with_blocked_neighbour(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -39,65 +38,48 @@ class ClusterTestCase(unittest.TestCase):
         cluster2 = Cluster([sites[2]])
         cluster1.neighbours = cluster1.neighbours - set([sites[1]])
         combined_cluster = cluster1.merge(cluster2)
-        self.assertEqual(combined_cluster.sites, set([sites[0], sites[2]]))
-        self.assertEqual(combined_cluster.neighbours, set([sites[3]]))
+        assert combined_cluster.sites == set([sites[0], sites[2]])
+        assert combined_cluster.neighbours == set([sites[3]])
 
     def test_cluster_is_neighbouring(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [sites[1]]
         sites[1].p_neighbours = [sites[0]]
         clusters = [Cluster([sites[0]]), Cluster([sites[1]])]
-        self.assertEqual(clusters[0].is_neighbouring(clusters[1]), True)
-        self.assertEqual(clusters[1].is_neighbouring(clusters[0]), True)
+        assert clusters[0].is_neighbouring(clusters[1]) is True
+        assert clusters[1].is_neighbouring(clusters[0]) is True
 
     def test_cluster_is_not_neighbouring(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [Mock(spec=Site)]
         sites[1].p_neighbours = [Mock(spec=Site)]
         clusters = [Cluster([sites[0]]), Cluster([sites[1]])]
-        self.assertEqual(clusters[0].is_neighbouring(clusters[1]), False)
-        self.assertEqual(clusters[1].is_neighbouring(clusters[0]), False)
+        assert clusters[0].is_neighbouring(clusters[1]) is False
+        assert clusters[1].is_neighbouring(clusters[0]) is False
 
     def test_cluster_size(self):
         sites = [Mock(spec=Site), Mock(spec=Site)]
         sites[0].p_neighbours = [Mock(spec=Site)]
         sites[1].p_neighbours = [Mock(spec=Site)]
         cluster = Cluster(sites)
-        self.assertEqual(cluster.size(), 2)
+        assert cluster.size() == 2
 
-    def test_cluster_is_periodically_contiguous_for_a_winding_ring_along_x(self):
+    @pytest.mark.parametrize("axis", [0, 1, 2])
+    def test_cluster_is_periodically_contiguous_for_a_winding_ring(self, axis):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
-        sites[0].r = np.array([0.0, 0.0, 0.0])
-        sites[1].r = np.array([1.0, 0.0, 0.0])
-        sites[2].r = np.array([2.0, 0.0, 0.0])
+        for i, s in enumerate(sites):
+            s.r = np.zeros(3)
+            s.r[axis] = float(i)
         for s in sites:
             s.p_neighbours = [other for other in sites if other is not s]
         cluster = Cluster(sites)
-        cell_lengths = np.array([3.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (True, False, False))
+        cell_lengths = np.full(3, 10.0)
+        cell_lengths[axis] = 3.0
+        expected = [False, False, False]
+        expected[axis] = True
+        assert cluster.is_periodically_contiguous(cell_lengths) == tuple(expected)
 
-    def test_cluster_is_periodically_contiguous_for_a_winding_ring_along_y(self):
-        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
-        sites[0].r = np.array([0.0, 0.0, 0.0])
-        sites[1].r = np.array([0.0, 1.0, 0.0])
-        sites[2].r = np.array([0.0, 2.0, 0.0])
-        for s in sites:
-            s.p_neighbours = [other for other in sites if other is not s]
-        cluster = Cluster(sites)
-        cell_lengths = np.array([10.0, 3.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, True, False))
-
-    def test_cluster_is_periodically_contiguous_for_a_winding_ring_along_z(self):
-        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
-        sites[0].r = np.array([0.0, 0.0, 0.0])
-        sites[1].r = np.array([0.0, 0.0, 1.0])
-        sites[2].r = np.array([0.0, 0.0, 2.0])
-        for s in sites:
-            s.p_neighbours = [other for other in sites if other is not s]
-        cluster = Cluster(sites)
-        cell_lengths = np.array([10.0, 10.0, 3.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, True))
-
+    @pytest.mark.filterwarnings("error")
     def test_cluster_is_periodically_contiguous_with_a_zero_cell_length(self):
         # Regression: a zero z cell length (as for two-dimensional lattices)
         # gave 0/0 in the bond wrap calculation, and the NaN cast to int is
@@ -110,9 +92,7 @@ class ClusterTestCase(unittest.TestCase):
             s.p_neighbours = [other for other in sites if other is not s]
         cluster = Cluster(sites)
         cell_lengths = np.array([3.0, 10.0, 0.0])
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (True, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (True, False, False)
 
     def test_cluster_is_not_periodically_contiguous_for_a_fully_connected_cluster(self):
         # Regression: a 4-clique has neighbouring coordinate-extreme sites on
@@ -126,7 +106,7 @@ class ClusterTestCase(unittest.TestCase):
             s.p_neighbours = [other for other in sites if other is not s]
         cluster = Cluster(sites)
         cell_lengths = np.array([10.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (False, False, False)
 
     def test_cluster_is_not_periodically_contiguous_when_straddling_a_boundary(self):
         # Regression: a bond crossing the wrapped boundary does not imply
@@ -138,7 +118,7 @@ class ClusterTestCase(unittest.TestCase):
         sites[1].p_neighbours = [sites[0]]
         cluster = Cluster(sites)
         cell_lengths = np.array([10.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (False, False, False)
 
     def test_cluster_is_not_periodically_contiguous_for_an_open_chain(self):
         # An open chain spans the cell but does not reconnect through the
@@ -152,7 +132,7 @@ class ClusterTestCase(unittest.TestCase):
         sites[2].p_neighbours = [sites[1]]
         cluster = Cluster(sites)
         cell_lengths = np.array([3.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (False, False, False)
 
     def test_cluster_is_periodically_contiguous_ignores_neighbours_outside_the_cluster(self):
         # Sites can have p_neighbours outside the cluster when connected_sites
@@ -166,7 +146,7 @@ class ClusterTestCase(unittest.TestCase):
         sites[1].p_neighbours = [sites[0]]
         cluster = Cluster(sites)
         cell_lengths = np.array([10.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (False, False, False)
 
     def test_cluster_is_not_periodically_contiguous_for_a_single_site(self):
         site = Mock(spec=Site)
@@ -174,7 +154,7 @@ class ClusterTestCase(unittest.TestCase):
         site.p_neighbours = []
         cluster = Cluster([site])
         cell_lengths = np.array([10.0, 10.0, 10.0])
-        self.assertEqual(cluster.is_periodically_contiguous(cell_lengths), (False, False, False))
+        assert cluster.is_periodically_contiguous(cell_lengths) == (False, False, False)
 
     def test_cluster_remove_sites_from_neighbours(self):
         sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
@@ -183,10 +163,6 @@ class ClusterTestCase(unittest.TestCase):
         sites[2].label = "B"
         cluster = Cluster([sites[0]])
         cluster.remove_sites_from_neighbours("A")
-        self.assertEqual(cluster.neighbours, set([sites[2]]))
+        assert cluster.neighbours == set([sites[2]])
         cluster.remove_sites_from_neighbours(["B"])
-        self.assertEqual(cluster.neighbours, set())
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert cluster.neighbours == set()
