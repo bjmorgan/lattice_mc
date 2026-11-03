@@ -137,9 +137,10 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Raises:
         ValueError: If the file is malformed or inconsistent: the site count does
             not match the number of site blocks, a key is unknown, repeated or
-            missing, a site number is repeated, a neighbour does not exist, two
-            sites do not list each other as neighbours, or sites with the same
-            label have different energies.
+            missing, a site number is repeated, a site lists itself or the same
+            neighbour twice, a neighbour does not exist, two sites do not list each
+            other as neighbours, or sites with the same label have different
+            energies.
 
     Notes:
         The file starts with the number of sites, followed by one block per site.
@@ -261,14 +262,19 @@ def _check_site_records(records: list[_SiteRecord]) -> None:
         records: The parsed site records.
 
     Raises:
-        ValueError: If a site number is repeated, a neighbour does not exist, a
-            neighbour pair is one-way, or sites with the same label have
-            different energies.
+        ValueError: If a site number is repeated, a site lists itself or the same
+            neighbour twice, a neighbour does not exist, a neighbour pair is one-way,
+            or sites with the same label have different energies.
     """
     neighbours: dict[int, set[int]] = {}
     for record in records:
         if record.number in neighbours:
             raise ValueError(f"The file defines site {record.number} more than once.")
+        if record.number in record.neighbours:
+            raise ValueError(f"Site {record.number} lists itself as a neighbour.")
+        for other in record.neighbours:
+            if record.neighbours.count(other) > 1:
+                raise ValueError(f"Site {record.number} lists site {other} more than once as a neighbour.")
         neighbours[record.number] = set(record.neighbours)
     for number, site_neighbours in neighbours.items():
         for other in sorted(site_neighbours):
