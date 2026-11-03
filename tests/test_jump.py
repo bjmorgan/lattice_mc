@@ -137,8 +137,9 @@ class TestJump:
             m.cn_occupation_energy.return_value = e
         self.jump.initial_site.p_neighbours = mock_sites[:2]
         self.jump.final_site.p_neighbours = mock_sites[2:]
-        delta_E = (0.2 + 1.0 + 3.0 + 4.0) - (1.5 + 1.0 + 3.0 + 4.0)
-        assert self.jump.coordination_number_delta_E() == delta_E
+        # The mocked neighbour energies do not depend on the occupation change, so only
+        # the initial and final sites contribute.
+        assert self.jump.coordination_number_delta_E() == pytest.approx(0.2 - 1.5)
 
     def test_dr(self):
         cell_lengths = np.array([10.0, 10.0, 10.0])
@@ -167,3 +168,45 @@ class TestJump:
     def test_relative_probability_setter(self):
         self.jump.relative_probability = 0.5
         assert self.jump._relative_probability == 0.5
+
+
+def total_cn_energy(sites):
+    return sum(site.cn_occupation_energy() for site in sites if site.is_occupied)
+
+
+def test_coordination_number_delta_E_counts_a_site_next_to_both_ends_once():
+    # Sites i and f share the neighbour s, which also neighbours t:
+    #
+    #     i --- f
+    #      \   /
+    #        s --- t
+    #
+    # i, s and t are occupied, and the atom on i jumps to f. Afterwards s still
+    # has two occupied neighbours, so its energy does not change.
+    numbers = {"i": 1, "f": 2, "s": 3, "t": 4}
+    neighbours = {"i": ["f", "s"], "f": ["i", "s"], "s": ["i", "f", "t"], "t": ["s"]}
+    sites = {
+        name: Site(
+            number=numbers[name],
+            coordinates=np.zeros(3),
+            neighbours=[numbers[n] for n in neighbours[name]],
+            energy=0.0,
+            label="A",
+        )
+        for name in numbers
+    }
+    for name, site in sites.items():
+        site.p_neighbours = [sites[n] for n in neighbours[name]]
+    cn = {"A": {0: 0.0, 1: 0.1, 2: 0.4, 3: 0.9}}
+    for name, site in sites.items():
+        site.set_cn_occupation_energies(cn)
+        site.is_occupied = name in ("i", "s", "t")
+    jump = Jump(sites["i"], sites["f"], coordination_number_energy={"A": cn}, params=PARAMS)
+
+    before = total_cn_energy(sites.values())
+    sites["i"].is_occupied, sites["f"].is_occupied = False, True
+    after = total_cn_energy(sites.values())
+    sites["i"].is_occupied, sites["f"].is_occupied = True, False
+
+    assert after - before == pytest.approx(0.0)
+    assert jump.coordination_number_delta_E() == pytest.approx(after - before)

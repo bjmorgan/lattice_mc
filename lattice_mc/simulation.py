@@ -154,11 +154,6 @@ class Simulation:
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
                     {'A': {'B': cn}, 'B': {'A': cn}}
-
-        Notes:
-            On lattices where a site can neighbour both ends of a jump (lattices with
-            triangles), the energy change for such a site is miscounted when both ends have
-            the same label. See https://github.com/bjmorgan/lattice_mc/issues/30.
         """
         assert self.lattice is not None
         if cn_energies is not None:
