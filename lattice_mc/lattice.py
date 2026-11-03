@@ -168,7 +168,11 @@ class Lattice:
                 for vacant_site in unoccupied_neighbours:
                     jumps.append(
                         jump.Jump(
-                            occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table,
+                            occupied_site,
+                            vacant_site,
+                            self.nn_energy,
+                            self.cn_energies,
+                            self.jump_lookup_table,
                             params=self.params,
                         )
                     )
@@ -180,7 +184,11 @@ class Lattice:
                 for occupied_site in occupied_neighbours:
                     jumps.append(
                         jump.Jump(
-                            occupied_site, vacant_site, self.nn_energy, self.cn_energies, self.jump_lookup_table,
+                            occupied_site,
+                            vacant_site,
+                            self.nn_energy,
+                            self.cn_energies,
+                            self.jump_lookup_table,
                             params=self.params,
                         )
                     )
@@ -484,11 +492,12 @@ class Lattice:
             List of sites not in a periodic percolating network.
 
         Notes:
-            Clusters can be wrongly reported as percolating. See
-            https://github.com/bjmorgan/lattice_mc/issues/2.
+            Every bond must span less than half the cell length along each axis
+            (see `Cluster.is_periodically_contiguous`). In smaller cells, clusters
+            that wind round the cell can be reported as detached.
         """
         clusters = self.connected_sites(site_labels=site_labels)
-        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
+        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous(self.cell_lengths))]
         return list(itertools.chain.from_iterable((c.sites for c in island_clusters)))
 
     def is_blocked(self) -> bool:
