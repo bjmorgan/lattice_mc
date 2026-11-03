@@ -8,8 +8,8 @@ Simulation parameters
 ---------------------
 
 :class:`~lattice_mc.simulation.SimulationParameters` holds the temperature, in K, and
-the jump rate prefactor, :math:`\nu_0`, in s\ :sup:`-1`. Both must be positive. The
-thermal energy :math:`kT`, in eV, is derived from the temperature.
+the jump rate prefactor, :math:`\nu_0`, in s\ :sup:`-1`. Both must be finite and
+positive. The thermal energy :math:`kT`, in eV, is derived from the temperature.
 
 .. testcode::
 
@@ -79,8 +79,9 @@ Random numbers
 
 ``seed``, an integer or a ``numpy.random.Generator``, is the source of all
 randomness in the simulation: the initial placement of atoms, and the choice and
-timing of jumps. Two simulations created with the same arguments and seed, and run in
-the same way, give the same results.
+timing of jumps. Two simulations created with the same arguments and the same integer
+seed, and run in the same way, give the same results. A generator is used directly,
+not copied, so the simulation advances it in place.
 Without a seed, the generator is unseeded.
 
 .. testcode::
@@ -134,10 +135,10 @@ reaches a set value:
 
 Give exactly one of ``n_jumps`` and ``for_time``. Calling
 :meth:`~lattice_mc.simulation.Simulation.run` again continues from the current state,
-and the time, displacements and other counters keep adding up across runs. With a
-fixed seed, ``run(n_jumps=300)`` then ``run(n_jumps=700)`` gives the same results as
-``run(n_jumps=1000)``. ``for_time`` is the total time since the simulation was created
-or last reset, not the time for that run.
+and the time, displacements and other counters keep adding up across runs. With the
+same integer seed, ``run(n_jumps=300)`` then ``run(n_jumps=700)`` gives the same
+results as ``run(n_jumps=1000)``. ``for_time`` is the total time since the simulation
+was created or last reset, not the time for that run.
 
 :meth:`~lattice_mc.simulation.Simulation.reset` sets the time, the atom displacements
 and the other counters back to zero, leaving the atoms where they are. The results are

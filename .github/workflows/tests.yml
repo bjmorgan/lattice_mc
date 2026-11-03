@@ -25,6 +25,9 @@ jobs:
       - name: Lint
         run: ruff check lattice_mc/ tests/
 
+      - name: Check formatting
+        run: ruff format --check .
+
   test:
     runs-on: ubuntu-latest
     strategy:

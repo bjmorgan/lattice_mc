@@ -25,27 +25,23 @@ class SimulationParameters:
     Immutable container for the physical parameters of a simulation.
 
     Raises:
-        ValueError: If `temperature` or `rate_prefactor` is not positive.
+        ValueError: If `temperature` or `rate_prefactor` is not finite and positive.
     """
 
     temperature: float
-    """Temperature, in K. Must be positive."""
+    """Temperature, in K. Must be finite and positive."""
 
     rate_prefactor: float
-    """Jump rate prefactor, nu_0, in s^-1. Must be positive."""
+    """Jump rate prefactor, nu_0, in s^-1. Must be finite and positive."""
 
     def __post_init__(self) -> None:
         """
-        Check that the temperature and rate prefactor are positive.
+        Check that the temperature and rate prefactor are finite and positive.
         """
-        if self.temperature <= 0:
-            raise ValueError(
-                f"temperature must be positive; got {self.temperature!r}."
-            )
-        if self.rate_prefactor <= 0:
-            raise ValueError(
-                f"rate_prefactor must be positive; got {self.rate_prefactor!r}."
-            )
+        if not (math.isfinite(self.temperature) and self.temperature > 0):
+            raise ValueError(f"temperature must be finite and positive; got {self.temperature!r}.")
+        if not (math.isfinite(self.rate_prefactor) and self.rate_prefactor > 0):
+            raise ValueError(f"rate_prefactor must be finite and positive; got {self.rate_prefactor!r}.")
 
     @property
     def kT(self) -> float:
@@ -104,8 +100,10 @@ class Simulation:
                 numbers of occupied neighbours, instead of calculating each as it is needed.
                 The table supports site energies and `nn_energy` only. Defaults to False.
             seed: Seed, or random number generator, for all randomness in the simulation:
-                the initial placement of atoms and the choice and timing of jumps. Defaults to
-                None, for an unseeded generator.
+                the initial placement of atoms and the choice and timing of jumps. A generator
+                is used directly, not copied, so it is advanced in place as the simulation runs.
+                The same integer seed gives the same results. Defaults to None, for an
+                unseeded generator.
 
         Raises:
             ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
@@ -117,10 +115,11 @@ class Simulation:
         """
         self._lattice: Lattice = copy.deepcopy(lattice)
         self._params: SimulationParameters = params
+        self._kT: float = params.kT
         self._rng: np.random.Generator = np.random.default_rng(seed)
         self._energy_model: EnergyModel = EnergyModel(self._lattice, nn_energy=nn_energy, cn_energies=cn_energies)
         self._probability: Callable[[npt.NDArray[np.bool_], int, int], float] = (
-            LookupTable(self._energy_model, params.kT).relative_probability
+            LookupTable(self._energy_model, self._kT).relative_probability
             if lookup_table
             else self._metropolis_probability
         )
@@ -197,7 +196,7 @@ class Simulation:
         Returns:
             The Metropolis relative probability of the jump.
         """
-        return metropolis(self._energy_model.delta_E(occupied, initial, final), self._params.kT)
+        return metropolis(self._energy_model.delta_E(occupied, initial, final), self._kT)
 
     @property
     def lattice(self) -> Lattice:
@@ -233,7 +232,7 @@ class Simulation:
         """
         Advance the simulation.
 
-        Results accumulate across runs, so with a fixed seed ``run(n_jumps=300)`` then
+        Results accumulate across runs, so with the same integer seed ``run(n_jumps=300)`` then
         ``run(n_jumps=700)`` gives the same results as ``run(n_jumps=1000)``.
 
         Args:

@@ -33,16 +33,17 @@ class Results:
     """
     Everything a simulation reports, accumulated since the last reset.
 
-    Lengths are in units of the site spacing and times in seconds.
+    Lengths are in the length unit of the site coordinates and cell lengths, and times
+    are in seconds.
 
     Attributes:
-        tracer_diffusion_coefficient: Tracer diffusion coefficient, in (site spacing)^2 s^-1.
+        tracer_diffusion_coefficient: Tracer diffusion coefficient, in (length unit)^2 s^-1.
             Defined as the sum of the squared displacements of the atoms divided by
             `2 d N t`, for `d` dimensions, `N` atoms and elapsed time `t`.
         collective_diffusion_coefficient: Collective (jump) diffusion coefficient per atom,
-            in (site spacing)^2 s^-1. Defined as the squared length of the summed displacement
+            in (length unit)^2 s^-1. Defined as the squared length of the summed displacement
             of all atoms divided by `2 d N t`.
-        reduced_ionic_conductivity: Reduced ionic conductivity, in (site spacing)^2 s^-1.
+        reduced_ionic_conductivity: Reduced ionic conductivity, in (length unit)^2 s^-1.
             Defined as the collective diffusion coefficient multiplied by the number of atoms
             and divided by the number of sites.
         tracer_correlation: Tracer correlation factor, dimensionless. Defined as the sum of

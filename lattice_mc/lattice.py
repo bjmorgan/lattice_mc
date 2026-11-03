@@ -174,10 +174,6 @@ class Lattice:
         """
         The occupation energy of the sites with each label.
 
-        Sites with the same label can have different energies, but the lookup table
-        is keyed by label, so it needs every site with a given label to have the same
-        energy.
-
         Returns:
             The occupation energy, in eV, for each site label.
 
@@ -188,8 +184,7 @@ class Lattice:
         for site in self.sites:
             if energies.setdefault(site.label, site.energy) != site.energy:
                 raise ValueError(
-                    f"Sites with label {site.label} have different energies, "
-                    f"{energies[site.label]} and {site.energy}."
+                    f"Sites with label {site.label} have different energies, {energies[site.label]} and {site.energy}."
                 )
         return energies
 
@@ -273,8 +268,9 @@ class Lattice:
             old_site_label: Site label, or labels, of the sites that can be modified.
             new_site_label: Site label to apply to the modified sites.
             n_sites_to_change: Number of sites to modify.
-            seed: Seed, or random number generator, for choosing the sites. Defaults to None,
-                for an unseeded generator.
+            seed: Seed, or random number generator, for choosing the sites. A generator is
+                used directly, and is advanced in place. The same integer seed chooses the
+                same sites. Defaults to None, for an unseeded generator.
 
         Raises:
             ValueError: If `n_sites_to_change` is negative or more than the number of sites
@@ -299,13 +295,15 @@ class Lattice:
         Returns:
             The clusters of contiguous sites.
         """
-        if site_labels:
-            selected_sites = self.select_sites(site_labels)
+        # A single label is wrapped, because set("Li") would be {"L", "i"}.
+        labels = {site_labels} if isinstance(site_labels, str) and site_labels else set(site_labels or ())
+        if labels:
+            selected_sites = self.select_sites(labels)
         else:
             selected_sites = self.sites
         initial_clusters = [cluster.Cluster([site], self) for site in selected_sites]
-        if site_labels:
-            blocking_sites = self.site_labels - set(site_labels)
+        if labels:
+            blocking_sites = self.site_labels - labels
             for c in initial_clusters:
                 c.remove_sites_from_neighbours(blocking_sites)
         final_clusters = []

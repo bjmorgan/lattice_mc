@@ -76,8 +76,9 @@ Average site occupations
 :attr:`~lattice_mc.results.Results.time` is :math:`t`, and
 :attr:`~lattice_mc.results.Results.number_of_jumps` is the number of jumps made.
 
-Diffusion coefficients and the reduced ionic conductivity are in units of (site
-spacing)\ :sup:`2` s\ :sup:`-1`. :math:`d` is the dimensionality of the lattice, given
+Lengths are in the length unit of the site coordinates and cell lengths, so
+diffusion coefficients and the reduced ionic conductivity are in that unit squared
+per second. :math:`d` is the dimensionality of the lattice, given
 by :attr:`Lattice.dimensionality <lattice_mc.lattice.Lattice.dimensionality>`: the
 number of non-zero cell lengths. Square and honeycomb lattices have a z cell length
 of 0, so :math:`d = 2`. Jump vectors use the minimum-image convention, and have zero

@@ -27,34 +27,36 @@ from lattice_mc import __version__  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '7.0'
+needs_sphinx = "7.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.doctest']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.doctest",
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'lattice_mc'
-copyright = '2017, Benjamin J. Morgan'
-author = 'Benjamin J. Morgan'
+project = "lattice_mc"
+copyright = "2017, Benjamin J. Morgan"
+author = "Benjamin J. Morgan"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -70,7 +72,7 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -78,7 +80,7 @@ language = 'en'
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -89,7 +91,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -108,12 +110,12 @@ html_static_path = []
 # This is required for the alabaster theme
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
-        'donate.html',
+    "**": [
+        "about.html",
+        "navigation.html",
+        "relations.html",  # needs 'show_related': True theme option to display
+        "searchbox.html",
+        "donate.html",
     ]
 }
 
@@ -121,7 +123,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'lattice_mcdoc'
+htmlhelp_basename = "lattice_mcdoc"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -130,15 +132,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -148,8 +147,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'lattice_mc.tex', 'lattice\\_mc Documentation',
-     'Benjamin J. Morgan', 'manual'),
+    (master_doc, "lattice_mc.tex", "lattice\\_mc Documentation", "Benjamin J. Morgan", "manual"),
 ]
 
 
@@ -157,10 +155,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'lattice_mc', 'lattice_mc Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "lattice_mc", "lattice_mc Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -169,11 +164,16 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'lattice_mc', 'lattice_mc Documentation',
-     author, 'lattice_mc', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "lattice_mc",
+        "lattice_mc Documentation",
+        author,
+        "lattice_mc",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]
-
 
 
 # -- Options for doctest --------------------------------------------------
@@ -182,5 +182,5 @@ texinfo_documents = [
 # doctests do not depend on the working directory Sphinx is run from.
 doctest_global_setup = f"""
 from pathlib import Path
-DATA_DIR = Path({str(DOCS_SOURCE_DIR / 'data')!r})
+DATA_DIR = Path({str(DOCS_SOURCE_DIR / "data")!r})
 """

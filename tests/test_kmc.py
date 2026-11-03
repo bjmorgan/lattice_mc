@@ -7,6 +7,7 @@ import pytest
 from lattice_mc._kmc import jump_vector, possible_jumps, step
 from lattice_mc._state import SimulationState
 from lattice_mc.error import BlockedLatticeError
+from lattice_mc.init_lattice import square_lattice
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 from lattice_mc.simulation import SimulationParameters
@@ -54,8 +55,17 @@ def test_possible_jumps_is_empty_when_no_site_is_occupied(ring: Lattice) -> None
 
 
 def test_possible_jumps_repeats_a_neighbour_listed_twice() -> None:
-    lattice = lattice_from_positions([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]], [[1, 1], [0]], [4.0, 0.0, 0.0])
+    lattice = lattice_from_positions([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]], [[1, 1], [0, 0]], [4.0, 0.0, 0.0])
     assert possible_jumps(lattice, occupation(2, [0])) == [(0, 1), (0, 1)]
+
+
+def test_possible_jumps_from_the_vacant_sites_repeats_a_neighbour_listed_twice() -> None:
+    # A 2 x 3 square lattice: each site lists its one x neighbour twice.
+    lattice = square_lattice(2, 3, 1.0)
+    mask = occupation(6, [0, 1, 2, 5])
+    expected = sorted((i, f) for i in range(6) for f in lattice.neighbour_indices[i] if mask[i] and not mask[f])
+    assert expected.count((2, 3)) == 2
+    assert sorted(possible_jumps(lattice, mask)) == expected
 
 
 def test_possible_jumps_on_a_mostly_occupied_lattice() -> None:
@@ -218,7 +228,13 @@ def test_step_chooses_among_three_jumps_with_a_zero_weight_in_the_middle() -> No
 def test_step_rejects_negative_or_non_finite_probabilities(ring: Lattice, bad_value: float, message: str) -> None:
     state = SimulationState.from_occupied(4, [0])
     with pytest.raises(ValueError, match=message):
-        step(ring, state, lambda occupied, initial, final: 1.0 if final == 1 else bad_value, PARAMS, np.random.default_rng(0))
+        step(
+            ring,
+            state,
+            lambda occupied, initial, final: 1.0 if final == 1 else bad_value,
+            PARAMS,
+            np.random.default_rng(0),
+        )
     assert state.number_of_jumps == 0
     assert state.time == 0.0
     assert state.atom_site.tolist() == [0]

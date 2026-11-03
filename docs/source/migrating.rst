@@ -78,7 +78,13 @@ in one call, in place of the 1.0.4 setters:
         ``simulation.number_of_equilibration_jumps``
       - Removed
     * - ``lattice_mc.Options``
-      - Removed: give the same settings to ``Simulation`` and ``run``
+      - Removed; ``Simulation`` never read it. Its settings map to the rows for
+        ``set_number_of_atoms``, ``set_site_energies``, ``set_cn_energies`` and
+        ``define_lattice_from_file`` above (``read_lattice_from_file`` and
+        ``set_lattice_cell_lengths``), and for ``set_number_of_jumps`` and
+        ``set_number_of_equilibration_jumps`` under Running.
+        ``set_nn_energy_scaling`` and ``set_cn_energy_scaling`` have no 2.0
+        equivalent.
 
 ``seed`` (an integer or a ``numpy.random.Generator``) controls the initial placement
 of atoms and the choice and timing of jumps. The simulation takes its own copy of the
@@ -108,7 +114,7 @@ Running
       - ``simulation.is_blocked()``
 
 Repeated calls to ``run`` accumulate: ``run(n_jumps=300)`` then ``run(n_jumps=700)``
-gives the same results as ``run(n_jumps=1000)`` with the same seed.
+gives the same results as ``run(n_jumps=1000)`` with the same integer seed.
 
 Results
 -------

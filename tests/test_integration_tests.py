@@ -18,7 +18,7 @@ def three_site_chain(positions):
 class TestIntegration:
     def test_simulation_runs_with_selected_labels(self):
         lattice = lattice_mc.cubic_lattice(4, 4, 4, 1.0)
-        lattice.transmute_sites("L", "X", 32)
+        lattice.transmute_sites("L", "X", 32, seed=0)
         s = lattice_mc.Simulation(lattice, PARAMS, n_atoms=32, selected_labels="L", lookup_table=True, seed=0)
         labels = {s.lattice.site_with_id(number).label for number in s.occupied_sites}
         assert labels == {"L"}
