@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from math import sqrt
 
 import numpy as np
+import numpy.typing as npt
 
 from lattice_mc import lattice, lattice_site
 
@@ -132,9 +134,16 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Returns:
         The new lattice.
 
+    Raises:
+        ValueError: If the file is malformed or inconsistent: the site count does
+            not match the number of site blocks, a key is unknown, repeated or
+            missing, a site number is repeated, a site lists itself or the same
+            neighbour twice, a neighbour does not exist, or two sites do not list
+            each other as neighbours.
+
     Notes:
         The file starts with the number of sites, followed by one block per site.
-        Blocks are separated by a blank line. Each block gives::
+        Blocks are separated by blank lines. Each block gives::
 
             site: <site number>
             centre: <x> <y> <z>
@@ -143,32 +152,134 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
             energy: <site occupation energy>
 
         Site numbers are arbitrary integers. The energy line is optional, and
-        defaults to 0.0. Energies must be plain decimals with a single space after
-        the colon (see https://github.com/bjmorgan/lattice_mc/issues/31). Lines
-        within a block can be in any order. Both centre/center and
-        neighbours/neighbors are accepted. A full example is
-        ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
+        defaults to 0.0; sites with the same label can have different energies.
+        Lines within a block can be in any order. Both centre/center and
+        neighbours/neighbors are accepted, and legacy vertices lines are ignored.
+        A full example is ``examples/llzo_lattice_site_list.dat`` in the
+        lattice_mc repository.
 
         For `Lattice.detached_sites`, every bond must span less than half the cell
         length along each axis, so a cell of a single conventional unit cell is
         usually too small.
     """
-    sites: list[lattice_site.Site] = []
-    site_re = re.compile(r"site:\s+([-+]?\d+)")
-    r_re = re.compile(r"cent(?:er|re):\s+([-\d\.e]+)\s+([-\d\.e]+)\s+([-\d\.e]+)")
-    r_neighbours = re.compile(r"neighbou{0,1}rs:((\s+[-+]?\d+)+)")
-    r_label = re.compile(r"label:\s+(\S+)")
-    r_energy = re.compile(r"energy:\s([-+\d\.]+)")
     with open(site_file) as f:
-        filein = f.read().split("\n\n")
-    number_of_sites = int(filein[0])
-    for i in range(number_of_sites):
-        block = filein[i + 1]
-        number = int(site_re.findall(block)[0])
-        r = np.array([float(s) for s in r_re.findall(block)[0]])
-        neighbours = [int(s) for s in r_neighbours.findall(block)[0][0].split()]
-        label = r_label.findall(block)[0]
-        energy_match = r_energy.findall(block)
-        energy: float = float(energy_match[0]) if energy_match else 0.0
-        sites.append(lattice_site.Site(number, r, neighbours, energy, label))
+        records = _read_site_records(f.read())
+    sites = [lattice_site.Site(r.number, r.centre, r.neighbours, r.energy, r.label) for r in records]
     return lattice.Lattice(sites, cell_lengths=np.array(cell_lengths))
+
+
+_KEY_ALIASES = {"center": "centre", "neighbors": "neighbours"}
+_REQUIRED_KEYS = ("site", "centre", "neighbours", "label")
+_OPTIONAL_KEYS = ("energy", "vertices")
+
+
+@dataclass(frozen=True)
+class _SiteRecord:
+    """The contents of one site block in a sites file."""
+
+    number: int
+    centre: npt.NDArray[np.float64]
+    neighbours: list[int]
+    label: str
+    energy: float
+
+
+def _read_site_records(text: str) -> list[_SiteRecord]:
+    """
+    Parse and check the contents of a sites file.
+
+    Args:
+        text: The contents of the sites file.
+
+    Returns:
+        One record for each site block, in file order.
+
+    Raises:
+        ValueError: If the file is malformed or inconsistent.
+    """
+    header, *blocks = re.split(r"\n[ \t]*\n", text.strip())
+    try:
+        number_of_sites = int(header)
+    except ValueError:
+        raise ValueError(f"The first line of a sites file must be the number of sites, not {header!r}.") from None
+    if len(blocks) != number_of_sites:
+        raise ValueError(f"The file header gives {number_of_sites} sites, but the file has {len(blocks)} site blocks.")
+    records = [_parse_site_block(block, index) for index, block in enumerate(blocks, start=1)]
+    _check_site_records(records)
+    return records
+
+
+def _parse_site_block(block: str, index: int) -> _SiteRecord:
+    """
+    Parse one site block.
+
+    Args:
+        block: The lines of the block.
+        index: The position of the block in the file, used in error messages.
+
+    Returns:
+        The parsed site.
+
+    Raises:
+        ValueError: If a line is malformed, a key is unknown or repeated, or a required key is missing.
+    """
+    fields: dict[str, str] = {}
+    for line in block.splitlines():
+        if not line.strip():
+            continue
+        key, colon, value = line.partition(":")
+        key = _KEY_ALIASES.get(key.strip(), key.strip())
+        if not colon:
+            raise ValueError(f"Line {line.strip()!r} in site block {index} has no 'key: value' form.")
+        if key not in _REQUIRED_KEYS + _OPTIONAL_KEYS:
+            raise ValueError(f"Unknown key {key!r} in site block {index}.")
+        if key in fields:
+            raise ValueError(f"Key {key!r} appears more than once in site block {index}.")
+        fields[key] = value.strip()
+    name = f"site {fields['site']}" if "site" in fields else f"site block {index}"
+    for key in _REQUIRED_KEYS:
+        if key not in fields:
+            raise ValueError(f"The block for {name} has no {key} line.")
+    try:
+        number = int(fields["site"])
+        centre = np.array([float(x) for x in fields["centre"].split()])
+        neighbours = [int(x) for x in fields["neighbours"].split()]
+        energy = float(fields.get("energy", "0.0"))
+    except ValueError as error:
+        raise ValueError(f"Could not read the block for {name}: {error}") from None
+    if centre.shape != (3,):
+        raise ValueError(f"The centre of {name} must have three coordinates.")
+    if len(fields["label"].split()) != 1:
+        raise ValueError(f"The label of {name} must be a single word.")
+    return _SiteRecord(number, centre, neighbours, fields["label"], energy)
+
+
+def _check_site_records(records: list[_SiteRecord]) -> None:
+    """
+    Check that a set of site records is consistent.
+
+    Args:
+        records: The parsed site records.
+
+    Raises:
+        ValueError: If a site number is repeated, a site lists itself or the same
+            neighbour twice, a neighbour does not exist, or a neighbour pair is one-way.
+    """
+    neighbours: dict[int, set[int]] = {}
+    for record in records:
+        if record.number in neighbours:
+            raise ValueError(f"The file defines site {record.number} more than once.")
+        if record.number in record.neighbours:
+            raise ValueError(f"Site {record.number} lists itself as a neighbour.")
+        for other in record.neighbours:
+            if record.neighbours.count(other) > 1:
+                raise ValueError(f"Site {record.number} lists site {other} more than once as a neighbour.")
+        neighbours[record.number] = set(record.neighbours)
+    for number, site_neighbours in neighbours.items():
+        for other in sorted(site_neighbours):
+            if other not in neighbours:
+                raise ValueError(f"Site {number} lists site {other} as a neighbour, but there is no site {other}.")
+            if number not in neighbours[other]:
+                raise ValueError(
+                    f"Site {number} lists site {other} as a neighbour, but site {other} does not list site {number}."
+                )
