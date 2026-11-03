@@ -33,3 +33,16 @@ publishing (no API token is stored in the repository).
    when the `publish` job is waiting.
 5. Check that the new version appears on PyPI and that Zenodo has archived the
    release.
+
+## If the workflow fails after publishing a release
+
+Publishing the GitHub release creates the tag, and Zenodo archives the release
+on publication regardless of whether the workflow succeeds. If the `Release`
+workflow fails:
+
+- If nothing reached PyPI (the `check` or `build` job failed, or the `publish`
+  job was rejected before uploading), delete the GitHub release and its tag,
+  fix the problem on `main`, and publish the release again.
+- If anything reached PyPI, the version cannot be reused, because PyPI never
+  allows a file to be uploaded again under a version that has been published or
+  yanked. Bump the version (for example `2.0.1`) and make a new release.
