@@ -166,10 +166,13 @@ class Simulation:
         Args:
             site_energies: Occupation energy, in eV, for each site label, for example
                 ``{'A': 0.0, 'B': 1.0}``. If None, the lattice is left unchanged.
+
+        Raises:
+            ValueError: If a label in `site_energies` is not a site label in the lattice.
         """
         assert self.lattice is not None
         if site_energies is not None:
-            self.lattice.set_site_energies(site_energies)
+            self.lattice.set_site_energies(by_label=site_energies)
 
     def is_initialised(self) -> None:
         """
