@@ -112,25 +112,26 @@ class Jump:
         """
         assert self.initial_site.p_neighbours is not None
         assert self.final_site.p_neighbours is not None
-        initial_site_neighbours = [
-            s for s in self.initial_site.p_neighbours if s.is_occupied
-        ]  # excludes final site, since this is always unoccupied
-        final_site_neighbours = [
-            s for s in self.final_site.p_neighbours if s.is_occupied and s is not self.initial_site
-        ]  # excludes initial site
-        initial_cn_occupation_energy = (
-            self.initial_site.cn_occupation_energy()
-            + sum([site.cn_occupation_energy() for site in initial_site_neighbours])
-            + sum([site.cn_occupation_energy() for site in final_site_neighbours])
-        )
-        final_cn_occupation_energy = (
+        # Occupied neighbours of either end change their occupied-neighbour counts. A site
+        # next to both ends gets both changes at once, so it is counted only once.
+        neighbour_changes: dict[Site, dict[str, int]] = {}
+        for site in self.initial_site.p_neighbours:
+            if site.is_occupied:
+                change = neighbour_changes.setdefault(site, {})
+                change[self.initial_site.label] = change.get(self.initial_site.label, 0) - 1
+        for site in self.final_site.p_neighbours:
+            if site.is_occupied and site is not self.initial_site:
+                change = neighbour_changes.setdefault(site, {})
+                change[self.final_site.label] = change.get(self.final_site.label, 0) + 1
+        # The initial site becomes vacant, so its energy is lost, and the final site
+        # becomes occupied with one fewer occupied neighbour than it has now.
+        delta_E = (
             self.final_site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
-            + sum([site.cn_occupation_energy(delta_occupation={self.initial_site.label: -1})
-                   for site in initial_site_neighbours])
-            + sum([site.cn_occupation_energy(delta_occupation={self.final_site.label: +1})
-                   for site in final_site_neighbours])
+            - self.initial_site.cn_occupation_energy()
         )
-        return final_cn_occupation_energy - initial_cn_occupation_energy
+        for site, change in neighbour_changes.items():
+            delta_E += site.cn_occupation_energy(delta_occupation=change) - site.cn_occupation_energy()
+        return delta_E
 
     def dr(self, cell_lengths: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """
