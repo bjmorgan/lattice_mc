@@ -9,7 +9,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-@dataclass
+@dataclass(eq=False)
 class SimulationState:
     """
     The mutable state of a running simulation.
@@ -90,7 +90,15 @@ class SimulationState:
             final: Index of the site the atom jumps to.
             dr: Displacement vector of the jump.
             delta_t: Time taken by the jump.
+
+        Raises:
+            ValueError: If the `initial` site is vacant or the `final` site is occupied.
+                The state is left unchanged.
         """
+        if self.site_atom[initial] < 0:
+            raise ValueError(f"Cannot jump from site {initial}: site {initial} is vacant")
+        if self.site_atom[final] >= 0:
+            raise ValueError(f"Cannot jump to site {final}: site {final} is occupied")
         self.time += delta_t
         self.site_occupation_time[self.occupied] += delta_t
         atom = self.site_atom[initial]

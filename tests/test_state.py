@@ -91,3 +91,36 @@ def test_reset_zeroes_counters_and_keeps_positions(state: SimulationState) -> No
     assert not state.site_occupation_time.any()
     assert state.atom_site.tolist() == [3, 0]
     assert state.site_atom.tolist() == [1, -1, -1, 0]
+
+
+def test_apply_jump_raises_if_initial_site_is_vacant(state: SimulationState) -> None:
+    with pytest.raises(ValueError, match="site 1 is vacant"):
+        state.apply_jump(1, 3, np.array([1.0, 0.0, 0.0]), 0.5)
+    assert state.number_of_jumps == 0
+    assert state.time == 0.0
+
+
+def test_apply_jump_raises_if_final_site_is_occupied(state: SimulationState) -> None:
+    with pytest.raises(ValueError, match="site 0 is occupied"):
+        state.apply_jump(2, 0, np.array([1.0, 0.0, 0.0]), 0.5)
+    assert state.number_of_jumps == 0
+    assert state.time == 0.0
+    assert state.atom_site.tolist() == [2, 0]
+
+
+def test_jumps_after_reset_accumulate_from_zero(state: SimulationState) -> None:
+    state.apply_jump(2, 3, np.array([1.0, 0.0, 0.0]), 0.5)
+    state.reset()
+    state.apply_jump(3, 1, np.array([0.0, 2.0, 0.0]), 0.25)
+    np.testing.assert_array_equal(state.displacement, [[0.0, 2.0, 0.0], [0.0, 0.0, 0.0]])
+    assert state.summed_jump_length_squared == 4.0
+    assert state.time == 0.25
+    assert state.number_of_jumps == 1
+    np.testing.assert_array_equal(state.site_occupation_time, [0.25, 0.0, 0.0, 0.25])
+    assert state.atom_site.tolist() == [1, 0]
+
+
+def test_states_compare_by_identity(state: SimulationState) -> None:
+    other = SimulationState.from_occupied(4, [2, 0])
+    assert state == state
+    assert state != other
