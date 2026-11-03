@@ -1,6 +1,9 @@
 """Tests for lattice_mc.results."""
 
+import copy
 import dataclasses
+import pickle
+from collections.abc import Callable
 
 import numpy as np
 import pytest
@@ -114,6 +117,28 @@ def test_average_site_occupations_with_unequal_numbers_of_sites_per_label() -> N
 def test_average_site_occupations_are_read_only(results: Results) -> None:
     with pytest.raises(TypeError):
         results.average_site_occupations["A"] = 0.0  # type: ignore[index]
+
+
+def test_results_survive_pickling(results: Results) -> None:
+    assert pickle.loads(pickle.dumps(results)) == results
+
+
+def test_results_survive_deepcopy(results: Results) -> None:
+    assert copy.deepcopy(results) == results
+
+
+@pytest.mark.parametrize("copier", [lambda r: pickle.loads(pickle.dumps(r)), copy.deepcopy], ids=["pickle", "deepcopy"])
+def test_copied_average_site_occupations_are_read_only(results: Results, copier: Callable[[Results], Results]) -> None:
+    copied = copier(results)
+    with pytest.raises(TypeError):
+        copied.average_site_occupations["A"] = 0.0
+
+
+def test_equality_compares_the_average_site_occupations(results: Results) -> None:
+    same = results_from(moved_state(4), labelled_ring())
+    different = results_from(moved_state(4), labelled_ring(("A", "A", "A", "B")))
+    assert same == results
+    assert different != results
 
 
 def test_results_are_frozen(results: Results) -> None:

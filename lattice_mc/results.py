@@ -2,16 +2,30 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import dataclasses
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 if TYPE_CHECKING:
     from lattice_mc._state import SimulationState
     from lattice_mc.lattice import Lattice
+
+
+def _rebuild_results(fields: dict[str, Any]) -> Results:
+    """
+    Rebuild a `Results` from its fields, as plain values, when unpickled or copied.
+
+    Args:
+        fields: The field values, with the site occupations as a plain dict.
+
+    Returns:
+        The rebuilt results.
+    """
+    return Results(**{**fields, "average_site_occupations": MappingProxyType(fields["average_site_occupations"])})
 
 
 @dataclass(frozen=True)
@@ -50,6 +64,17 @@ class Results:
     average_site_occupations: Mapping[str, float]
     time: float
     number_of_jumps: int
+
+    def __reduce__(self) -> tuple[Callable[[dict[str, Any]], Results], tuple[dict[str, Any]]]:
+        """
+        Support pickling and copying, which cannot handle the read-only mapping directly.
+
+        Returns:
+            The function and arguments that rebuild these results.
+        """
+        fields = {field.name: getattr(self, field.name) for field in dataclasses.fields(self)}
+        fields["average_site_occupations"] = dict(self.average_site_occupations)
+        return _rebuild_results, (fields,)
 
     @classmethod
     def from_state(cls, state: SimulationState, lattice: Lattice) -> Results | None:
