@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.15"
+
+      - name: Check the release tag matches the package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(python -c "import ast; tree = ast.parse(open('lattice_mc/__init__.py').read()); print(next(n.value.value for n in tree.body if isinstance(n, ast.Assign) and any(getattr(t, 'id', None) == '__version__' for t in n.targets)))")
+          echo "Release tag: $RELEASE_TAG"
+          echo "Package version: $VERSION"
+          if [ "$RELEASE_TAG" != "$VERSION" ]; then
+            echo "::error::Release tag '$RELEASE_TAG' does not match __version__ '$VERSION'"
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,docs]"
+
+      - name: Run tests
+        run: pytest --cov=lattice_mc --cov-report=term-missing --cov-fail-under=95
+
+      - name: Build HTML documentation
+        run: python -m sphinx -W --keep-going -b html docs/source docs/build/html
+
+      - name: Run documentation examples
+        run: python -m sphinx -W --keep-going -b doctest docs/source docs/build/doctest
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.15"
+
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+          python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
