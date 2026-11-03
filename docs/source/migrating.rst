@@ -80,7 +80,8 @@ in one call, in place of the 1.0.4 setters:
     * - ``lattice_mc.Options``
       - Removed; ``Simulation`` never read it. Its settings map to the rows for
         ``set_number_of_atoms``, ``set_site_energies``, ``set_cn_energies`` and
-        ``define_lattice_from_file`` above, and for ``set_number_of_jumps`` and
+        ``define_lattice_from_file`` above (``read_lattice_from_file`` and
+        ``set_lattice_cell_lengths``), and for ``set_number_of_jumps`` and
         ``set_number_of_equilibration_jumps`` under Running.
         ``set_nn_energy_scaling`` and ``set_cn_energy_scaling`` have no 2.0
         equivalent.
