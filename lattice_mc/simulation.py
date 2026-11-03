@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import math
+from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
@@ -175,11 +176,15 @@ class Simulation:
             The index of each site.
 
         Raises:
-            ValueError: If there are no site numbers, or a site number is not in the lattice.
+            ValueError: If there are no site numbers, a site number is repeated, or a site
+                number is not in the lattice.
         """
         numbers = list(site_numbers)
         if not numbers:
             raise ValueError("occupied_sites must contain at least one site number.")
+        repeated = sorted(number for number, count in Counter(numbers).items() if count > 1)
+        if repeated:
+            raise ValueError(f"occupied_sites lists site numbers more than once: {repeated}.")
         try:
             return [self._lattice.site_index(number) for number in numbers]
         except KeyError as error:

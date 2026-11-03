@@ -82,6 +82,10 @@ class TestConstruction:
         with pytest.raises(ValueError):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[1, 99])
 
+    def test_rejects_duplicate_occupied_sites_naming_the_site_numbers(self):
+        with pytest.raises(ValueError, match=r"occupied_sites lists site numbers more than once: \[5, 9\]"):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[9, 5, 2, 5, 9])
+
     def test_rejects_empty_occupied_sites(self):
         with pytest.raises(ValueError):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[])
