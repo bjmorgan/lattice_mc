@@ -40,9 +40,11 @@ A cubic lattice of 3 x 3 x 3 sites:
 
     27 3
 
-Use at least 3 repeat units along each axis of square and cubic lattices, and at
-least 2 along each axis of honeycomb lattices. With fewer, a site's neighbours on
-either side along an axis are the same site, so it is listed as a neighbour twice.
+A :class:`~lattice_mc.lattice.Lattice` raises a ``ValueError`` if a site lists itself
+as a neighbour, or lists the same neighbour more than once. Smaller lattices would do
+this, so the builders raise a ``ValueError``, naming the argument, for fewer than 3
+repeat units along any axis of a square or cubic lattice, and for fewer than 2 along
+x (``a``) or 1 along y (``b``) of a honeycomb lattice.
 
 Each repeat unit of a honeycomb lattice contains 4 sites. Every site in these
 lattices is labelled ``'L'``. A honeycomb lattice can instead

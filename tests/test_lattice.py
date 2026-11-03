@@ -46,6 +46,14 @@ class TestLattice:
         np.testing.assert_array_equal(lattice.sites[0].r, [9.0, 1.0, 3.0])
         np.testing.assert_array_equal(lattice.sites[1].r, [2.0, 7.0, 2.0])
 
+    def test_rejects_a_site_that_lists_itself_as_a_neighbour(self):
+        with pytest.raises(ValueError, match="Site 5 lists itself as a neighbour"):
+            make_lattice([-2, 5], neighbours=[[5], [-2, 5]])
+
+    def test_rejects_a_site_that_lists_the_same_neighbour_twice(self):
+        with pytest.raises(ValueError, match="Site -2 lists site 5 more than once as a neighbour"):
+            make_lattice([-2, 5], neighbours=[[5, 5], [-2]])
+
     def test_site_with_id(self):
         lattice = make_lattice([-2, 5, 3])
         assert lattice.site_with_id(5) is lattice.sites[1]

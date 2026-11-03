@@ -13,13 +13,46 @@ class TestInitLatticeDimensionality:
     """Tests for the dimensionality of lattices built by the initialisation routines"""
 
     def test_square_lattice_is_two_dimensional(self):
-        assert init_lattice.square_lattice(2, 3, 1.0).dimensionality == 2
+        assert init_lattice.square_lattice(3, 4, 1.0).dimensionality == 2
 
     def test_honeycomb_lattice_is_two_dimensional(self):
         assert init_lattice.honeycomb_lattice(2, 2, 1.0).dimensionality == 2
 
     def test_cubic_lattice_is_three_dimensional(self):
-        assert init_lattice.cubic_lattice(2, 2, 2, 1.0).dimensionality == 3
+        assert init_lattice.cubic_lattice(3, 3, 3, 1.0).dimensionality == 3
+
+
+class TestInitLatticeSizes:
+    """Tests for the smallest numbers of repeat units the builders accept"""
+
+    @pytest.mark.parametrize(
+        ("build", "argument"),
+        [
+            (lambda: init_lattice.square_lattice(2, 3, 1.0), "a"),
+            (lambda: init_lattice.square_lattice(3, 1, 1.0), "b"),
+            (lambda: init_lattice.cubic_lattice(2, 3, 3, 1.0), "a"),
+            (lambda: init_lattice.cubic_lattice(3, 2, 3, 1.0), "b"),
+            (lambda: init_lattice.cubic_lattice(3, 3, 1, 1.0), "c"),
+            (lambda: init_lattice.honeycomb_lattice(1, 2, 1.0), "a"),
+            (lambda: init_lattice.honeycomb_lattice(2, 0, 1.0), "b"),
+        ],
+        ids=["square a", "square b", "cubic a", "cubic b", "cubic c", "honeycomb a", "honeycomb b"],
+    )
+    def test_rejects_too_few_repeat_units(self, build, argument):
+        with pytest.raises(ValueError, match=f"^{argument} must be at least"):
+            build()
+
+    @pytest.mark.parametrize(
+        ("build", "number_of_sites"),
+        [
+            (lambda: init_lattice.square_lattice(3, 3, 1.0), 9),
+            (lambda: init_lattice.cubic_lattice(3, 3, 3, 1.0), 27),
+            (lambda: init_lattice.honeycomb_lattice(2, 1, 1.0), 8),
+        ],
+        ids=["square", "cubic", "honeycomb"],
+    )
+    def test_builds_the_smallest_accepted_lattice(self, build, number_of_sites):
+        assert build().number_of_sites == number_of_sites
 
 
 class TestInitLattice:
@@ -28,19 +61,25 @@ class TestInitLattice:
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
     def test_square_lattice(self, mock_lattice, mock_site):
-        mock_site.side_effect = range(2 * 3)
+        mock_site.side_effect = range(3 * 4)
         mock_lattice.return_value = "foo"
-        a = 2
-        b = 3
+        a = 3
+        b = 4
         spacing = 1.0
         lattice = init_lattice.square_lattice(a, b, spacing)
         expected_site_calls = [
-            [1, np.array([0.0, 0.0, 0.0]), [2, 2, 5, 3], 0.0, "L"],
-            [2, np.array([1.0, 0.0, 0.0]), [1, 1, 6, 4], 0.0, "L"],
-            [3, np.array([0.0, 1.0, 0.0]), [4, 4, 1, 5], 0.0, "L"],
-            [4, np.array([1.0, 1.0, 0.0]), [3, 3, 2, 6], 0.0, "L"],
-            [5, np.array([0.0, 2.0, 0.0]), [6, 6, 3, 1], 0.0, "L"],
-            [6, np.array([1.0, 2.0, 0.0]), [5, 5, 4, 2], 0.0, "L"],
+            [1, np.array([0.0, 0.0, 0.0]), [3, 2, 10, 4], 0.0, "L"],
+            [2, np.array([1.0, 0.0, 0.0]), [1, 3, 11, 5], 0.0, "L"],
+            [3, np.array([2.0, 0.0, 0.0]), [2, 1, 12, 6], 0.0, "L"],
+            [4, np.array([0.0, 1.0, 0.0]), [6, 5, 1, 7], 0.0, "L"],
+            [5, np.array([1.0, 1.0, 0.0]), [4, 6, 2, 8], 0.0, "L"],
+            [6, np.array([2.0, 1.0, 0.0]), [5, 4, 3, 9], 0.0, "L"],
+            [7, np.array([0.0, 2.0, 0.0]), [9, 8, 4, 10], 0.0, "L"],
+            [8, np.array([1.0, 2.0, 0.0]), [7, 9, 5, 11], 0.0, "L"],
+            [9, np.array([2.0, 2.0, 0.0]), [8, 7, 6, 12], 0.0, "L"],
+            [10, np.array([0.0, 3.0, 0.0]), [12, 11, 7, 1], 0.0, "L"],
+            [11, np.array([1.0, 3.0, 0.0]), [10, 12, 8, 2], 0.0, "L"],
+            [12, np.array([2.0, 3.0, 0.0]), [11, 10, 9, 3], 0.0, "L"],
         ]
         for c, e in zip(mock_site.mock_calls, expected_site_calls, strict=True):
             assert c[1][0] == e[0]  # site number
@@ -48,9 +87,9 @@ class TestInitLattice:
             assert c[1][2] == e[2]  # neighbour lists
             assert c[1][3] == e[3]  # ?
             assert c[1][4] == e[4]  # site label
-        assert mock_lattice.mock_calls[0][1][0] == list(range(2 * 3))
+        assert mock_lattice.mock_calls[0][1][0] == list(range(3 * 4))
         assert lattice == "foo"
-        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([2.0, 3.0, 0.0]))
+        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([3.0, 4.0, 0.0]))
 
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
@@ -115,20 +154,34 @@ class TestInitLattice:
     @patch("lattice_mc.lattice_site.Site")
     @patch("lattice_mc.lattice.Lattice")
     def test_cubic_lattice(self, mock_lattice, mock_site):
-        a, b, c = 2, 2, 2
+        a, b, c = 3, 3, 3
         spacing = 1.0
-        mock_site.side_effect = range(2 * 2 * 2)
+        mock_site.side_effect = range(3 * 3 * 3)
         mock_lattice.return_value = "bar"
         lattice = init_lattice.cubic_lattice(a, b, c, spacing)
+
+        def number(x, y, z):
+            # Sites are numbered from 1, with x varying fastest.
+            return 1 + x % 3 + 3 * (y % 3) + 9 * (z % 3)
+
         expected_site_calls = [
-            [1, np.array([0.0, 0.0, 0.0]), [2, 2, 3, 3, 5, 5], 0.0, "L"],
-            [2, np.array([1.0, 0.0, 0.0]), [1, 1, 4, 4, 6, 6], 0.0, "L"],
-            [3, np.array([0.0, 1.0, 0.0]), [4, 4, 1, 1, 7, 7], 0.0, "L"],
-            [4, np.array([1.0, 1.0, 0.0]), [3, 3, 2, 2, 8, 8], 0.0, "L"],
-            [5, np.array([0.0, 0.0, 1.0]), [6, 6, 7, 7, 1, 1], 0.0, "L"],
-            [6, np.array([1.0, 0.0, 1.0]), [5, 5, 8, 8, 2, 2], 0.0, "L"],
-            [7, np.array([0.0, 1.0, 1.0]), [8, 8, 5, 5, 3, 3], 0.0, "L"],
-            [8, np.array([1.0, 1.0, 1.0]), [7, 7, 6, 6, 4, 4], 0.0, "L"],
+            [
+                number(x, y, z),
+                np.array([x, y, z], dtype=float),
+                [
+                    number(x - 1, y, z),
+                    number(x + 1, y, z),
+                    number(x, y - 1, z),
+                    number(x, y + 1, z),
+                    number(x, y, z - 1),
+                    number(x, y, z + 1),
+                ],
+                0.0,
+                "L",
+            ]
+            for z in range(3)
+            for y in range(3)
+            for x in range(3)
         ]
         for call, e in zip(mock_site.mock_calls, expected_site_calls, strict=True):
             assert call[1][0] == e[0]  # site number
@@ -136,7 +189,7 @@ class TestInitLattice:
             assert call[1][2] == e[2]  # neighbour lists
             assert call[1][3] == e[3]  # ?
             assert call[1][4] == e[4]  # site label
-        assert mock_lattice.mock_calls[0][1][0] == list(range(2 * 2 * 2))
+        assert mock_lattice.mock_calls[0][1][0] == list(range(3 * 3 * 3))
         assert lattice == "bar"
         np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([a, b, c]))
 

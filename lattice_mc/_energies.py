@@ -140,9 +140,7 @@ class EnergyModel:
         """
         The change in system energy if an atom jumped between two sites.
 
-        The occupation array is not modified. If a site appears more than once in a neighbour
-        list (only possible in very small built-in lattices), the nearest-neighbour term counts
-        that neighbour once for each appearance.
+        The occupation array is not modified.
 
         Args:
             occupied: Whether each site is occupied, before the jump.

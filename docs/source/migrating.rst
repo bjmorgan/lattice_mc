@@ -188,6 +188,11 @@ Lattices, sites and clusters
       - ``Cluster(sites, lattice)``
     * - ``cluster.sites_at_edges()``
       - Removed
+    * - ``square_lattice`` and ``cubic_lattice`` with fewer than 3 repeat units
+        along an axis, and ``honeycomb_lattice`` with ``a`` less than 2, which gave
+        sites that list themselves or the same neighbour twice
+      - Raise ``ValueError``, as does a ``Lattice`` with a site that lists itself
+        or the same neighbour twice
 
 :attr:`Lattice.site_labels <lattice_mc.lattice.Lattice.site_labels>` and
 :attr:`Lattice.site_populations <lattice_mc.lattice.Lattice.site_populations>` are

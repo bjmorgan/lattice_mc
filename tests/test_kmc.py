@@ -7,7 +7,6 @@ import pytest
 from lattice_mc._kmc import jump_vector, possible_jumps, step
 from lattice_mc._state import SimulationState
 from lattice_mc.error import BlockedLatticeError
-from lattice_mc.init_lattice import square_lattice
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 from lattice_mc.simulation import SimulationParameters
@@ -52,20 +51,6 @@ def test_possible_jumps_is_empty_when_every_neighbour_is_occupied(ring: Lattice)
 
 def test_possible_jumps_is_empty_when_no_site_is_occupied(ring: Lattice) -> None:
     assert possible_jumps(ring, occupation(4, [])) == []
-
-
-def test_possible_jumps_repeats_a_neighbour_listed_twice() -> None:
-    lattice = lattice_from_positions([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]], [[1, 1], [0, 0]], [4.0, 0.0, 0.0])
-    assert possible_jumps(lattice, occupation(2, [0])) == [(0, 1), (0, 1)]
-
-
-def test_possible_jumps_from_the_vacant_sites_repeats_a_neighbour_listed_twice() -> None:
-    # A 2 x 3 square lattice: each site lists its one x neighbour twice.
-    lattice = square_lattice(2, 3, 1.0)
-    mask = occupation(6, [0, 1, 2, 5])
-    expected = sorted((i, f) for i in range(6) for f in lattice.neighbour_indices[i] if mask[i] and not mask[f])
-    assert expected.count((2, 3)) == 2
-    assert sorted(possible_jumps(lattice, mask)) == expected
 
 
 def test_possible_jumps_on_a_mostly_occupied_lattice() -> None:

@@ -144,14 +144,6 @@ class TestCoordinationNumber:
                         checked += 1
         assert checked > 50
 
-    def test_repeated_neighbours_match_brute_force(self) -> None:
-        # In very small periodic lattices a site can appear more than once in a neighbour list.
-        lattice = make_lattice({"a": ["b", "b"], "b": ["a", "a"]})
-        cn = {"A": {"A": {0: 0.0, 1: 0.3, 2: 0.8}}}
-        occupied = occupation(lattice, [0])
-        expected = brute_force_cn_delta_E(lattice, occupied, 0, 1, cn)
-        assert EnergyModel(lattice, cn_energies=cn).delta_E(occupied, 0, 1) == pytest.approx(expected)
-
     def test_all_three_contributions_are_summed(self) -> None:
         lattice = make_lattice(
             {"i": ["f", "s"], "f": ["i", "s", "t"], "s": ["i", "f"], "t": ["f"]}, energies={"i": 0.1, "f": 0.5}
