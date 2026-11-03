@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
@@ -109,7 +110,7 @@ class Simulation:
         Raises:
             ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
                 are no atoms, or more atoms than (selected) sites; if `selected_labels` is given
-                with `occupied_sites` or names a label not in the lattice; if `occupied_sites`
+                with `occupied_sites`, is empty, or names a label not in the lattice; if `occupied_sites`
                 has a duplicate or unknown site number; if `cn_energies` is incomplete; or if
                 `lookup_table` is True with `cn_energies`, or with sites of one label that have
                 different energies.
@@ -147,12 +148,14 @@ class Simulation:
 
         Raises:
             ValueError: If `n_atoms` is not positive or is more than the number of sites to
-                choose from, or if a label is not in the lattice.
+                choose from, or if `selected_labels` is empty or has a label not in the lattice.
         """
         if selected_labels is None:
             labels = self._lattice.site_labels
         else:
             labels = {selected_labels} if isinstance(selected_labels, str) else set(selected_labels)
+        if not labels:
+            raise ValueError("selected_labels must contain at least one site label.")
         unknown_labels = labels - self._lattice.site_labels
         if unknown_labels:
             raise ValueError(f"Unknown site labels: {sorted(unknown_labels)}.")
@@ -199,9 +202,11 @@ class Simulation:
     @property
     def lattice(self) -> Lattice:
         """
-        The simulation's own copy of the lattice.
+        The simulation's own copy of the lattice, for read-only use.
 
-        Changing it does not change the energies used by the simulation.
+        Do not change it: the energies were read when the simulation was created, and
+        changing the lattice, for example its site positions or labels, would make the
+        simulation inconsistent.
         """
         return self._lattice
 
@@ -232,18 +237,24 @@ class Simulation:
         ``run(n_jumps=700)`` gives the same results as ``run(n_jumps=1000)``.
 
         Args:
-            n_jumps: Number of jumps to make.
+            n_jumps: Number of jumps to make. Zero makes no jumps.
             for_time: Run until the time elapsed since construction or the last reset
-                reaches this value. If it has already been reached, no jumps are made.
+                reaches this value. If it has already been reached, including when it is
+                zero, no jumps are made.
 
         Raises:
-            ValueError: If not exactly one of `n_jumps` and `for_time` is given.
+            ValueError: If not exactly one of `n_jumps` and `for_time` is given, if `n_jumps`
+                is negative, or if `for_time` is negative or not finite.
             BlockedLatticeError: If no jump is possible. Jumps made before this are kept.
         """
         if n_jumps is not None and for_time is None:
+            if n_jumps < 0:
+                raise ValueError(f"n_jumps must not be negative; got {n_jumps}.")
             for _ in range(n_jumps):
                 self._step()
         elif for_time is not None and n_jumps is None:
+            if not (math.isfinite(for_time) and for_time >= 0.0):
+                raise ValueError(f"for_time must be finite and not negative; got {for_time}.")
             while self._state.time < for_time:
                 self._step()
         else:

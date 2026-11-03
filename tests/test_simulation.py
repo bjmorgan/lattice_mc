@@ -64,6 +64,11 @@ class TestConstruction:
         with pytest.raises(ValueError):
             Simulation(lattice, PARAMS, n_atoms=1, selected_labels=["A", "C"])
 
+    def test_rejects_empty_selected_labels(self):
+        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+        with pytest.raises(ValueError, match="selected_labels"):
+            Simulation(lattice, PARAMS, n_atoms=1, selected_labels=[])
+
     def test_rejects_selected_labels_with_occupied_sites(self):
         lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
         with pytest.raises(ValueError):
@@ -102,6 +107,23 @@ class TestRun:
     @pytest.fixture
     def simulation(self) -> Simulation:
         return Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=0)
+
+    def test_zero_jumps_is_a_no_op(self, simulation):
+        simulation.run(n_jumps=0)
+        assert simulation.results is None
+
+    def test_zero_time_is_a_no_op(self, simulation):
+        simulation.run(for_time=0.0)
+        assert simulation.results is None
+
+    def test_run_rejects_negative_n_jumps(self, simulation):
+        with pytest.raises(ValueError, match="n_jumps"):
+            simulation.run(n_jumps=-1)
+
+    @pytest.mark.parametrize("for_time", [-1.0, float("nan"), float("inf")])
+    def test_run_rejects_negative_or_non_finite_for_time(self, simulation, for_time):
+        with pytest.raises(ValueError, match="for_time"):
+            simulation.run(for_time=for_time)
 
     def test_results_are_none_before_any_run(self, simulation):
         assert simulation.results is None
@@ -175,6 +197,8 @@ class TestLatticeCopy:
         lattice = square_lattice(4, 4, 1.0)
         simulation = Simulation(lattice, PARAMS, n_atoms=4, seed=5)
         lattice.set_site_energies(by_site={number: 0.5 * (number % 2) for number in range(1, 17)})
+        for site in lattice.sites:
+            site.r = site.r * 0.5
         simulation.run(n_jumps=100)
         assert results_of(simulation) == results_of(reference)
 

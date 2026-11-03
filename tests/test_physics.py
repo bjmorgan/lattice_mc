@@ -25,12 +25,14 @@ def segment_results(simulation: Simulation, n_segments: int, n_jumps: int) -> li
     return results
 
 
-@pytest.mark.parametrize("lattice", [square_lattice(10, 10, 1.0), cubic_lattice(6, 6, 6, 1.0)], ids=["square", "cubic"])
-def test_single_atom_tracer_diffusion_coefficient_is_rate_times_spacing_squared(lattice):
+@pytest.mark.parametrize(
+    "build_lattice", [lambda: square_lattice(10, 10, 1.0), lambda: cubic_lattice(6, 6, 6, 1.0)], ids=["square", "cubic"]
+)
+def test_single_atom_tracer_diffusion_coefficient_is_rate_times_spacing_squared(build_lattice):
     # D* = nu a^2 for one atom, with rate_prefactor nu = 1 and spacing a = 1. Weighting each
     # segment by its time gives the summed squared displacement over the total time, without
     # the bias of averaging 1 / t over short segments.
-    simulation = Simulation(lattice, PARAMS, n_atoms=1, seed=0)
+    simulation = Simulation(build_lattice(), PARAMS, n_atoms=1, seed=0)
     results = segment_results(simulation, n_segments=1500, n_jumps=10)
     d = sum(r.tracer_diffusion_coefficient * r.time for r in results) / sum(r.time for r in results)
     assert d == pytest.approx(1.0, rel=0.1)
