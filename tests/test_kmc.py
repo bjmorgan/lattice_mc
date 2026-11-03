@@ -160,16 +160,20 @@ def test_step_never_chooses_a_jump_with_zero_probability(ring: Lattice) -> None:
 
 
 def test_step_mean_time_step_is_the_inverse_of_the_total_rate(ring: Lattice) -> None:
-    # A single atom on the ring always has two possible jumps, so the total rate is constant.
+    # A single atom on the ring always has one jump in each direction, with probabilities
+    # 0.3 and 0.9, so the total rate is constant and differs from the number of jumps.
+    def probability(occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:
+        return 0.3 if final == (initial + 1) % 4 else 0.9
+
     state = SimulationState.from_occupied(4, [0])
     rng = np.random.default_rng(2024)
     n_steps = 20000
     times = np.empty(n_steps + 1)
     times[0] = state.time
     for i in range(n_steps):
-        step(ring, state, lambda occupied, initial, final: 1.0, PARAMS, rng)
+        step(ring, state, probability, PARAMS, rng)
         times[i + 1] = state.time
-    expected = 1.0 / (PARAMS.rate_prefactor * 2)
+    expected = 1.0 / (PARAMS.rate_prefactor * (0.3 + 0.9))
     # The standard error of the mean is expected / sqrt(n_steps), about 0.7 %.
     assert np.diff(times).mean() == pytest.approx(expected, rel=0.05)
 
