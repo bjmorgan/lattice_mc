@@ -41,3 +41,13 @@ class TestSimulationParameters:
     def test_zero_rate_prefactor_raises_ValueError(self):
         with pytest.raises(ValueError):
             SimulationParameters(temperature=298.0, rate_prefactor=0.0)
+
+    @pytest.mark.parametrize("temperature", [float("nan"), float("inf")])
+    def test_non_finite_temperature_raises_ValueError(self, temperature):
+        with pytest.raises(ValueError, match="temperature must be finite and positive"):
+            SimulationParameters(temperature=temperature, rate_prefactor=1e13)
+
+    @pytest.mark.parametrize("rate_prefactor", [float("nan"), float("inf")])
+    def test_non_finite_rate_prefactor_raises_ValueError(self, rate_prefactor):
+        with pytest.raises(ValueError, match="rate_prefactor must be finite and positive"):
+            SimulationParameters(temperature=298.0, rate_prefactor=rate_prefactor)

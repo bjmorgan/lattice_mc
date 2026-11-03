@@ -296,13 +296,15 @@ class Lattice:
         Returns:
             The clusters of contiguous sites.
         """
-        if site_labels:
-            selected_sites = self.select_sites(site_labels)
+        # A single label is wrapped, because set("Li") would be {"L", "i"}.
+        labels = {site_labels} if isinstance(site_labels, str) and site_labels else set(site_labels or ())
+        if labels:
+            selected_sites = self.select_sites(labels)
         else:
             selected_sites = self.sites
         initial_clusters = [cluster.Cluster([site], self) for site in selected_sites]
-        if site_labels:
-            blocking_sites = self.site_labels - set(site_labels)
+        if labels:
+            blocking_sites = self.site_labels - labels
             for c in initial_clusters:
                 c.remove_sites_from_neighbours(blocking_sites)
         final_clusters = []

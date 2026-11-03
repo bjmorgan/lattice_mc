@@ -40,6 +40,14 @@ class TestConnectedSites:
         clusters = lattice.connected_sites("A")
         assert sorted(sorted(s.number for s in c.sites) for c in clusters) == [[1], [3]]
 
+    def test_multi_character_label_string_matches_a_list_of_that_label(self):
+        lattice = square_lattice(4, 4, 1.0)
+        for site in lattice.sites:
+            site.label = "Li"
+        by_string = lattice.connected_sites("Li")
+        assert [c.sites for c in by_string] == [c.sites for c in lattice.connected_sites(["Li"])]
+        assert len(by_string) == 1
+
 
 class TestDetachedSitesIntegration:
     """Tests for Lattice.detached_sites using real Site and Lattice objects."""
@@ -90,6 +98,12 @@ class TestDetachedSitesIntegration:
         (cluster,) = lattice.connected_sites()
         assert cluster.is_periodically_contiguous() == (True, True, False)
         assert lattice.detached_sites() == []
+
+    def test_multi_character_label_string_finds_no_detached_sites_on_a_full_lattice(self):
+        lattice = square_lattice(4, 4, 1.0)
+        for site in lattice.sites:
+            site.label = "Li"
+        assert lattice.detached_sites("Li") == []
 
     def test_dimer_on_a_square_lattice_is_detached(self):
         lattice = square_lattice(4, 4, 1.0)

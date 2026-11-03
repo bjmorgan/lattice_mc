@@ -8,8 +8,8 @@ Simulation parameters
 ---------------------
 
 :class:`~lattice_mc.simulation.SimulationParameters` holds the temperature, in K, and
-the jump rate prefactor, :math:`\nu_0`, in s\ :sup:`-1`. Both must be positive. The
-thermal energy :math:`kT`, in eV, is derived from the temperature.
+the jump rate prefactor, :math:`\nu_0`, in s\ :sup:`-1`. Both must be finite and
+positive. The thermal energy :math:`kT`, in eV, is derived from the temperature.
 
 .. testcode::
 

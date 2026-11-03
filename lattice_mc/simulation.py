@@ -25,27 +25,23 @@ class SimulationParameters:
     Immutable container for the physical parameters of a simulation.
 
     Raises:
-        ValueError: If `temperature` or `rate_prefactor` is not positive.
+        ValueError: If `temperature` or `rate_prefactor` is not finite and positive.
     """
 
     temperature: float
-    """Temperature, in K. Must be positive."""
+    """Temperature, in K. Must be finite and positive."""
 
     rate_prefactor: float
-    """Jump rate prefactor, nu_0, in s^-1. Must be positive."""
+    """Jump rate prefactor, nu_0, in s^-1. Must be finite and positive."""
 
     def __post_init__(self) -> None:
         """
-        Check that the temperature and rate prefactor are positive.
+        Check that the temperature and rate prefactor are finite and positive.
         """
-        if self.temperature <= 0:
-            raise ValueError(
-                f"temperature must be positive; got {self.temperature!r}."
-            )
-        if self.rate_prefactor <= 0:
-            raise ValueError(
-                f"rate_prefactor must be positive; got {self.rate_prefactor!r}."
-            )
+        if not (math.isfinite(self.temperature) and self.temperature > 0):
+            raise ValueError(f"temperature must be finite and positive; got {self.temperature!r}.")
+        if not (math.isfinite(self.rate_prefactor) and self.rate_prefactor > 0):
+            raise ValueError(f"rate_prefactor must be finite and positive; got {self.rate_prefactor!r}.")
 
     @property
     def kT(self) -> float:
