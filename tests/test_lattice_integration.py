@@ -37,7 +37,6 @@ class TestConnectedSites:
     def test_site_labels_restrict_the_search(self):
         lattice = lattice_with_neighbours([[1], [0, 2], [1]])
         lattice.sites[1].label = "B"
-        lattice.site_labels = {"A", "B"}
         clusters = lattice.connected_sites("A")
         assert sorted(sorted(s.number for s in c.sites) for c in clusters) == [[1], [3]]
 
@@ -82,11 +81,14 @@ class TestDetachedSitesIntegration:
         assert {s.number for s in lattice.detached_sites("A")} == {1, 2}
 
     @pytest.mark.parametrize(
-        "lattice", [square_lattice(3, 3, 1.0), honeycomb_lattice(2, 2, 1.0)], ids=["square", "honeycomb"]
+        "build_lattice",
+        [lambda: square_lattice(3, 3, 1.0), lambda: honeycomb_lattice(2, 2, 1.0)],
+        ids=["square", "honeycomb"],
     )
-    def test_fully_occupied_two_dimensional_lattice_winds_along_x_and_y(self, lattice):
+    def test_fully_occupied_two_dimensional_lattice_winds_along_x_and_y(self, build_lattice):
+        lattice = build_lattice()
         (cluster,) = lattice.connected_sites()
-        assert cluster.is_periodically_contiguous(lattice.cell_lengths) == (True, True, False)
+        assert cluster.is_periodically_contiguous() == (True, True, False)
         assert lattice.detached_sites() == []
 
     def test_dimer_on_a_square_lattice_is_detached(self):
@@ -106,7 +108,7 @@ class TestDetachedSitesIntegration:
         lattice = square_lattice(3, 3, 1.0)
         relabel(lattice, {square_site(x, y, 3) for x, y in [(0, 0), (1, 0), (1, 1), (2, 1), (2, 2), (0, 2)]})
         (cluster,) = lattice.connected_sites("A")
-        assert cluster.is_periodically_contiguous(lattice.cell_lengths) == (True, True, False)
+        assert cluster.is_periodically_contiguous() == (True, True, False)
 
 
 def square_site(x, y, a):
@@ -118,4 +120,3 @@ def relabel(lattice, a_site_numbers):
     """Label the given sites 'A' and every other site 'B'."""
     for site in lattice.sites:
         site.label = "A" if site.number in a_site_numbers else "B"
-    lattice.site_labels = {site.label for site in lattice.sites}

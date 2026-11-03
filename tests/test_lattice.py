@@ -76,6 +76,18 @@ class TestLattice:
         lattice.transmute_sites("B", "D", 1)
         assert sorted(site.label for site in lattice.sites) == ["A", "A", "B", "C", "D"]
         assert lattice.site_labels == {"A", "B", "C", "D"}
+        assert lattice.site_populations == {"A": 2, "B": 1, "C": 1, "D": 1}
+
+    def test_transmute_sites_with_the_same_seed_relabels_the_same_sites(self):
+        lattices = [make_lattice(list(range(1, 21))) for _ in range(2)]
+        for lattice in lattices:
+            lattice.transmute_sites("A", "B", 10, seed=3)
+        assert [s.label for s in lattices[0].sites] == [s.label for s in lattices[1].sites]
+
+    def test_site_labels_and_populations_follow_changes_to_site_labels(self, lattice):
+        lattice.sites[4].label = "A"
+        assert lattice.site_labels == {"A", "B"}
+        assert lattice.site_populations == {"A": 3, "B": 2}
 
     def test_select_sites(self):
         lattice = make_lattice([1, 2, 3], labels=["A", "AA", "B"])

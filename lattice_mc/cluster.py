@@ -68,7 +68,7 @@ class Cluster:
         """
         return len(self.sites)
 
-    def is_periodically_contiguous(self, cell_lengths: npt.NDArray[np.float64]) -> tuple[bool, bool, bool]:
+    def is_periodically_contiguous(self) -> tuple[bool, bool, bool]:
         """
         Check whether this cluster winds round the periodic boundaries of the simulation cell.
 
@@ -77,12 +77,9 @@ class Cluster:
         arbitrary root site, using the minimum-image convention to find the wrap count of
         each bond. The cluster is periodically contiguous along an axis if and only if a
         bond reaches an already-visited site with a different image vector on that axis
-        (a non-zero winding number).
-
-        Args:
-            cell_lengths: Cell lengths for the orthorhombic simulation cell.
-                An axis with a zero cell length (e.g. z for a two-dimensional
-                lattice) is not periodic, and is never reported as contiguous.
+        (a non-zero winding number). The cell is that of the cluster's lattice. An axis
+        with a zero cell length (e.g. z for a two-dimensional lattice) is not periodic,
+        and is never reported as contiguous.
 
         Returns:
             Contiguity along the x, y, and z axes. A cluster that winds diagonally, for
@@ -101,6 +98,7 @@ class Cluster:
         """
         if not self.sites:
             raise ValueError("Cannot check the periodic contiguity of an empty cluster.")
+        cell_lengths = self.lattice.cell_lengths
         root = next(iter(self.sites))
         images: dict[Site, npt.NDArray[np.int_]] = {root: np.zeros(3, dtype=int)}
         stack = [root]

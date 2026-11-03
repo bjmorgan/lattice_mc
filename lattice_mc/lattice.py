@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import itertools
-import random
 from collections import Counter
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
@@ -34,13 +33,21 @@ class Lattice:
         self.cell_lengths: npt.NDArray[np.float64] = cell_lengths
         self.sites: list[Site] = sites
         self.number_of_sites: int = len(self.sites)
-        self.site_labels: set[str] = set([site.label for site in self.sites])
-        self.site_populations: Counter[str] = Counter([site.label for site in self.sites])
         self.enforce_periodic_boundary_conditions()
         self._site_indices: dict[int, int] = {site.number: index for index, site in enumerate(self.sites)}
         self.neighbour_indices: tuple[tuple[int, ...], ...] = tuple(
             tuple(self._site_indices[number] for number in site.neighbours) for site in self.sites
         )
+
+    @property
+    def site_labels(self) -> set[str]:
+        """The labels of the sites, computed from the sites when read."""
+        return {site.label for site in self.sites}
+
+    @property
+    def site_populations(self) -> Counter[str]:
+        """The number of sites with each label, computed from the sites when read."""
+        return Counter(site.label for site in self.sites)
 
     @property
     def dimensionality(self) -> int:
@@ -251,7 +258,14 @@ class Lattice:
                     site_connections[initial_site.label].append(final_site.label)
         return site_connections
 
-    def transmute_sites(self, old_site_label: str | list[str], new_site_label: str, n_sites_to_change: int) -> None:
+    def transmute_sites(
+        self,
+        old_site_label: str | list[str],
+        new_site_label: str,
+        n_sites_to_change: int,
+        *,
+        seed: int | np.random.Generator | None = None,
+    ) -> None:
         """
         Selects a random subset of sites with a specific label and gives them a different label.
 
@@ -259,11 +273,17 @@ class Lattice:
             old_site_label: Site label, or labels, of the sites that can be modified.
             new_site_label: Site label to apply to the modified sites.
             n_sites_to_change: Number of sites to modify.
+            seed: Seed, or random number generator, for choosing the sites. Defaults to None,
+                for an unseeded generator.
+
+        Raises:
+            ValueError: If `n_sites_to_change` is negative or more than the number of sites
+                that can be modified.
         """
         selected_sites = self.select_sites(old_site_label)
-        for site in random.sample(selected_sites, n_sites_to_change):
-            site.label = new_site_label
-        self.site_labels = set([site.label for site in self.sites])
+        rng = np.random.default_rng(seed)
+        for index in rng.choice(len(selected_sites), size=n_sites_to_change, replace=False):
+            selected_sites[index].label = new_site_label
 
     def connected_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[cluster.Cluster]:
         """
@@ -342,5 +362,5 @@ class Lattice:
             that wind round the cell can be reported as detached.
         """
         clusters = self.connected_sites(site_labels=site_labels)
-        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous(self.cell_lengths))]
+        island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous())]
         return list(itertools.chain.from_iterable((c.sites for c in island_clusters)))
