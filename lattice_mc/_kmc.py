@@ -21,8 +21,7 @@ def possible_jumps(lattice: Lattice, occupied: npt.NDArray[np.bool_]) -> list[tu
     """
     All jumps not blocked by volume exclusion.
 
-    These are jumps from occupied sites to neighbouring vacant sites. A neighbour that is
-    listed more than once for a site gives the same jump more than once. The order of the
+    These are jumps from occupied sites to neighbouring vacant sites. The order of the
     jumps depends only on the occupation. Neighbour lists are assumed to be symmetric.
 
     Args:

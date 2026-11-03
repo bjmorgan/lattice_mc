@@ -2,11 +2,22 @@
 
 from __future__ import annotations
 
+import copy
+import math
+from collections import Counter
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
-from lattice_mc import init_lattice, lookup_table, species
+import numpy as np
+import numpy.typing as npt
+
+from lattice_mc._energies import CNEnergies, EnergyModel, metropolis
+from lattice_mc._kmc import possible_jumps, step
+from lattice_mc._lookup import LookupTable
+from lattice_mc._state import SimulationState
 from lattice_mc.constants import k_boltzmann
 from lattice_mc.lattice import Lattice
+from lattice_mc.results import Results
 
 
 @dataclass(frozen=True)
@@ -15,27 +26,23 @@ class SimulationParameters:
     Immutable container for the physical parameters of a simulation.
 
     Raises:
-        ValueError: If `temperature` or `rate_prefactor` is not positive.
+        ValueError: If `temperature` or `rate_prefactor` is not finite and positive.
     """
 
     temperature: float
-    """Temperature, in K. Must be positive."""
+    """Temperature, in K. Must be finite and positive."""
 
     rate_prefactor: float
-    """Jump rate prefactor, nu_0, in s^-1. Must be positive."""
+    """Jump rate prefactor, nu_0, in s^-1. Must be finite and positive."""
 
     def __post_init__(self) -> None:
         """
-        Check that the temperature and rate prefactor are positive.
+        Check that the temperature and rate prefactor are finite and positive.
         """
-        if self.temperature <= 0:
-            raise ValueError(
-                f"temperature must be positive; got {self.temperature!r}."
-            )
-        if self.rate_prefactor <= 0:
-            raise ValueError(
-                f"rate_prefactor must be positive; got {self.rate_prefactor!r}."
-            )
+        if not (math.isfinite(self.temperature) and self.temperature > 0):
+            raise ValueError(f"temperature must be finite and positive; got {self.temperature!r}.")
+        if not (math.isfinite(self.rate_prefactor) and self.rate_prefactor > 0):
+            raise ValueError(f"rate_prefactor must be finite and positive; got {self.rate_prefactor!r}.")
 
     @property
     def kT(self) -> float:
@@ -45,305 +52,221 @@ class SimulationParameters:
 
 class Simulation:
     """
-    A lattice-gas Monte Carlo simulation.
+    A lattice-gas kinetic Monte Carlo simulation.
+
+    The simulation takes its own copy of the lattice when it is created, and reads the site
+    energies from that copy, so later changes to the caller's lattice have no effect.
     """
 
-    def __init__(self, params: SimulationParameters) -> None:
+    def __init__(
+        self,
+        lattice: Lattice,
+        params: SimulationParameters,
+        *,
+        n_atoms: int | None = None,
+        occupied_sites: Iterable[int] | None = None,
+        selected_labels: str | Iterable[str] | None = None,
+        nn_energy: float | None = None,
+        cn_energies: CNEnergies | None = None,
+        lookup_table: bool = False,
+        seed: int | np.random.Generator | None = None,
+    ) -> None:
         """
-        Initialise a Simulation object.
+        Initialise a Simulation.
 
         Args:
-            params: Physical parameters for the simulation
-                (temperature, rate prefactor).
-        """
-        self.params: SimulationParameters = params
-        self.lattice: Lattice | None = None
-        self.number_of_atoms: int | None = None
-        self.number_of_jumps: int | None = None
-        self.for_time: float | None = None
-        self.number_of_equilibration_jumps: int = 0
-        self.atoms: species.Species | None = None
-        self.has_run: bool = False
-
-    def reset(self) -> None:
-        """
-        Reset all counters for this simulation.
-
-        Notes:
-            Reading the diffusion coefficients or correlation factors after a reset, before
-            running again, raises a ZeroDivisionError. See
-            https://github.com/bjmorgan/lattice_mc/issues/32.
-        """
-        assert self.lattice is not None
-        assert self.atoms is not None
-        self.lattice.reset()
-        for atom in self.atoms.atoms:
-            atom.reset()
-
-    def set_number_of_atoms(self, n: int, selected_sites: list[str] | None = None) -> None:
-        """
-        Set the number of atoms for the simulation, and populate the simulation lattice.
-
-        Args:
-            n: Number of atoms for this simulation.
-            selected_sites: Site labels to populate with atoms. If None, atoms are placed on
-                randomly chosen sites of any label. Defaults to None.
-        """
-        assert self.lattice is not None
-        self.number_of_atoms = n
-        self.atoms = species.Species(self.lattice.populate_sites(self.number_of_atoms, selected_sites=selected_sites))
-
-    def set_number_of_jumps(self, n: int) -> None:
-        """
-        Set the number of jumps for this simulation.
-
-        Args:
-            n: Number of jumps.
-        """
-        self.number_of_jumps = n
-
-    def set_number_of_equilibration_jumps(self, n: int) -> None:
-        """
-        Set the number of equilibration jumps for this simulation.
-
-        Args:
-            n: Number of equilibration jumps, run (and then discarded) before the jumps that are
-                analysed.
-        """
-        self.number_of_equilibration_jumps = n
-
-    def define_lattice_from_file(self, filename: str, cell_lengths: list[float]) -> None:
-        """
-        Set up the simulation lattice from a file containing site data.
-
-        Uses `init_lattice.lattice_from_sites_file`, which defines the site file spec.
-
-        Args:
-            filename: Path to the sites file.
-            cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
-                Set the z cell length to 0 for a two-dimensional lattice.
-        """
-        self.lattice = init_lattice.lattice_from_sites_file(filename, cell_lengths=cell_lengths)
-
-    def set_nn_energy(self, nn_energy: float | None) -> None:
-        """
-        Set the nearest-neighbour energy for this simulation.
-
-        Args:
+            lattice: The lattice to simulate. The simulation uses its own copy.
+            params: Physical parameters for the simulation (temperature, rate prefactor).
+            n_atoms: Number of atoms to place on randomly chosen sites. Give either this or
+                `occupied_sites`.
+            occupied_sites: Numbers of the sites to place one atom on each. Give either this
+                or `n_atoms`.
+            selected_labels: Site labels, or a single site label, to restrict the random
+                placement under `n_atoms` to. Defaults to None, for sites with any label.
             nn_energy: Interaction energy, in eV, for each pair of occupied nearest-neighbour
-                sites. A positive energy is a repulsion. If None, the lattice is left unchanged.
-        """
-        assert self.lattice is not None
-        if nn_energy is not None:
-            self.lattice.set_nn_energy(nn_energy)
-
-    def set_cn_energies(self, cn_energies: dict[str, dict[str, dict[int, float]]] | None) -> None:
-        """
-        Set the coordination-number dependent energies for this simulation.
-
-        Args:
+                sites. A positive energy is a repulsion. Defaults to None, for no interaction.
             cn_energies: Energies, in eV, for each occupied site, nested by site label, then by
                 the label of its neighbouring sites, then by the number of those neighbours that
                 are occupied. The energy of an occupied site is the sum of the energies for each
-                neighbouring label; vacant sites contribute no energy. If None, the lattice is left
-                unchanged. The dict must be complete:
-                every site label, every label of a neighbouring site, and every count from 0 to the
-                number of those neighbours, or the simulation raises a KeyError. For example, on a
-                honeycomb lattice built with ``alternating_sites=True``, every 'A' site has three
-                'B' neighbours::
+                neighbouring label; vacant sites contribute no energy. The mapping must include
+                every site label, every label of a neighbouring site, and every count from 0 to
+                the number of those neighbours. For example, on a honeycomb lattice built with
+                ``alternating_sites=True``, every 'A' site has three 'B' neighbours::
 
                     cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
                     {'A': {'B': cn}, 'B': {'A': cn}}
-        """
-        assert self.lattice is not None
-        if cn_energies is not None:
-            self.lattice.set_cn_energies(cn_energies)
 
-    def set_site_energies(self, site_energies: dict[str, float] | None) -> None:
-        """
-        Set the on-site energies for this simulation.
-
-        Args:
-            site_energies: Occupation energy, in eV, for each site label, for example
-                ``{'A': 0.0, 'B': 1.0}``. If None, the lattice is left unchanged.
+                Defaults to None, for no coordination-number dependence.
+            lookup_table: If True, precompute the jump probabilities, keyed by site label and
+                numbers of occupied neighbours, instead of calculating each as it is needed.
+                The table supports site energies and `nn_energy` only. Defaults to False.
+            seed: Seed, or random number generator, for all randomness in the simulation:
+                the initial placement of atoms and the choice and timing of jumps. A generator
+                is used directly, not copied, so it is advanced in place as the simulation runs.
+                The same integer seed gives the same results. Defaults to None, for an
+                unseeded generator.
 
         Raises:
-            ValueError: If a label in `site_energies` is not a site label in the lattice.
-        """
-        assert self.lattice is not None
-        if site_energies is not None:
-            self.lattice.set_site_energies(by_label=site_energies)
-
-    def is_initialised(self) -> None:
-        """
-        Check whether the simulation has been initialised.
-
-        Raises:
-            AttributeError: If the lattice or the atoms have not been set, or if neither a number
-                of jumps nor a run time has been set.
-        """
-        if not self.lattice:
-            raise AttributeError("Running a simulation needs the lattice to be initialised")
-        if not self.atoms:
-            raise AttributeError("Running a simulation needs the atoms to be initialised")
-        if not self.number_of_jumps and not self.for_time:
-            raise AttributeError("Running a simulation needs number_of_jumps or for_time to be set")
-
-    def run(self, for_time: float | None = None) -> None:
-        """
-        Run the simulation.
-
-        Args:
-            for_time: If given, run until the simulation time reaches this value, instead of for
-                the number of jumps set by `set_number_of_jumps`. Any equilibration jumps are run
-                first, and the time is counted from the end of equilibration. After the run,
-                `number_of_jumps` is the number of jumps made. Defaults to None.
-
-        Raises:
-            AttributeError: If the simulation has not been initialised.
-            BlockedLatticeError: If no jumps are possible on the lattice.
-        """
-        self.for_time = for_time
-        self.is_initialised()
-        assert self.lattice is not None
-        assert self.atoms is not None
-        self.lattice.params = self.params
-        if self.number_of_equilibration_jumps > 0:
-            for step in range(self.number_of_equilibration_jumps):
-                self.lattice.jump()
-            self.reset()
-        if self.for_time:
-            self.number_of_jumps = 0
-            while self.lattice.time < self.for_time:
-                self.lattice.jump()
-                self.number_of_jumps += 1
-        else:
-            assert self.number_of_jumps is not None
-            for step in range(self.number_of_jumps):
-                self.lattice.jump()
-        self.has_run = True
-
-    @property
-    def tracer_correlation(self) -> float | None:
-        """
-        Tracer correlation factor, f.
-
-        Returns:
-            The tracer correlation factor, f, or None if the simulation has not been run.
-        """
-        if self.has_run:
-            assert self.atoms is not None
-            return self.atoms.tracer_correlation()
-        else:
-            return None
-
-    @property
-    def tracer_diffusion_coefficient(self) -> float | None:
-        """
-        Tracer diffusion coefficient, D*.
-
-        Calculated from the Einstein relation, <r^2> = 2 d D* t, where <r^2> is
-        the mean squared displacement over all atoms and d is the dimensionality
-        of the lattice.
-
-        Returns:
-            The tracer diffusion coefficient, D*, or None if the simulation has not been run.
-        """
-        if self.has_run:
-            assert self.atoms is not None
-            assert self.lattice is not None
-            assert self.number_of_atoms is not None
-            return self.atoms.sum_dr_squared() / (
-                2.0 * self.lattice.dimensionality * float(self.number_of_atoms) * self.lattice.time
-            )
-        else:
-            return None
-
-    @property
-    def collective_correlation(self) -> float | None:
-        """
-        Collective correlation factor, f_I.
-
-        Returns:
-            The collective correlation factor, f_I, or None if the simulation has not been run.
-        """
-        if self.has_run:
-            assert self.atoms is not None
-            return self.atoms.collective_correlation()
-        else:
-            return None
-
-    @property
-    def collective_diffusion_coefficient(self) -> float | None:
-        """
-        Collective, or "jump", diffusion coefficient, D_J.
-
-        Calculated from the Einstein relation, <R^2> = 2 d D_J t, where
-        R = sum_i dr_i is the summed displacement of all atoms (not the centre of
-        mass displacement) and d is the dimensionality of the lattice. No 1/N
-        normalisation is applied; see `collective_diffusion_coefficient_per_atom`.
-
-        Returns:
-            The collective diffusion coefficient, D_J, or None if the simulation has not been run.
-        """
-        if self.has_run:
-            assert self.atoms is not None
-            assert self.lattice is not None
-            return self.atoms.collective_dr_squared() / (2.0 * self.lattice.dimensionality * self.lattice.time)
-        else:
-            return None
-
-    @property
-    def collective_diffusion_coefficient_per_atom(self) -> float | None:
-        """
-        Collective diffusion coefficient per atom, D_J / n_atoms.
-
-        Returns:
-            The collective diffusion coefficient per atom, or None if the simulation has not been run.
-        """
-        if self.has_run:
-            assert self.number_of_atoms is not None
-            assert self.collective_diffusion_coefficient is not None
-            return self.collective_diffusion_coefficient / float(self.number_of_atoms)
-        else:
-            return None
-
-    @property
-    def average_site_occupations(self) -> dict[str, float] | None:
-        """
-        Average site occupation numbers.
-
-        Returns:
-            Average site occupation numbers for each site label, for example
-            ``{'A': 12.4, 'B': 231.2}``, or None if no simulation time has elapsed.
-        """
-        assert self.lattice is not None
-        return self.lattice.site_occupation_statistics()
-
-    def setup_lookup_table(self, hamiltonian: str = "nearest-neighbour") -> None:
-        """
-        Create a look-up table of jump probabilities, to speed up the simulation.
-
-        Without a table, the probability of each jump is calculated as it is needed. The table
-        includes the site energies, whether read from a sites file or set with
-        `set_site_energies`, and the nearest-neighbour energy, as they are when the table is
-        created, so set those first. It supports nearest-neighbour interactions only, so do not
-        use a table with coordination-number energies.
-
-        Args:
-            hamiltonian: The model Hamiltonian. The only supported value is 'nearest-neighbour'.
-                Defaults to 'nearest-neighbour'.
-
-        Raises:
-            ValueError: If `hamiltonian` is not supported, or if sites with the same label have
+            ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
+                are no atoms, or more atoms than (selected) sites; if `selected_labels` is given
+                with `occupied_sites`, is empty, or names a label not in the lattice; if `occupied_sites`
+                has a duplicate or unknown site number; if a site energy, `nn_energy` or an
+                energy in `cn_energies` is not finite; if `cn_energies` is incomplete; or if
+                `lookup_table` is True with `cn_energies`, or with sites of one label that have
                 different energies.
         """
-        expected_hamiltonian_values = ["nearest-neighbour"]
-        if hamiltonian not in expected_hamiltonian_values:
-            raise ValueError(
-                f"Unsupported hamiltonian {hamiltonian!r}. "
-                f"Expected one of {expected_hamiltonian_values!r}."
-            )
-        assert self.lattice is not None
-        self.lattice.params = self.params
-        self.lattice.jump_lookup_table = lookup_table.LookupTable(self.lattice, hamiltonian)
+        self._lattice: Lattice = copy.deepcopy(lattice)
+        self._params: SimulationParameters = params
+        self._kT: float = params.kT
+        self._rng: np.random.Generator = np.random.default_rng(seed)
+        self._energy_model: EnergyModel = EnergyModel(self._lattice, nn_energy=nn_energy, cn_energies=cn_energies)
+        self._probability: Callable[[npt.NDArray[np.bool_], int, int], float] = (
+            LookupTable(self._energy_model, self._kT).relative_probability
+            if lookup_table
+            else self._metropolis_probability
+        )
+        if n_atoms is not None and occupied_sites is None:
+            occupied = self._random_sites(n_atoms, selected_labels)
+        elif occupied_sites is not None and n_atoms is None:
+            if selected_labels is not None:
+                raise ValueError("selected_labels can only be given with n_atoms.")
+            occupied = self._site_indices(occupied_sites)
+        else:
+            raise ValueError("Give exactly one of n_atoms and occupied_sites.")
+        self._state: SimulationState = SimulationState.from_occupied(self._lattice.number_of_sites, occupied)
+
+    def _random_sites(self, n_atoms: int, selected_labels: str | Iterable[str] | None) -> list[int]:
+        """
+        Choose distinct sites at random for the atoms.
+
+        Args:
+            n_atoms: The number of atoms.
+            selected_labels: Site labels, or a single site label, to choose from, or None for
+                any label.
+
+        Returns:
+            The indices of the chosen sites.
+
+        Raises:
+            ValueError: If `n_atoms` is not positive or is more than the number of sites to
+                choose from, or if `selected_labels` is empty or has a label not in the lattice.
+        """
+        if selected_labels is None:
+            labels = self._lattice.site_labels
+        else:
+            labels = {selected_labels} if isinstance(selected_labels, str) else set(selected_labels)
+        if not labels:
+            raise ValueError("selected_labels must contain at least one site label.")
+        unknown_labels = labels - self._lattice.site_labels
+        if unknown_labels:
+            raise ValueError(f"Unknown site labels: {sorted(unknown_labels)}.")
+        candidates = [index for index, site in enumerate(self._lattice.sites) if site.label in labels]
+        if not 0 < n_atoms <= len(candidates):
+            raise ValueError(f"n_atoms must be between 1 and {len(candidates)}; got {n_atoms}.")
+        return [int(index) for index in self._rng.choice(candidates, size=n_atoms, replace=False)]
+
+    def _site_indices(self, site_numbers: Iterable[int]) -> list[int]:
+        """
+        The indices of the sites with the given numbers.
+
+        Args:
+            site_numbers: The site numbers.
+
+        Returns:
+            The index of each site.
+
+        Raises:
+            ValueError: If there are no site numbers, a site number is repeated, or a site
+                number is not in the lattice.
+        """
+        numbers = list(site_numbers)
+        if not numbers:
+            raise ValueError("occupied_sites must contain at least one site number.")
+        repeated = sorted(number for number, count in Counter(numbers).items() if count > 1)
+        if repeated:
+            raise ValueError(f"occupied_sites lists site numbers more than once: {repeated}.")
+        try:
+            return [self._lattice.site_index(number) for number in numbers]
+        except KeyError as error:
+            raise ValueError(f"Unknown site number: {error.args[0]}.") from None
+
+    def _metropolis_probability(self, occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:
+        """
+        The relative probability of a jump, calculated from the energy model.
+
+        Args:
+            occupied: Whether each site is occupied, before the jump.
+            initial: Index of the site the atom jumps from.
+            final: Index of the site the atom jumps to.
+
+        Returns:
+            The Metropolis relative probability of the jump.
+        """
+        return metropolis(self._energy_model.delta_E(occupied, initial, final), self._kT)
+
+    @property
+    def lattice(self) -> Lattice:
+        """
+        A copy of the simulation's lattice.
+
+        Each access returns a new copy, so changes to it have no effect on the simulation.
+        """
+        return copy.deepcopy(self._lattice)
+
+    @property
+    def occupied_sites(self) -> tuple[int, ...]:
+        """The numbers of the occupied sites, in the order of `Lattice.sites`."""
+        return tuple(int(self._lattice.sites[index].number) for index in np.flatnonzero(self._state.occupied))
+
+    @property
+    def results(self) -> Results | None:
+        """The results accumulated since construction or the last reset, or None if no jump has been made."""
+        return Results.from_state(self._state, self._lattice)
+
+    def is_blocked(self) -> bool:
+        """
+        Check whether no jump is possible.
+
+        Returns:
+            True if no occupied site has a vacant neighbour, otherwise False.
+        """
+        return not possible_jumps(self._lattice, self._state.occupied)
+
+    def run(self, *, n_jumps: int | None = None, for_time: float | None = None) -> None:
+        """
+        Advance the simulation.
+
+        Results accumulate across runs, so with the same integer seed ``run(n_jumps=300)`` then
+        ``run(n_jumps=700)`` gives the same results as ``run(n_jumps=1000)``.
+
+        Args:
+            n_jumps: Number of jumps to make. Zero makes no jumps.
+            for_time: Run until the time elapsed since construction or the last reset
+                reaches this value. If it has already been reached, including when it is
+                zero, no jumps are made.
+
+        Raises:
+            ValueError: If not exactly one of `n_jumps` and `for_time` is given, if `n_jumps`
+                is negative, or if `for_time` is negative or not finite.
+            BlockedLatticeError: If no jump is possible. Jumps made before this are kept.
+        """
+        if n_jumps is not None and for_time is None:
+            if n_jumps < 0:
+                raise ValueError(f"n_jumps must not be negative; got {n_jumps}.")
+            for _ in range(n_jumps):
+                self._step()
+        elif for_time is not None and n_jumps is None:
+            if not (math.isfinite(for_time) and for_time >= 0.0):
+                raise ValueError(f"for_time must be finite and not negative; got {for_time}.")
+            while self._state.time < for_time:
+                self._step()
+        else:
+            raise ValueError("Give exactly one of n_jumps and for_time.")
+
+    def _step(self) -> None:
+        """Make one jump."""
+        step(self._lattice, self._state, self._probability, self._params, self._rng)
+
+    def reset(self) -> None:
+        """Zero the elapsed time, displacements and other accumulated counters, leaving the atoms where they are."""
+        self._state.reset()

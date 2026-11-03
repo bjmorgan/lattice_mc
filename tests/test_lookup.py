@@ -41,10 +41,16 @@ def star_lattice() -> Lattice:
     return Lattice(sites, np.array([10.0, 10.0, 10.0]))
 
 
+def alternating_honeycomb() -> Lattice:
+    """A honeycomb lattice with 'A' and 'B' sites of different energies."""
+    lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+    lattice.set_site_energies(by_label={"A": 0.05, "B": -0.03})
+    return lattice
+
+
 class TestRelativeProbability:
     def test_matches_the_energy_model_for_every_jump_in_random_configurations(self) -> None:
-        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
-        lattice.set_site_energies(by_label={"A": 0.05, "B": -0.03})
+        lattice = alternating_honeycomb()
         model = EnergyModel(lattice, nn_energy=0.04)
         table = LookupTable(model, KT)
         rng = np.random.default_rng(0)

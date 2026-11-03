@@ -9,6 +9,7 @@ import numpy as np
 import numpy.typing as npt
 
 if TYPE_CHECKING:
+    from lattice_mc.lattice import Lattice
     from lattice_mc.lattice_site import Site
 
 
@@ -17,18 +18,19 @@ class Cluster:
     Clusters are sets of sites.
     """
 
-    def __init__(self, sites: Iterable[Site]) -> None:
+    def __init__(self, sites: Iterable[Site], lattice: Lattice) -> None:
         """
         Initialise a Cluster instance.
 
         Args:
             sites: The sites that make up the cluster.
+            lattice: The lattice the sites belong to, which defines their neighbours.
         """
         self.sites: set[Site] = set(sites)
+        self.lattice: Lattice = lattice
         self.neighbours: set[Site] = set()
         for s in self.sites:
-            assert s.p_neighbours is not None
-            self.neighbours.update(s.p_neighbours)
+            self.neighbours.update(lattice.neighbours_of(s))
         self.neighbours = self.neighbours.difference(self.sites)
 
     def merge(self, other_cluster: Cluster) -> Cluster:
@@ -41,7 +43,7 @@ class Cluster:
         Returns:
             The combination of both clusters.
         """
-        new_cluster = Cluster(self.sites | other_cluster.sites)
+        new_cluster = Cluster(self.sites | other_cluster.sites, self.lattice)
         new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
         return new_cluster
 
@@ -66,7 +68,7 @@ class Cluster:
         """
         return len(self.sites)
 
-    def is_periodically_contiguous(self, cell_lengths: npt.NDArray[np.float64]) -> tuple[bool, bool, bool]:
+    def is_periodically_contiguous(self) -> tuple[bool, bool, bool]:
         """
         Check whether this cluster winds round the periodic boundaries of the simulation cell.
 
@@ -75,12 +77,9 @@ class Cluster:
         arbitrary root site, using the minimum-image convention to find the wrap count of
         each bond. The cluster is periodically contiguous along an axis if and only if a
         bond reaches an already-visited site with a different image vector on that axis
-        (a non-zero winding number).
-
-        Args:
-            cell_lengths: Cell lengths for the orthorhombic simulation cell.
-                An axis with a zero cell length (e.g. z for a two-dimensional
-                lattice) is not periodic, and is never reported as contiguous.
+        (a non-zero winding number). The cell is that of the cluster's lattice. An axis
+        with a zero cell length (e.g. z for a two-dimensional lattice) is not periodic,
+        and is never reported as contiguous.
 
         Returns:
             Contiguity along the x, y, and z axes. A cluster that winds diagonally, for
@@ -99,14 +98,14 @@ class Cluster:
         """
         if not self.sites:
             raise ValueError("Cannot check the periodic contiguity of an empty cluster.")
+        cell_lengths = self.lattice.cell_lengths
         root = next(iter(self.sites))
         images: dict[Site, npt.NDArray[np.int_]] = {root: np.zeros(3, dtype=int)}
         stack = [root]
         winds = np.zeros(3, dtype=bool)
         while stack:
             site = stack.pop()
-            assert site.p_neighbours is not None
-            for neighbour in site.p_neighbours:
+            for neighbour in self.lattice.neighbours_of(site):
                 if neighbour not in self.sites:
                     continue
                 bond_wrap = np.round(

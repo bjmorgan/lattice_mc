@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from math import sqrt
+from math import isfinite, sqrt
 
 import numpy as np
 import numpy.typing as npt
@@ -17,16 +17,20 @@ def square_lattice(a: int, b: int, spacing: float) -> lattice.Lattice:
     Generate a square lattice.
 
     Args:
-        a: Number of lattice repeat units along x.
-        b: Number of lattice repeat units along y.
+        a: Number of lattice repeat units along x. At least 3.
+        b: Number of lattice repeat units along y. At least 3.
         spacing: Distance between lattice sites.
 
     Returns:
         The new lattice.
 
+    Raises:
+        ValueError: If `a` or `b` is less than 3.
+
     Notes:
         The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
     """
+    _check_repeat_units({"a": a, "b": b}, minimum=3)
     grid = np.array(list(range(1, a * b + 1))).reshape(a, b, order="F")
     it = np.nditer(grid, flags=["multi_index"])
     sites: list[lattice_site.Site] = []
@@ -49,8 +53,8 @@ def honeycomb_lattice(a: int, b: int, spacing: float, alternating_sites: bool = 
     Generate a honeycomb lattice.
 
     Args:
-        a: Number of lattice repeat units along x.
-        b: Number of lattice repeat units along y.
+        a: Number of lattice repeat units along x. At least 2.
+        b: Number of lattice repeat units along y. At least 1.
         spacing: Distance between lattice sites.
         alternating_sites: If True, label alternating sites 'A' and 'B', so that every 'A' site
             has only 'B' neighbours. Otherwise every site is labelled 'L'. Defaults to False.
@@ -58,9 +62,14 @@ def honeycomb_lattice(a: int, b: int, spacing: float, alternating_sites: bool = 
     Returns:
         The new lattice.
 
+    Raises:
+        ValueError: If `a` is less than 2 or `b` is less than 1.
+
     Notes:
         The returned lattice is two-dimensional: all sites lie in the xy plane and the z cell length is 0.
     """
+    _check_repeat_units({"a": a}, minimum=2)
+    _check_repeat_units({"b": b}, minimum=1)
     if alternating_sites:
         site_labels = ["A", "B", "A", "B"]
     else:
@@ -95,14 +104,18 @@ def cubic_lattice(a: int, b: int, c: int, spacing: float) -> lattice.Lattice:
     Generate a cubic lattice.
 
     Args:
-        a: Number of lattice repeat units along x.
-        b: Number of lattice repeat units along y.
-        c: Number of lattice repeat units along z.
+        a: Number of lattice repeat units along x. At least 3.
+        b: Number of lattice repeat units along y. At least 3.
+        c: Number of lattice repeat units along z. At least 3.
         spacing: Distance between lattice sites.
 
     Returns:
         The new lattice.
+
+    Raises:
+        ValueError: If `a`, `b` or `c` is less than 3.
     """
+    _check_repeat_units({"a": a, "b": b, "c": c}, minimum=3)
     grid = np.array(list(range(1, a * b * c + 1))).reshape(a, b, c, order="F")
     it = np.nditer(grid, flags=["multi_index"])
     sites: list[lattice_site.Site] = []
@@ -122,6 +135,25 @@ def cubic_lattice(a: int, b: int, c: int, spacing: float) -> lattice.Lattice:
     return lattice.Lattice(sites, cell_lengths=np.array([a, b, c]) * spacing)
 
 
+def _check_repeat_units(repeat_units: dict[str, int], minimum: int) -> None:
+    """
+    Check that a builder has enough repeat units along each axis.
+
+    With fewer, the lattice would be empty, or a site would list itself, or the same
+    neighbour twice, as a neighbour.
+
+    Args:
+        repeat_units: The number of repeat units, keyed by argument name.
+        minimum: The smallest number of repeat units allowed.
+
+    Raises:
+        ValueError: If any number of repeat units is less than `minimum`.
+    """
+    for name, value in repeat_units.items():
+        if value < minimum:
+            raise ValueError(f"{name} must be at least {minimum}; got {value}.")
+
+
 def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattice.Lattice:
     """
     Generate a lattice from a sites file.
@@ -137,9 +169,9 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Raises:
         ValueError: If the file is malformed or inconsistent: the site count does
             not match the number of site blocks, a key is unknown, repeated or
-            missing, a site number is repeated, a site lists itself or the same
-            neighbour twice, a neighbour does not exist, or two sites do not list
-            each other as neighbours.
+            missing, an energy is not finite, a site number is repeated, a site lists
+            itself or the same neighbour twice, a neighbour does not exist, or two
+            sites do not list each other as neighbours.
 
     Notes:
         The file starts with the number of sites, followed by one block per site.
@@ -221,7 +253,8 @@ def _parse_site_block(block: str, index: int) -> _SiteRecord:
         The parsed site.
 
     Raises:
-        ValueError: If a line is malformed, a key is unknown or repeated, or a required key is missing.
+        ValueError: If a line is malformed, a key is unknown or repeated, a required key is missing,
+            or the energy is not finite.
     """
     fields: dict[str, str] = {}
     for line in block.splitlines():
@@ -247,6 +280,8 @@ def _parse_site_block(block: str, index: int) -> _SiteRecord:
         energy = float(fields.get("energy", "0.0"))
     except ValueError as error:
         raise ValueError(f"Could not read the block for {name}: {error}") from None
+    if not isfinite(energy):
+        raise ValueError(f"The energy of {name} must be finite; got {energy!r}.")
     if centre.shape != (3,):
         raise ValueError(f"The centre of {name} must have three coordinates.")
     if len(fields["label"].split()) != 1:
@@ -262,18 +297,13 @@ def _check_site_records(records: list[_SiteRecord]) -> None:
         records: The parsed site records.
 
     Raises:
-        ValueError: If a site number is repeated, a site lists itself or the same
-            neighbour twice, a neighbour does not exist, or a neighbour pair is one-way.
+        ValueError: If a site number is repeated, a neighbour does not exist, or a
+            neighbour pair is one-way.
     """
     neighbours: dict[int, set[int]] = {}
     for record in records:
         if record.number in neighbours:
             raise ValueError(f"The file defines site {record.number} more than once.")
-        if record.number in record.neighbours:
-            raise ValueError(f"Site {record.number} lists itself as a neighbour.")
-        for other in record.neighbours:
-            if record.neighbours.count(other) > 1:
-                raise ValueError(f"Site {record.number} lists site {other} more than once as a neighbour.")
         neighbours[record.number] = set(record.neighbours)
     for number, site_neighbours in neighbours.items():
         for other in sorted(site_neighbours):

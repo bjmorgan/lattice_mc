@@ -1,9 +1,11 @@
 API reference
 =============
 
-:class:`~lattice_mc.simulation.Simulation` and
-:class:`~lattice_mc.simulation.SimulationParameters` can also be imported from the
-top-level package, as ``lattice_mc.Simulation`` and ``lattice_mc.SimulationParameters``.
+:class:`~lattice_mc.simulation.Simulation`, :class:`~lattice_mc.simulation.SimulationParameters`,
+:class:`~lattice_mc.results.Results`, :class:`~lattice_mc.lattice.Lattice`,
+:class:`~lattice_mc.lattice_site.Site`, :class:`~lattice_mc.error.BlockedLatticeError` and the
+lattice builders in :mod:`lattice_mc.init_lattice` can also be imported from the top-level
+package, for example as ``lattice_mc.Simulation`` and ``lattice_mc.square_lattice``.
 
 lattice_mc.simulation
 ---------------------
@@ -11,6 +13,13 @@ lattice_mc.simulation
 .. automodule:: lattice_mc.simulation
     :members:
     :undoc-members:
+    :show-inheritance:
+
+lattice_mc.results
+------------------
+
+.. automodule:: lattice_mc.results
+    :members:
     :show-inheritance:
 
 lattice_mc.init_lattice
@@ -37,14 +46,6 @@ lattice_mc.error
     :undoc-members:
     :show-inheritance:
 
-lattice_mc.atom
----------------
-
-.. automodule:: lattice_mc.atom
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 lattice_mc.cluster
 ------------------
 
@@ -53,42 +54,10 @@ lattice_mc.cluster
     :undoc-members:
     :show-inheritance:
 
-lattice_mc.jump
----------------
-
-.. automodule:: lattice_mc.jump
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 lattice_mc.lattice_site
 -----------------------
 
 .. automodule:: lattice_mc.lattice_site
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-lattice_mc.lookup_table
------------------------
-
-.. automodule:: lattice_mc.lookup_table
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-lattice_mc.species
-------------------
-
-.. automodule:: lattice_mc.species
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-lattice_mc.transitions
-----------------------
-
-.. automodule:: lattice_mc.transitions
     :members:
     :undoc-members:
     :show-inheritance:
