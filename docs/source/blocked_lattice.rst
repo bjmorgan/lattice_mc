@@ -1,38 +1,41 @@
 Blocked lattices
 ================
 
-It is possible to construct a simulation lattice where there are no possible jumps;
-such a lattice is classified as "blocked". For example, a lattice where every site is
+It is possible to construct a simulation where there are no possible jumps; such a
+simulation is classified as "blocked". For example, a simulation where every site is
 occupied is blocked.
 
-If a simulation with a blocked lattice is run, a
-:class:`~lattice_mc.error.BlockedLatticeError` exception is raised:
+:meth:`Simulation.is_blocked <lattice_mc.simulation.Simulation.is_blocked>` checks
+for this before running. It returns ``True`` if no occupied site has a vacant
+neighbour:
 
 .. testcode::
 
-    import lattice_mc
-    from lattice_mc import init_lattice
+    import lattice_mc as lmc
 
-    params = lattice_mc.SimulationParameters(temperature=298.0, rate_prefactor=1e13)
-    simulation = lattice_mc.Simulation(params)
-    simulation.lattice = init_lattice.square_lattice(4, 4, 1.0)
-    simulation.set_number_of_atoms(16)
-    simulation.set_number_of_jumps(10)
-    simulation.run()
+    params = lmc.SimulationParameters(temperature=298.0, rate_prefactor=1e13)
+    lattice = lmc.square_lattice(4, 4, 1.0)
+    simulation = lmc.Simulation(lattice, params, n_atoms=16)
+    print(simulation.is_blocked())
+
+.. testoutput::
+
+    True
+
+If a blocked simulation is run, a :class:`~lattice_mc.error.BlockedLatticeError`
+exception is raised:
+
+.. testcode::
+
+    simulation.run(n_jumps=10)
 
 .. testoutput::
 
     Traceback (most recent call last):
       ...
-    lattice_mc.error.BlockedLatticeError: No moves are possible in this lattice
+    lattice_mc.error.BlockedLatticeError: No jumps are possible.
 
-To test for this, a :class:`~lattice_mc.lattice.Lattice` object can be queried using
-the :meth:`~lattice_mc.lattice.Lattice.is_blocked` method:
-
-.. testcode::
-
-    print(simulation.lattice.is_blocked())
-
-.. testoutput::
-
-    True
+:meth:`~lattice_mc.simulation.Simulation.run` also raises
+:class:`~lattice_mc.error.BlockedLatticeError` if every possible jump has a
+probability of zero, which ``is_blocked`` does not check. Jumps made in a run before
+the error is raised are kept.

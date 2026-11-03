@@ -32,6 +32,26 @@ cd lattice_mc
 pip install -e ".[dev]"
 ```
 
+## Usage
+
+```python
+import lattice_mc as lmc
+
+lattice = lmc.cubic_lattice(4, 4, 4, spacing=1.0)
+simulation = lmc.Simulation(
+    lattice,
+    params=lmc.SimulationParameters(temperature=298.0, rate_prefactor=1e13),
+    n_atoms=32,
+    nn_energy=0.1,
+    lookup_table=True,
+    seed=42,
+)
+simulation.run(n_jumps=1_000)  # equilibration
+simulation.reset()
+simulation.run(n_jumps=10_000)
+print(simulation.results.tracer_diffusion_coefficient)
+```
+
 ## Documentation
 
 Documentation, including a user guide and API reference, is at [lattice-mc.readthedocs.io](https://lattice-mc.readthedocs.io/).

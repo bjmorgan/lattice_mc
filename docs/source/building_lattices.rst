@@ -9,16 +9,20 @@ built programmatically, and lattices of any geometry can be read from a sites fi
 Simple lattices
 ---------------
 
-The functions in :mod:`lattice_mc.init_lattice` build square, honeycomb and cubic
-lattices from a number of repeat units along each axis and a site spacing.
+:func:`~lattice_mc.init_lattice.square_lattice`,
+:func:`~lattice_mc.init_lattice.honeycomb_lattice` and
+:func:`~lattice_mc.init_lattice.cubic_lattice` build square, honeycomb and cubic
+lattices from a number of repeat units along each axis and a site spacing. They are
+defined in :mod:`lattice_mc.init_lattice`, and can be imported from the top-level
+package.
 
 A square lattice of 4 x 4 sites:
 
 .. testcode::
 
-    from lattice_mc import init_lattice
+    import lattice_mc as lmc
 
-    lattice = init_lattice.square_lattice(4, 4, 1.0)
+    lattice = lmc.square_lattice(4, 4, 1.0)
     print(lattice.number_of_sites, lattice.dimensionality, sorted(lattice.site_labels))
 
 .. testoutput::
@@ -29,7 +33,7 @@ A cubic lattice of 3 x 3 x 3 sites:
 
 .. testcode::
 
-    lattice = init_lattice.cubic_lattice(3, 3, 3, 1.0)
+    lattice = lmc.cubic_lattice(3, 3, 3, 1.0)
     print(lattice.number_of_sites, lattice.dimensionality)
 
 .. testoutput::
@@ -44,11 +48,11 @@ Each repeat unit of a honeycomb lattice contains 4 sites. Every site in these
 lattices is labelled ``'L'``. A honeycomb lattice can instead
 have alternating ``'A'`` and ``'B'`` sites, so that every ``'A'`` site has only
 ``'B'`` neighbours. This is useful for giving the two sublattices different energies
-(see :doc:`interaction_models`).
+(see `Site energies`_).
 
 .. testcode::
 
-    lattice = init_lattice.honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+    lattice = lmc.honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
     print(lattice.number_of_sites, lattice.dimensionality, sorted(lattice.site_labels))
 
 .. testoutput::
@@ -103,7 +107,7 @@ location of your own sites file:
 
 .. testcode::
 
-    lattice = init_lattice.lattice_from_sites_file(
+    lattice = lmc.lattice_from_sites_file(
         str(DATA_DIR / "four_site_ring.dat"), cell_lengths=[4.0, 4.0, 0.0]
     )
     print(lattice.number_of_sites, lattice.dimensionality, sorted(lattice.site_labels))
@@ -112,11 +116,36 @@ location of your own sites file:
 
     4 2 ['A', 'B']
 
-:meth:`Simulation.define_lattice_from_file
-<lattice_mc.simulation.Simulation.define_lattice_from_file>` does the same, and
-assigns the lattice to a simulation.
-
 A full real-world example, the lithium sublattice of the garnet LLZO studied in
 [Morgan2017]_, is `llzo_lattice_site_list.dat
 <https://github.com/bjmorgan/lattice_mc/blob/main/examples/llzo_lattice_site_list.dat>`_
 in the ``examples`` directory of the repository.
+
+Site energies
+-------------
+
+:meth:`~lattice_mc.lattice.Lattice.set_site_energies` sets the occupation energies,
+in eV, of the sites in a lattice. ``by_label`` gives an energy to every site with each
+label, and ``by_site`` gives energies to individual sites, keyed by site number.
+Energies given by label are applied first, so an energy given by site number
+overrides the energy for that site's label. Both arguments are keyword-only. An
+unknown label or site number raises a ``ValueError``, and leaves the lattice
+unchanged.
+
+.. testcode::
+
+    lattice = lmc.honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+    lattice.set_site_energies(by_label={"A": 0.0, "B": 0.1}, by_site={1: 0.2})
+    for number in (1, 2, 3):
+        site = lattice.site_with_id(number)
+        print(site.number, site.label, site.energy)
+
+.. testoutput::
+
+    1 A 0.2
+    2 B 0.1
+    3 A 0.0
+
+``set_site_energies`` overwrites any energies read from a sites file for the labels
+and sites it is given. A :class:`~lattice_mc.simulation.Simulation` reads the site
+energies when it is created, so set them before creating the simulation.

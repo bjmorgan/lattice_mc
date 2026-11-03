@@ -10,30 +10,40 @@ Capabilities
   lattices of any geometry read from a sites file.
 - **Interaction models:** volume exclusion, nearest-neighbour interactions,
   coordination-number dependent energies, and site energies, in any combination.
-- **Results:** tracer and collective diffusion coefficients, tracer and collective
-  correlation factors, and average site occupations.
-- **Runs** of a set number of jumps or a set simulation time, with optional
-  equilibration jumps.
+- **Results:** tracer and collective diffusion coefficients, the reduced ionic
+  conductivity, tracer and collective correlation factors, and average site
+  occupations.
+- **Runs** of a set number of jumps or a set simulation time, continued across
+  calls, with counters that can be reset, and a seed for reproducible runs.
 
 Quickstart
 ----------
 
-A simulation of 50 atoms on a 10 x 10 square lattice:
+A simulation of 32 atoms on a 4 x 4 x 4 cubic lattice, with nearest-neighbour
+repulsion:
 
 .. testcode::
 
-    import lattice_mc
-    from lattice_mc import init_lattice
+    import lattice_mc as lmc
 
-    params = lattice_mc.SimulationParameters(temperature=298.0, rate_prefactor=1e13)
-    simulation = lattice_mc.Simulation(params)
-    simulation.lattice = init_lattice.square_lattice(10, 10, 1.0)
-    simulation.set_number_of_atoms(50)
-    simulation.set_number_of_jumps(1000)
-    simulation.run()
+    lattice = lmc.cubic_lattice(4, 4, 4, spacing=1.0)
+    lattice.set_site_energies(by_label={"L": 0.0})
 
-    print(f"D* = {simulation.tracer_diffusion_coefficient:.3e}")
-    print(f"f  = {simulation.tracer_correlation:.3f}")
+    simulation = lmc.Simulation(
+        lattice,
+        params=lmc.SimulationParameters(temperature=298.0, rate_prefactor=1e13),
+        n_atoms=32,
+        nn_energy=0.1,
+        lookup_table=True,
+        seed=42,
+    )
+    simulation.run(n_jumps=1_000)  # equilibration
+    simulation.reset()
+    simulation.run(n_jumps=10_000)
+    results = simulation.results
+
+    print(f"D* = {results.tracer_diffusion_coefficient:.3e}")
+    print(f"f  = {results.tracer_correlation:.3f}")
 
 .. testoutput::
 
@@ -48,4 +58,5 @@ A simulation of 50 atoms on a 10 x 10 square lattice:
    running_simulations
    interaction_models
    blocked_lattice
+   migrating
    api
