@@ -80,6 +80,16 @@ class EnergyModel:
             self._check_cn_energies(copied)
             self._cn_energies = copied
 
+    @property
+    def nn_energy(self) -> float | None:
+        """Interaction energy, in eV, for each pair of occupied nearest-neighbour sites, or None for no interaction."""
+        return self._nn_energy
+
+    @property
+    def has_cn_energies(self) -> bool:
+        """Whether the model includes coordination-number dependent energies."""
+        return self._cn_energies is not None
+
     def _check_cn_energies(self, cn_energies: CNEnergies) -> None:
         """
         Check that `cn_energies` covers every site label, neighbour label and occupied count.

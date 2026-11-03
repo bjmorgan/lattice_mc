@@ -228,3 +228,22 @@ class TestCoordinationNumberValidation:
 
     def test_lattice_without_cn_energies_needs_no_checking(self) -> None:
         EnergyModel(self.lattice(), nn_energy=0.2)
+
+
+class TestReadOnlyProperties:
+    def test_nn_energy_is_none_by_default(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        assert EnergyModel(lattice).nn_energy is None
+
+    def test_nn_energy_is_the_value_given(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        assert EnergyModel(lattice, nn_energy=0.7).nn_energy == 0.7
+
+    def test_has_cn_energies_is_false_by_default(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        assert not EnergyModel(lattice).has_cn_energies
+
+    def test_has_cn_energies_is_true_when_cn_energies_are_given(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        cn = {"A": {"A": {0: 0.0, 1: 0.1}}}
+        assert EnergyModel(lattice, cn_energies=cn).has_cn_energies
