@@ -152,11 +152,11 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
             energy: <site occupation energy>
 
         Site numbers are arbitrary integers. The energy line is optional, and
-        defaults to 0.0; sites with the same label can have different energies. Lines
-        within a block can be in any order. Both
-        centre/center and neighbours/neighbors are accepted, and legacy vertices
-        lines are ignored. A full example is
-        ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
+        defaults to 0.0; sites with the same label can have different energies.
+        Lines within a block can be in any order. Both centre/center and
+        neighbours/neighbors are accepted, and legacy vertices lines are ignored.
+        A full example is ``examples/llzo_lattice_site_list.dat`` in the
+        lattice_mc repository.
 
         For `Lattice.detached_sites`, every bond must span less than half the cell
         length along each axis, so a cell of a single conventional unit cell is
