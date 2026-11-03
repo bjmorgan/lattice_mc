@@ -128,9 +128,9 @@ Site energies
 in eV, of the sites in a lattice. ``by_label`` gives an energy to every site with each
 label, and ``by_site`` gives energies to individual sites, keyed by site number.
 Energies given by label are applied first, so an energy given by site number
-overrides the energy for that site's label. Both arguments are keyword-only. An
-unknown label or site number raises a ``ValueError``, and leaves the lattice
-unchanged.
+overrides the energy for that site's label. Both arguments are keyword-only. Giving
+neither raises a ``ValueError``. An unknown label or site number raises a
+``ValueError``, and leaves the lattice unchanged.
 
 .. testcode::
 

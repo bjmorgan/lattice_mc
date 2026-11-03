@@ -79,7 +79,8 @@ Random numbers
 
 ``seed``, an integer or a ``numpy.random.Generator``, is the source of all
 randomness in the simulation: the initial placement of atoms, and the choice and
-timing of jumps. Two simulations created with the same seed give the same results.
+timing of jumps. Two simulations created with the same arguments and seed, and run in
+the same way, give the same results.
 Without a seed, the generator is unseeded.
 
 .. testcode::

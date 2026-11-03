@@ -19,7 +19,7 @@ Capabilities
 Quickstart
 ----------
 
-A simulation of 32 atoms on a 4 x 4 x 4 cubic lattice, with nearest-neighbour
+A simulation of 16 atoms on a 4 x 4 x 4 cubic lattice, with nearest-neighbour
 repulsion:
 
 .. testcode::
@@ -27,12 +27,11 @@ repulsion:
     import lattice_mc as lmc
 
     lattice = lmc.cubic_lattice(4, 4, 4, spacing=1.0)
-    lattice.set_site_energies(by_label={"L": 0.0})
 
     simulation = lmc.Simulation(
         lattice,
         params=lmc.SimulationParameters(temperature=298.0, rate_prefactor=1e13),
-        n_atoms=32,
+        n_atoms=16,
         nn_energy=0.1,
         lookup_table=True,
         seed=42,

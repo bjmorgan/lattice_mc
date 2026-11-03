@@ -38,10 +38,11 @@ pip install -e ".[dev]"
 import lattice_mc as lmc
 
 lattice = lmc.cubic_lattice(4, 4, 4, spacing=1.0)
+
 simulation = lmc.Simulation(
     lattice,
     params=lmc.SimulationParameters(temperature=298.0, rate_prefactor=1e13),
-    n_atoms=32,
+    n_atoms=16,
     nn_energy=0.1,
     lookup_table=True,
     seed=42,
@@ -49,7 +50,10 @@ simulation = lmc.Simulation(
 simulation.run(n_jumps=1_000)  # equilibration
 simulation.reset()
 simulation.run(n_jumps=10_000)
-print(simulation.results.tracer_diffusion_coefficient)
+results = simulation.results
+
+print(f"D* = {results.tracer_diffusion_coefficient:.3e}")
+print(f"f  = {results.tracer_correlation:.3f}")
 ```
 
 ## Documentation
