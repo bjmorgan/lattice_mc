@@ -117,10 +117,11 @@ class Simulation:
         """
         self._lattice: Lattice = copy.deepcopy(lattice)
         self._params: SimulationParameters = params
+        self._kT: float = params.kT
         self._rng: np.random.Generator = np.random.default_rng(seed)
         self._energy_model: EnergyModel = EnergyModel(self._lattice, nn_energy=nn_energy, cn_energies=cn_energies)
         self._probability: Callable[[npt.NDArray[np.bool_], int, int], float] = (
-            LookupTable(self._energy_model, params.kT).relative_probability
+            LookupTable(self._energy_model, self._kT).relative_probability
             if lookup_table
             else self._metropolis_probability
         )
@@ -197,7 +198,7 @@ class Simulation:
         Returns:
             The Metropolis relative probability of the jump.
         """
-        return metropolis(self._energy_model.delta_E(occupied, initial, final), self._params.kT)
+        return metropolis(self._energy_model.delta_E(occupied, initial, final), self._kT)
 
     @property
     def lattice(self) -> Lattice:

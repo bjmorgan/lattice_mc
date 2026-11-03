@@ -51,14 +51,15 @@ class LookupTable:
         max_coordination: dict[str, int] = {}
         for label, neighbours in zip(self._labels, self._neighbours, strict=True):
             max_coordination[label] = max(max_coordination.get(label, 0), len(neighbours))
-        self._probabilities: dict[tuple[str, str], npt.NDArray[np.float64]] = {}
+        # Nested lists, because indexing them is quicker than indexing a numpy array.
+        self._probabilities: dict[tuple[str, str], list[list[float]]] = {}
         for initial_label, final_label in product(max_coordination, repeat=2):
             c_initial, c_final = np.indices((max_coordination[initial_label] + 1, max_coordination[final_label] + 1))
             delta_E = np.full(c_initial.shape, site_energies[final_label] - site_energies[initial_label])
             if nn_energy is not None:
                 # -1 because the jumping atom is not counted in the final site occupation number
                 delta_E += nn_energy * (c_final - c_initial - 1)
-            self._probabilities[initial_label, final_label] = np.vectorize(metropolis)(delta_E, kT)
+            self._probabilities[initial_label, final_label] = np.vectorize(metropolis)(delta_E, kT).tolist()
 
     def relative_probability(self, occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:
         """
@@ -72,6 +73,6 @@ class LookupTable:
         Returns:
             The relative probability of this jump occurring.
         """
-        n_initial = int(occupied[self._neighbours[initial]].sum())
-        n_final = int(occupied[self._neighbours[final]].sum())
-        return float(self._probabilities[self._labels[initial], self._labels[final]][n_initial, n_final])
+        n_initial = np.count_nonzero(occupied[self._neighbours[initial]])
+        n_final = np.count_nonzero(occupied[self._neighbours[final]])
+        return self._probabilities[self._labels[initial], self._labels[final]][n_initial][n_final]
