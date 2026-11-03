@@ -65,8 +65,7 @@ Two-dimensional lattices
 Square and honeycomb lattices lie in the xy plane, and have a z cell length of 0.
 :attr:`~lattice_mc.lattice.Lattice.dimensionality` is the number of non-zero cell
 lengths, and is used as :math:`d` in the Einstein relations for the diffusion
-coefficients (see :doc:`introduction`). A cubic lattice with one repeat unit along
-z still has a non-zero z cell length, so it counts as three-dimensional.
+coefficients (see :doc:`introduction`).
 
 Lattices from a sites file
 --------------------------
