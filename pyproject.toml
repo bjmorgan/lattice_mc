@@ -49,9 +49,6 @@ Repository = "https://github.com/bjmorgan/lattice_mc"
 target-version = "py312"
 line-length = 120
 
-[tool.ruff.format]
-skip-magic-trailing-comma = true
-
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "D"]
 ignore = [

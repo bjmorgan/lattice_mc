@@ -184,8 +184,7 @@ class Lattice:
         for site in self.sites:
             if energies.setdefault(site.label, site.energy) != site.energy:
                 raise ValueError(
-                    f"Sites with label {site.label} have different energies, "
-                    f"{energies[site.label]} and {site.energy}."
+                    f"Sites with label {site.label} have different energies, {energies[site.label]} and {site.energy}."
                 )
         return energies
 

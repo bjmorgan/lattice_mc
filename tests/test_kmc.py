@@ -228,7 +228,13 @@ def test_step_chooses_among_three_jumps_with_a_zero_weight_in_the_middle() -> No
 def test_step_rejects_negative_or_non_finite_probabilities(ring: Lattice, bad_value: float, message: str) -> None:
     state = SimulationState.from_occupied(4, [0])
     with pytest.raises(ValueError, match=message):
-        step(ring, state, lambda occupied, initial, final: 1.0 if final == 1 else bad_value, PARAMS, np.random.default_rng(0))
+        step(
+            ring,
+            state,
+            lambda occupied, initial, final: 1.0 if final == 1 else bad_value,
+            PARAMS,
+            np.random.default_rng(0),
+        )
     assert state.number_of_jumps == 0
     assert state.time == 0.0
     assert state.atom_site.tolist() == [0]
