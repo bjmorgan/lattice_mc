@@ -46,7 +46,7 @@ class TestRelativeProbability:
         lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
         lattice.set_site_energies(by_label={"A": 0.05, "B": -0.03})
         model = EnergyModel(lattice, nn_energy=0.04)
-        table = LookupTable(lattice, model, KT)
+        table = LookupTable(model, KT)
         rng = np.random.default_rng(0)
         checked = 0
         for _ in range(10):
@@ -63,7 +63,7 @@ class TestRelativeProbability:
     def test_without_nn_energy_depends_only_on_site_energies(self) -> None:
         lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
         lattice.set_site_energies(by_label={"A": 0.0, "B": 0.05})
-        table = LookupTable(lattice, EnergyModel(lattice), KT)
+        table = LookupTable(EnergyModel(lattice), KT)
         occupied = np.zeros(lattice.number_of_sites, dtype=np.bool_)
         initial = next(i for i, site in enumerate(lattice.sites) if site.label == "A")
         occupied[initial] = True
@@ -72,7 +72,7 @@ class TestRelativeProbability:
 
     def test_includes_site_energies_from_a_sites_file(self, tmp_path: Path) -> None:
         lattice = lattice_from_text(tmp_path, SITES_WITH_ENERGIES)
-        table = LookupTable(lattice, EnergyModel(lattice), KT)
+        table = LookupTable(EnergyModel(lattice), KT)
         occupied = np.array([True, False])
         assert table.relative_probability(occupied, 0, 1) == pytest.approx(metropolis(0.1, KT))
 
@@ -80,7 +80,7 @@ class TestRelativeProbability:
         lattice = star_lattice()
         lattice.set_site_energies(by_label={"A": 0.02, "B": -0.01})
         model = EnergyModel(lattice, nn_energy=0.05)
-        table = LookupTable(lattice, model, KT)
+        table = LookupTable(model, KT)
         largest_counts = set()
         for configuration in range(2**lattice.number_of_sites):
             occupied = np.array([(configuration >> i) & 1 for i in range(lattice.number_of_sites)], dtype=np.bool_)
@@ -102,7 +102,7 @@ class TestRelativeProbability:
         lattice.set_site_energies(by_label={"A": 0.0, "B": 0.05})
         model = EnergyModel(lattice, nn_energy=0.04)
         lattice.set_site_energies(by_label={"A": 0.2, "B": -0.2})
-        table = LookupTable(lattice, model, KT)
+        table = LookupTable(model, KT)
         initial = next(i for i, site in enumerate(lattice.sites) if site.label == "A")
         occupied = np.zeros(lattice.number_of_sites, dtype=np.bool_)
         occupied[initial] = True
@@ -116,16 +116,16 @@ class TestConstruction:
     def test_raises_for_non_positive_kT(self, kT: float) -> None:
         lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
         with pytest.raises(ValueError, match="kT"):
-            LookupTable(lattice, EnergyModel(lattice), kT)
+            LookupTable(EnergyModel(lattice), kT)
 
     def test_raises_for_a_model_with_coordination_number_energies(self) -> None:
         lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
         cn = {0: 0.0, 1: 0.1, 2: 0.2, 3: 0.3}
         model = EnergyModel(lattice, cn_energies={"A": {"B": cn}, "B": {"A": cn}})
         with pytest.raises(ValueError, match="coordination"):
-            LookupTable(lattice, model, KT)
+            LookupTable(model, KT)
 
     def test_raises_for_one_label_with_different_energies(self, tmp_path: Path) -> None:
         lattice = lattice_from_text(tmp_path, SITES_WITH_ENERGIES.replace("label: B", "label: A"))
         with pytest.raises(ValueError, match="label A"):
-            LookupTable(lattice, EnergyModel(lattice), KT)
+            LookupTable(EnergyModel(lattice), KT)

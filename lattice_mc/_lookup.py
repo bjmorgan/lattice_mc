@@ -3,34 +3,29 @@
 from __future__ import annotations
 
 from itertools import product
-from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
 
 from lattice_mc._energies import EnergyModel, metropolis
 
-if TYPE_CHECKING:
-    from lattice_mc.lattice import Lattice
-
 
 class LookupTable:
     """
     Relative jump probabilities, looked up by site labels and numbers of occupied neighbours.
 
-    The table is built when it is created, so later changes to the lattice or the energy model
-    are not reflected. It holds the same probabilities as ``metropolis(energy_model.delta_E(...), kT)``,
-    for models with site energies and an optional nearest-neighbour interaction.
+    The table is built when it is created, so later changes to the energy model or the
+    lattice it was created from are not reflected. It holds the same probabilities as
+    ``metropolis(energy_model.delta_E(...), kT)``, for models with site energies and an optional nearest-neighbour interaction.
     """
 
-    def __init__(self, lattice: Lattice, energy_model: EnergyModel, kT: float) -> None:
+    def __init__(self, energy_model: EnergyModel, kT: float) -> None:
         """
         Initialise a LookupTable.
 
         Args:
-            lattice: The lattice. The table reads its site energies, labels and neighbours from
-                `energy_model`, so that it always agrees with the model.
-            energy_model: The energy model. It must not have coordination-number energies.
+            energy_model: The energy model, which defines the site energies, labels and neighbours.
+                It must not have coordination-number energies.
             kT: Thermal energy kT in eV.
 
         Raises:
