@@ -139,7 +139,8 @@ def _check_repeat_units(repeat_units: dict[str, int], minimum: int) -> None:
     """
     Check that a builder has enough repeat units along each axis.
 
-    With fewer, a site would list itself, or the same neighbour twice, as a neighbour.
+    With fewer, the lattice would be empty, or a site would list itself, or the same
+    neighbour twice, as a neighbour.
 
     Args:
         repeat_units: The number of repeat units, keyed by argument name.

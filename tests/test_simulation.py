@@ -230,6 +230,7 @@ class TestLatticeCopy:
         reference.run(n_jumps=100)
         simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
         lattice = simulation.lattice
+        # Changed labels and positions would show in the results if the copy were shared.
         lattice.transmute_sites("L", "M", 8, seed=0)
         lattice.set_site_energies(by_label={"M": 0.5})
         for site in lattice.sites:

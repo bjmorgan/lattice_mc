@@ -80,6 +80,13 @@ class TestSiteEnergies:
         model = EnergyModel(lattice)
         assert model.delta_E(occupation(lattice, [0]), 0, 1) == pytest.approx(0.6)
 
+    @pytest.mark.parametrize("energy", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite_site_energy_raises(self, energy: float) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        lattice.sites[1].energy = energy
+        with pytest.raises(ValueError, match="Site 2 has a non-finite energy"):
+            EnergyModel(lattice)
+
 
 class TestNearestNeighbour:
     def test_delta_E_counts_neighbours_of_each_end(self) -> None:

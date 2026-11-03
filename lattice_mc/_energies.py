@@ -63,7 +63,7 @@ class EnergyModel:
                 with sites raises `ValueError`; pass None to turn the term off.
 
         Raises:
-            ValueError: If `nn_energy` is not finite; if `cn_energies` has no entry for a site
+            ValueError: If a site energy or `nn_energy` is not finite; if `cn_energies` has no entry for a site
                 label in the lattice, for a label of a neighbour of a site with that label, or
                 for every count of occupied neighbours of that label from 0 up to the number of
                 such neighbours; or if any energy in `cn_energies` is not finite.
@@ -71,6 +71,10 @@ class EnergyModel:
         if nn_energy is not None and not math.isfinite(nn_energy):
             raise ValueError(f"nn_energy must be finite; got {nn_energy!r}.")
         self._site_energies: npt.NDArray[np.float64] = lattice.site_energies()
+        non_finite = np.flatnonzero(~np.isfinite(self._site_energies))
+        if non_finite.size > 0:
+            site = lattice.sites[non_finite[0]]
+            raise ValueError(f"Site {site.number} has a non-finite energy: {site.energy!r}.")
         self._labels: tuple[str, ...] = tuple(site.label for site in lattice.sites)
         self._neighbours: tuple[tuple[int, ...], ...] = lattice.neighbour_indices
         self._nn_energy: float | None = nn_energy
