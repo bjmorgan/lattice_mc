@@ -27,7 +27,10 @@ class TestLattice:
         self.site_id = site_id
         site_labels = ["A", "B", "A", "B", "C"]
         site_neighbours = [[2, 3], [1, 3], [1, 2], [5], [4]]
-        self.mock_sites = [Mock(spec=Site, label=label, neighbours=n) for label, n in zip(site_labels, site_neighbours)]
+        self.mock_sites = [
+            Mock(spec=Site, number=i, label=label, neighbours=n)
+            for i, (label, n) in enumerate(zip(site_labels, site_neighbours), start=1)
+        ]
         self.cell_lengths = np.array([7.0, 8.0, 9.0])
         self.lattice = Lattice(self.mock_sites, self.cell_lengths)
 
@@ -261,16 +264,6 @@ class TestLattice:
         occupation_stats = self.lattice.site_occupation_statistics()
         assert occupation_stats == {"A": 0.5, "B": 0.8}
 
-    def test_set_site_energies(self):
-        site_energies = {"A": 0.2, "B": 0.4}
-        sites = [Mock(spec=Site), Mock(spec=Site)]
-        sites[0].label = "A"
-        sites[1].label = "B"
-        self.lattice.sites = sites
-        self.lattice.set_site_energies(site_energies)
-        assert sites[0].energy == 0.2
-        assert sites[1].energy == 0.4
-
     def test_site_energies_by_label(self):
         self.lattice.sites = [
             Site(number=i, coordinates=np.zeros(3), neighbours=[], energy=energy, label=label)
@@ -441,7 +434,10 @@ class TestLattice:
         site_id.side_effect = (1, 2)
         site_labels = ["A", "A"]
         site_neighbours = [[], []]
-        mock_sites = [Mock(spec=Site, label=label, neighbours=n) for label, n in zip(site_labels, site_neighbours)]
+        mock_sites = [
+            Mock(spec=Site, number=i, label=label, neighbours=n)
+            for i, (label, n) in enumerate(zip(site_labels, site_neighbours), start=1)
+        ]
         cell_lengths = np.array([7.0, 8.0, 9.0])
         lattice = Lattice(mock_sites, cell_lengths)
         lattice.sites[0].is_occupied = True
@@ -458,10 +454,86 @@ class TestLattice:
         site_id.side_effect = (1, 2)
         site_labels = ["A", "A"]
         site_neighbours = [[2], [1]]
-        mock_sites = [Mock(spec=Site, label=label, neighbours=n) for label, n in zip(site_labels, site_neighbours)]
+        mock_sites = [
+            Mock(spec=Site, number=i, label=label, neighbours=n)
+            for i, (label, n) in enumerate(zip(site_labels, site_neighbours), start=1)
+        ]
         cell_lengths = np.array([7.0, 8.0, 9.0])
         lattice = Lattice(mock_sites, cell_lengths)
         lattice.sites[0].is_occupied = True
         lattice.sites[1].is_occupied = True
         lattice.number_of_occupied_sites = 1
         assert lattice.is_blocked() is False
+
+
+def make_lattice(numbers, labels=None, neighbours=None, energies=None):
+    """Build a Lattice from real Sites with the given site numbers."""
+    n = len(numbers)
+    labels = labels or ["A"] * n
+    neighbours = neighbours or [[] for _ in numbers]
+    energies = energies or [0.0] * n
+    sites = [
+        Site(number=number, coordinates=np.zeros(3), neighbours=nn, energy=e, label=label)
+        for number, nn, e, label in zip(numbers, neighbours, energies, labels)
+    ]
+    return Lattice(sites, np.array([10.0, 10.0, 10.0]))
+
+
+class TestLatticeIndexing:
+    """Tests for site indices and neighbour indices"""
+
+    def test_site_index_uses_position_not_number(self):
+        lattice = make_lattice([-2, 5, 3])
+        assert [lattice.site_index(number) for number in (-2, 5, 3)] == [0, 1, 2]
+
+    def test_site_index_raises_KeyError_for_unknown_number(self):
+        lattice = make_lattice([-2, 5, 3])
+        with pytest.raises(KeyError):
+            lattice.site_index(4)
+
+    def test_neighbour_indices(self):
+        lattice = make_lattice([-2, 5, 3], neighbours=[[5, 3], [-2], [-2, 5]])
+        assert lattice.neighbour_indices == ((1, 2), (0,), (0, 1))
+
+
+class TestLatticeSiteEnergies:
+    """Tests for setting and reading per-site energies"""
+
+    @pytest.fixture
+    def lattice(self):
+        return make_lattice([-2, 5, 3], labels=["A", "B", "A"])
+
+    def test_set_site_energies_by_label(self, lattice):
+        lattice.set_site_energies(by_label={"A": 0.2, "B": 0.4})
+        assert [site.energy for site in lattice.sites] == [0.2, 0.4, 0.2]
+
+    def test_set_site_energies_by_site(self, lattice):
+        lattice.set_site_energies(by_site={5: 0.7, -2: 0.1})
+        assert [site.energy for site in lattice.sites] == [0.1, 0.7, 0.0]
+
+    def test_set_site_energies_by_site_overrides_by_label(self, lattice):
+        lattice.set_site_energies(by_label={"A": 0.2, "B": 0.4}, by_site={3: 0.9})
+        assert [site.energy for site in lattice.sites] == [0.2, 0.4, 0.9]
+
+    def test_set_site_energies_requires_an_argument(self, lattice):
+        with pytest.raises(ValueError):
+            lattice.set_site_energies()
+
+    def test_set_site_energies_unknown_label(self, lattice):
+        with pytest.raises(ValueError, match="C"):
+            lattice.set_site_energies(by_label={"C": 0.2})
+
+    def test_set_site_energies_unknown_site(self, lattice):
+        with pytest.raises(ValueError, match="4"):
+            lattice.set_site_energies(by_site={4: 0.2})
+
+    def test_set_site_energies_unknown_key_leaves_energies_unchanged(self, lattice):
+        with pytest.raises(ValueError):
+            lattice.set_site_energies(by_label={"A": 0.2}, by_site={4: 0.5})
+        assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
+
+    def test_site_energies_array(self):
+        lattice = make_lattice([-2, 5, 3], energies=[0.1, 0.2, 0.3])
+        energies = lattice.site_energies()
+        assert energies.dtype == np.float64
+        np.testing.assert_array_equal(energies, [0.1, 0.2, 0.3])

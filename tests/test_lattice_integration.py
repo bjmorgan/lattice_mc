@@ -20,7 +20,10 @@ class TestLatticeIntegration:
         self.site_id = site_id
         site_labels = ["A", "A", "A", "A", "A"]
         site_neighbours = [[2, 3], [1, 3], [1, 2], [5], [4]]
-        self.mock_sites = [Mock(spec=Site, label=label, neighbours=n) for label, n in zip(site_labels, site_neighbours)]
+        self.mock_sites = [
+            Mock(spec=Site, number=i, label=label, neighbours=n)
+            for i, (label, n) in enumerate(zip(site_labels, site_neighbours), start=1)
+        ]
         self.cell_lengths = np.array([7.0, 8.0, 9.0])
         self.lattice = Lattice(self.mock_sites, self.cell_lengths)
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import itertools
 import random
 from collections import Counter
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -43,6 +43,10 @@ class Lattice:
         self.site_populations: Counter[str] = Counter([site.label for site in self.sites])
         self.enforce_periodic_boundary_conditions()
         self.initialise_site_lookup_table()
+        self._site_indices: dict[int, int] = {site.number: index for index, site in enumerate(self.sites)}
+        self.neighbour_indices: tuple[tuple[int, ...], ...] = tuple(
+            tuple(self._site_indices[number] for number in site.neighbours) for site in self.sites
+        )
         self.params: SimulationParameters | None = None
         self.nn_energy: float | None = None
         self.cn_energies: dict[str, dict[str, dict[int, float]]] | None = None
@@ -107,6 +111,23 @@ class Lattice:
             The site with id number equal to `number`.
         """
         return self.site_lookup[number]
+
+    def site_index(self, number: int) -> int:
+        """
+        The position of a site in `Lattice.sites`.
+
+        Site numbers are arbitrary identifiers, so this is not related to `number` in general.
+
+        Args:
+            number: The identifying number for a specific site.
+
+        Returns:
+            The index of the site with id number equal to `number`.
+
+        Raises:
+            KeyError: If no site has the id number `number`.
+        """
+        return self._site_indices[number]
 
     def vacant_sites(self) -> Iterator[Site]:
         """
@@ -289,18 +310,53 @@ class Lattice:
             occupation_stats[label] /= self.time
         return occupation_stats
 
-    def set_site_energies(self, energies: dict[str, float]) -> None:
+    def set_site_energies(
+        self,
+        *,
+        by_label: Mapping[str, float] | None = None,
+        by_site: Mapping[int, float] | None = None,
+    ) -> None:
         """
-        Set the energies for every site in the lattice according to the site labels.
+        Set the occupation energies of the sites in the lattice.
+
+        Energies given by label are applied first, then energies given by site number, so
+        a site energy overrides the energy for that site's label. The lattice is unchanged
+        if any label or site number is unknown.
 
         Args:
-            energies: Occupation energy, in eV, for each site label, for example
-                ``{'A': 1.0, 'B': 0.0}``.
+            by_label: Occupation energy, in eV, for every site with each label, for example
+                ``{'A': 1.0, 'B': 0.0}``. Defaults to None.
+            by_site: Occupation energy, in eV, for individual sites, keyed by site number.
+                Defaults to None.
+
+        Raises:
+            ValueError: If neither `by_label` nor `by_site` is given, or if a label
+                or site number is not in the lattice.
         """
-        for site_label in energies:
-            for site in self.sites:
-                if site.label == site_label:
-                    site.energy = energies[site_label]
+        if by_label is None and by_site is None:
+            raise ValueError("One of by_label or by_site must be given.")
+        by_label = by_label or {}
+        by_site = by_site or {}
+        unknown_labels = set(by_label) - self.site_labels
+        if unknown_labels:
+            raise ValueError(f"Unknown site labels: {sorted(unknown_labels)}.")
+        unknown_numbers = set(by_site) - self._site_indices.keys()
+        if unknown_numbers:
+            raise ValueError(f"Unknown site numbers: {sorted(unknown_numbers)}.")
+        for site in self.sites:
+            if site.label in by_label:
+                site.energy = by_label[site.label]
+        for number, energy in by_site.items():
+            self.sites[self._site_indices[number]].energy = energy
+
+    def site_energies(self) -> npt.NDArray[np.float64]:
+        """
+        The occupation energy of every site.
+
+        Returns:
+            The occupation energy, in eV, for each site, in the order of `Lattice.sites`.
+        """
+        return np.array([site.energy for site in self.sites], dtype=np.float64)
 
     def site_energies_by_label(self) -> dict[str, float]:
         """

@@ -95,7 +95,7 @@ class TestSimulation:
         simulation.lattice = Mock(spec=Lattice)
         simulation.lattice.set_site_energies = Mock()
         simulation.set_site_energies("foo")
-        simulation.lattice.set_site_energies.assert_called_with("foo")
+        simulation.lattice.set_site_energies.assert_called_with(by_label="foo")
 
     def test_is_initialised_fails_with_no_lattice(self):
         simulation = Simulation(PARAMS)

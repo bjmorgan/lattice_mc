@@ -169,7 +169,7 @@ class Simulation:
         """
         assert self.lattice is not None
         if site_energies is not None:
-            self.lattice.set_site_energies(site_energies)
+            self.lattice.set_site_energies(by_label=site_energies)
 
     def is_initialised(self) -> None:
         """
