@@ -39,12 +39,13 @@ def test_single_atom_tracer_diffusion_coefficient_is_rate_times_spacing_squared(
 
 
 def test_honeycomb_single_vacancy_tracer_correlation_is_one_third():
-    # Friauf (1962): f = 1/3 for vacancy-mediated diffusion on the honeycomb lattice. This
-    # finite lattice and run length give about 0.35.
-    simulation = Simulation(honeycomb_lattice(4, 3, 1.0), PARAMS, n_atoms=47, seed=0)
-    results = segment_results(simulation, n_segments=40, n_jumps=2000)
+    # Friauf (1962): f = 1/3 for vacancy-mediated diffusion on the honeycomb lattice. A
+    # single vacancy among fewer sites gives a larger value, about 0.36 for 48 sites. With
+    # 480 sites, this run length gives about 0.325 to 0.345 across seeds.
+    simulation = Simulation(honeycomb_lattice(12, 10, 1.0), PARAMS, n_atoms=479, seed=0)
+    results = segment_results(simulation, n_segments=20, n_jumps=6000)
     f = sum(r.tracer_correlation for r in results) / len(results)
-    assert f == pytest.approx(1 / 3, abs=0.05)
+    assert f == pytest.approx(1 / 3, abs=0.02)
 
 
 def test_non_interacting_atoms_have_unit_collective_correlation():

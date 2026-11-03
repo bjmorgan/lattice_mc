@@ -40,9 +40,11 @@ A cubic lattice of 3 x 3 x 3 sites:
 
     27 3
 
-Use at least 3 repeat units along each axis of square and cubic lattices, and at
-least 2 along each axis of honeycomb lattices. With fewer, a site's neighbours on
-either side along an axis are the same site, so it is listed as a neighbour twice.
+A :class:`~lattice_mc.lattice.Lattice` raises a ``ValueError`` if a site lists itself
+as a neighbour, or lists the same neighbour more than once. Smaller lattices would do
+this, so the builders raise a ``ValueError``, naming the argument, for fewer than 3
+repeat units along any axis of a square or cubic lattice, and for fewer than 2 along
+x (``a``) or 1 along y (``b``) of a honeycomb lattice.
 
 Each repeat unit of a honeycomb lattice contains 4 sites. Every site in these
 lattices is labelled ``'L'``. A honeycomb lattice can instead
@@ -90,9 +92,9 @@ Each block gives:
 ``label``
     A label for the site type.
 ``energy``
-    The occupation energy of the site, in eV. This line is optional, and defaults to
-    0.0. Sites with the same label can have different energies, but a lookup table
-    then cannot be used (see :doc:`interaction_models`).
+    The occupation energy of the site, in eV, which must be finite. This line is
+    optional, and defaults to 0.0. Sites with the same label can have different
+    energies, but a lookup table then cannot be used (see :doc:`interaction_models`).
 
 Lines within a block can be in any order. Site numbers must be unique. Each listed
 neighbour must exist, be listed only once, and not be the site itself, and neighbours
@@ -128,8 +130,8 @@ in eV, of the sites in a lattice. ``by_label`` gives an energy to every site wit
 label, and ``by_site`` gives energies to individual sites, keyed by site number.
 Energies given by label are applied first, so an energy given by site number
 overrides the energy for that site's label. Both arguments are keyword-only. Giving
-neither raises a ``ValueError``. An unknown label or site number raises a
-``ValueError``, and leaves the lattice unchanged.
+neither raises a ``ValueError``. An unknown label or site number, or an energy that is
+not finite, raises a ``ValueError``, and leaves the lattice unchanged.
 
 .. testcode::
 

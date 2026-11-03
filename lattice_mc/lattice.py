@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import math
 from collections import Counter
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
@@ -29,7 +30,17 @@ class Lattice:
             sites: The sites contained in the lattice.
             cell_lengths: The [x, y, z] lengths of the orthorhombic simulation cell.
                 A cell length of 0 means the lattice has no extent along that axis.
+
+        Raises:
+            ValueError: If a site lists itself as a neighbour, or lists the same neighbour
+                more than once.
         """
+        for site in sites:
+            if site.number in site.neighbours:
+                raise ValueError(f"Site {site.number} lists itself as a neighbour.")
+            repeated = sorted(number for number, count in Counter(site.neighbours).items() if count > 1)
+            if repeated:
+                raise ValueError(f"Site {site.number} lists site {repeated[0]} more than once as a neighbour.")
         self.cell_lengths: npt.NDArray[np.float64] = cell_lengths
         self.sites: list[Site] = sites
         self.number_of_sites: int = len(self.sites)
@@ -142,8 +153,8 @@ class Lattice:
                 Defaults to None.
 
         Raises:
-            ValueError: If neither `by_label` nor `by_site` is given, or if a label
-                or site number is not in the lattice.
+            ValueError: If neither `by_label` nor `by_site` is given, if a label
+                or site number is not in the lattice, or if an energy is not finite.
         """
         if by_label is None and by_site is None:
             raise ValueError("One of by_label or by_site must be given.")
@@ -155,6 +166,12 @@ class Lattice:
         unknown_numbers = set(by_site) - self._site_indices.keys()
         if unknown_numbers:
             raise ValueError(f"Unknown site numbers: {sorted(unknown_numbers)}.")
+        for label, energy in by_label.items():
+            if not math.isfinite(energy):
+                raise ValueError(f"The energy for label {label!r} must be finite; got {energy!r}.")
+        for number, energy in by_site.items():
+            if not math.isfinite(energy):
+                raise ValueError(f"The energy for site {number} must be finite; got {energy!r}.")
         for site in self.sites:
             if site.label in by_label:
                 site.energy = by_label[site.label]

@@ -7,7 +7,6 @@ import pytest
 from lattice_mc._kmc import jump_vector, possible_jumps, step
 from lattice_mc._state import SimulationState
 from lattice_mc.error import BlockedLatticeError
-from lattice_mc.init_lattice import square_lattice
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 from lattice_mc.simulation import SimulationParameters
@@ -52,20 +51,6 @@ def test_possible_jumps_is_empty_when_every_neighbour_is_occupied(ring: Lattice)
 
 def test_possible_jumps_is_empty_when_no_site_is_occupied(ring: Lattice) -> None:
     assert possible_jumps(ring, occupation(4, [])) == []
-
-
-def test_possible_jumps_repeats_a_neighbour_listed_twice() -> None:
-    lattice = lattice_from_positions([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]], [[1, 1], [0, 0]], [4.0, 0.0, 0.0])
-    assert possible_jumps(lattice, occupation(2, [0])) == [(0, 1), (0, 1)]
-
-
-def test_possible_jumps_from_the_vacant_sites_repeats_a_neighbour_listed_twice() -> None:
-    # A 2 x 3 square lattice: each site lists its one x neighbour twice.
-    lattice = square_lattice(2, 3, 1.0)
-    mask = occupation(6, [0, 1, 2, 5])
-    expected = sorted((i, f) for i in range(6) for f in lattice.neighbour_indices[i] if mask[i] and not mask[f])
-    assert expected.count((2, 3)) == 2
-    assert sorted(possible_jumps(lattice, mask)) == expected
 
 
 def test_possible_jumps_on_a_mostly_occupied_lattice() -> None:
@@ -175,16 +160,20 @@ def test_step_never_chooses_a_jump_with_zero_probability(ring: Lattice) -> None:
 
 
 def test_step_mean_time_step_is_the_inverse_of_the_total_rate(ring: Lattice) -> None:
-    # A single atom on the ring always has two possible jumps, so the total rate is constant.
+    # A single atom on the ring always has one jump in each direction, with probabilities
+    # 0.3 and 0.9, so the total rate is constant and differs from the number of jumps.
+    def probability(occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:
+        return 0.3 if final == (initial + 1) % 4 else 0.9
+
     state = SimulationState.from_occupied(4, [0])
     rng = np.random.default_rng(2024)
     n_steps = 20000
     times = np.empty(n_steps + 1)
     times[0] = state.time
     for i in range(n_steps):
-        step(ring, state, lambda occupied, initial, final: 1.0, PARAMS, rng)
+        step(ring, state, probability, PARAMS, rng)
         times[i + 1] = state.time
-    expected = 1.0 / (PARAMS.rate_prefactor * 2)
+    expected = 1.0 / (PARAMS.rate_prefactor * (0.3 + 0.9))
     # The standard error of the mean is expected / sqrt(n_steps), about 0.7 %.
     assert np.diff(times).mean() == pytest.approx(expected, rel=0.05)
 

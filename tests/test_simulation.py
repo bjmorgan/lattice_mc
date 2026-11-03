@@ -82,6 +82,10 @@ class TestConstruction:
         with pytest.raises(ValueError):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[1, 99])
 
+    def test_rejects_duplicate_occupied_sites_naming_the_site_numbers(self):
+        with pytest.raises(ValueError, match=r"occupied_sites lists site numbers more than once: \[5, 9\]"):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[9, 5, 2, 5, 9])
+
     def test_rejects_empty_occupied_sites(self):
         with pytest.raises(ValueError):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[])
@@ -89,6 +93,15 @@ class TestConstruction:
     def test_rejects_incomplete_cn_energies(self):
         cn_energies = {"L": {"L": {count: 0.0 for count in range(4)}}}
         with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies)
+
+    def test_rejects_a_non_finite_nn_energy(self):
+        with pytest.raises(ValueError, match="nn_energy must be finite"):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, nn_energy=float("nan"))
+
+    def test_rejects_non_finite_cn_energies(self):
+        cn_energies = {"L": {"L": {count: float("inf") for count in range(5)}}}
+        with pytest.raises(ValueError, match="must be finite"):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies)
 
     def test_lookup_table_rejects_cn_energies(self):
@@ -207,6 +220,23 @@ class TestLatticeCopy:
         simulation = Simulation(lattice, PARAMS, n_atoms=4)
         assert simulation.lattice is not lattice
         assert simulation.lattice.number_of_sites == lattice.number_of_sites
+
+    def test_lattice_is_a_new_copy_on_each_access(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4)
+        assert simulation.lattice is not simulation.lattice
+
+    def test_changes_to_the_returned_lattice_do_not_change_results(self):
+        reference = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
+        reference.run(n_jumps=100)
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
+        lattice = simulation.lattice
+        # Changed labels and positions would show in the results if the copy were shared.
+        lattice.transmute_sites("L", "M", 8, seed=0)
+        lattice.set_site_energies(by_label={"M": 0.5})
+        for site in lattice.sites:
+            site.r = site.r * 0.5
+        simulation.run(n_jumps=100)
+        assert results_of(simulation) == results_of(reference)
 
 
 class TestLattices:

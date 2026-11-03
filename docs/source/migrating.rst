@@ -88,8 +88,9 @@ in one call, in place of the 1.0.4 setters:
 
 ``seed`` (an integer or a ``numpy.random.Generator``) controls the initial placement
 of atoms and the choice and timing of jumps. The simulation takes its own copy of the
-lattice when it is created. An incomplete ``cn_energies`` mapping raises a
-``ValueError`` when the simulation is created.
+lattice when it is created, and ``simulation.lattice`` returns a new copy of it on each
+access, so changes to either lattice have no effect on the simulation. An incomplete
+``cn_energies`` mapping raises a ``ValueError`` when the simulation is created.
 
 Running
 -------
@@ -188,6 +189,11 @@ Lattices, sites and clusters
       - ``Cluster(sites, lattice)``
     * - ``cluster.sites_at_edges()``
       - Removed
+    * - ``square_lattice`` and ``cubic_lattice`` with fewer than 3 repeat units
+        along an axis, and ``honeycomb_lattice`` with ``a`` less than 2, which gave
+        sites that list themselves or the same neighbour twice
+      - Raise ``ValueError``, as does a ``Lattice`` with a site that lists itself
+        or the same neighbour twice
 
 :attr:`Lattice.site_labels <lattice_mc.lattice.Lattice.site_labels>` and
 :attr:`Lattice.site_populations <lattice_mc.lattice.Lattice.site_populations>` are

@@ -1,6 +1,5 @@
 """Tests for lattice_mc._lookup."""
 
-from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +7,7 @@ import pytest
 
 from lattice_mc._energies import EnergyModel, metropolis
 from lattice_mc._lookup import LookupTable
-from lattice_mc.init_lattice import cubic_lattice, honeycomb_lattice, lattice_from_sites_file
+from lattice_mc.init_lattice import honeycomb_lattice, lattice_from_sites_file
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 
@@ -49,22 +48,9 @@ def alternating_honeycomb() -> Lattice:
     return lattice
 
 
-def cubic_lattice_with_repeated_neighbours() -> Lattice:
-    """A cubic lattice one repeat unit deep, so each site lists itself twice as a neighbour."""
-    return cubic_lattice(4, 4, 1, 1.0)
-
-
 class TestRelativeProbability:
-    @pytest.mark.parametrize(
-        "build_lattice",
-        [alternating_honeycomb, cubic_lattice_with_repeated_neighbours],
-        ids=["honeycomb", "repeated-neighbours"],
-    )
-    def test_matches_the_energy_model_for_every_jump_in_random_configurations(
-        self,
-        build_lattice: Callable[[], Lattice],
-    ) -> None:
-        lattice = build_lattice()
+    def test_matches_the_energy_model_for_every_jump_in_random_configurations(self) -> None:
+        lattice = alternating_honeycomb()
         model = EnergyModel(lattice, nn_energy=0.04)
         table = LookupTable(model, KT)
         rng = np.random.default_rng(0)

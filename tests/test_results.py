@@ -93,8 +93,8 @@ def test_time_and_number_of_jumps_are_copied_from_the_state(results: Results) ->
 @pytest.mark.parametrize(
     ("lattice", "tracer", "collective", "conductivity"),
     [
-        (init_lattice.square_lattice(2, 2, 1.0), 0.375, 0.5, 0.25),
-        (init_lattice.cubic_lattice(2, 2, 2, 1.0), 0.25, 1.0 / 3.0, 1.0 / 12.0),
+        (init_lattice.square_lattice(3, 3, 1.0), 0.375, 0.5, 1.0 / 9.0),
+        (init_lattice.cubic_lattice(3, 3, 3, 1.0), 0.25, 1.0 / 3.0, 2.0 / 81.0),
     ],
     ids=["square", "cubic"],
 )

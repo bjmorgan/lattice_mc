@@ -80,6 +80,13 @@ class TestSiteEnergies:
         model = EnergyModel(lattice)
         assert model.delta_E(occupation(lattice, [0]), 0, 1) == pytest.approx(0.6)
 
+    @pytest.mark.parametrize("energy", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite_site_energy_raises(self, energy: float) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        lattice.sites[1].energy = energy
+        with pytest.raises(ValueError, match="Site 2 has a non-finite energy"):
+            EnergyModel(lattice)
+
 
 class TestNearestNeighbour:
     def test_delta_E_counts_neighbours_of_each_end(self) -> None:
@@ -88,6 +95,12 @@ class TestNearestNeighbour:
         lattice = make_lattice({"i": ["f", "a", "b", "c"], "f": ["i"], "a": ["i"], "b": ["i"], "c": ["i"]})
         model = EnergyModel(lattice, nn_energy=0.7)
         assert model.delta_E(occupation(lattice, [0, 2, 3, 4]), 0, 1) == pytest.approx(-3 * 0.7)
+
+    @pytest.mark.parametrize("nn_energy", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite_nn_energy_raises(self, nn_energy: float) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        with pytest.raises(ValueError, match="nn_energy must be finite"):
+            EnergyModel(lattice, nn_energy=nn_energy)
 
     def test_delta_E_does_not_modify_the_occupation(self) -> None:
         lattice = make_lattice({"i": ["f"], "f": ["i"]})
@@ -143,14 +156,6 @@ class TestCoordinationNumber:
                         assert model.delta_E(occupied, int(initial), final) == pytest.approx(expected, abs=1e-12)
                         checked += 1
         assert checked > 50
-
-    def test_repeated_neighbours_match_brute_force(self) -> None:
-        # In very small periodic lattices a site can appear more than once in a neighbour list.
-        lattice = make_lattice({"a": ["b", "b"], "b": ["a", "a"]})
-        cn = {"A": {"A": {0: 0.0, 1: 0.3, 2: 0.8}}}
-        occupied = occupation(lattice, [0])
-        expected = brute_force_cn_delta_E(lattice, occupied, 0, 1, cn)
-        assert EnergyModel(lattice, cn_energies=cn).delta_E(occupied, 0, 1) == pytest.approx(expected)
 
     def test_all_three_contributions_are_summed(self) -> None:
         lattice = make_lattice(
@@ -225,6 +230,12 @@ class TestCoordinationNumberValidation:
         assert expected != 0.0
         del cn["A"]["A"][1]
         assert model.delta_E(occupied, 0, 1) == pytest.approx(expected)
+
+    @pytest.mark.parametrize("energy", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite_energy_raises(self, energy: float) -> None:
+        cn = {"A": {"B": {0: 0.0, 1: 0.1, 2: energy, 3: 0.3}}, "B": {"A": {0: 0.0, 1: 0.1}}}
+        with pytest.raises(ValueError, match="site label 'A'.*neighbour label 'B'.*count 2 must be finite"):
+            EnergyModel(self.lattice(), cn_energies=cn)
 
     def test_lattice_without_cn_energies_needs_no_checking(self) -> None:
         EnergyModel(self.lattice(), nn_energy=0.2)

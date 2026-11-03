@@ -52,9 +52,9 @@ Nearest-neighbour interactions
 ------------------------------
 
 ``nn_energy`` sets an interaction energy for each pair of occupied neighbouring
-sites. A positive energy is a repulsion. For a jump from site :math:`i` to site
-:math:`j`, with :math:`n_i` and :math:`n_j` occupied neighbours before the jump, this
-adds :math:`E_\mathrm{nn} (n_j - n_i - 1)` to :math:`\Delta E`.
+sites. It must be finite, and a positive energy is a repulsion. For a jump from site
+:math:`i` to site :math:`j`, with :math:`n_i` and :math:`n_j` occupied neighbours
+before the jump, this adds :math:`E_\mathrm{nn} (n_j - n_i - 1)` to :math:`\Delta E`.
 
 .. testcode::
 
@@ -86,8 +86,8 @@ site label, then by the label of the neighbouring sites, then by the number of t
 neighbours that are occupied. The energy of an occupied site is the sum of its
 energies for each neighbouring label. The mapping must include every site label,
 every label of a neighbouring site, and every number of occupied neighbours from 0 to
-the number of those neighbours; otherwise creating the simulation raises a
-``ValueError``.
+the number of those neighbours, and every energy must be finite; otherwise creating
+the simulation raises a ``ValueError``.
 
 .. testcode::
 

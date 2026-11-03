@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import math
+from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
@@ -109,7 +110,8 @@ class Simulation:
             ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
                 are no atoms, or more atoms than (selected) sites; if `selected_labels` is given
                 with `occupied_sites`, is empty, or names a label not in the lattice; if `occupied_sites`
-                has a duplicate or unknown site number; if `cn_energies` is incomplete; or if
+                has a duplicate or unknown site number; if a site energy, `nn_energy` or an
+                energy in `cn_energies` is not finite; if `cn_energies` is incomplete; or if
                 `lookup_table` is True with `cn_energies`, or with sites of one label that have
                 different energies.
         """
@@ -174,11 +176,15 @@ class Simulation:
             The index of each site.
 
         Raises:
-            ValueError: If there are no site numbers, or a site number is not in the lattice.
+            ValueError: If there are no site numbers, a site number is repeated, or a site
+                number is not in the lattice.
         """
         numbers = list(site_numbers)
         if not numbers:
             raise ValueError("occupied_sites must contain at least one site number.")
+        repeated = sorted(number for number, count in Counter(numbers).items() if count > 1)
+        if repeated:
+            raise ValueError(f"occupied_sites lists site numbers more than once: {repeated}.")
         try:
             return [self._lattice.site_index(number) for number in numbers]
         except KeyError as error:
@@ -201,13 +207,11 @@ class Simulation:
     @property
     def lattice(self) -> Lattice:
         """
-        The simulation's own copy of the lattice, for read-only use.
+        A copy of the simulation's lattice.
 
-        Do not change it: the energies were read when the simulation was created, and
-        changing the lattice, for example its site positions or labels, would make the
-        simulation inconsistent.
+        Each access returns a new copy, so changes to it have no effect on the simulation.
         """
-        return self._lattice
+        return copy.deepcopy(self._lattice)
 
     @property
     def occupied_sites(self) -> tuple[int, ...]:
