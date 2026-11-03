@@ -249,13 +249,13 @@ class TestLatticeFromSitesFile:
         with pytest.raises(ValueError, match=message):
             load(tmp_path, RING.replace(old, new, 1))
 
-    def test_raises_ValueError_for_sites_with_one_label_and_different_energies(self, tmp_path):
+    def test_reads_different_energies_for_sites_with_one_label(self, tmp_path):
         text = RING.replace(
             "site: 1\ncentre: 0.0 0.0 0.0\nneighbours: 2 3\nlabel: A\n",
             "site: 1\ncentre: 0.0 0.0 0.0\nneighbours: 2 3\nlabel: A\nenergy: 0.2\n",
         )
-        with pytest.raises(ValueError, match="label A"):
-            load(tmp_path, text)
+        lattice = load(tmp_path, text)
+        assert [lattice.site_with_id(n).energy for n in (1, 2, 3)] == [0.2, 0.0, 0.0]
 
     def test_reads_the_example_llzo_sites_file(self):
         path = str(pathlib.Path(__file__).resolve().parents[1] / "examples" / "llzo_lattice_site_list.dat")
