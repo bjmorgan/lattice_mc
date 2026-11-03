@@ -22,7 +22,8 @@ def possible_jumps(lattice: Lattice, occupied: npt.NDArray[np.bool_]) -> list[tu
     All jumps not blocked by volume exclusion.
 
     These are jumps from occupied sites to neighbouring vacant sites. A neighbour that is
-    listed more than once for a site gives the same jump more than once.
+    listed more than once for a site gives the same jump more than once. The order of the
+    jumps depends only on the occupation. Neighbour lists are assumed to be symmetric.
 
     Args:
         lattice: The lattice, which defines the neighbours of each site.
@@ -31,11 +32,19 @@ def possible_jumps(lattice: Lattice, occupied: npt.NDArray[np.bool_]) -> list[tu
     Returns:
         The possible jumps, as (initial site index, final site index) pairs.
     """
+    if np.count_nonzero(occupied) <= len(occupied) / 2:
+        return [
+            (initial, final)
+            for initial in np.flatnonzero(occupied).tolist()
+            for final in lattice.neighbour_indices[initial]
+            if not occupied[final]
+        ]
+    # Mostly occupied, so it is quicker to start from the vacant sites.
     return [
         (initial, final)
-        for initial in np.flatnonzero(occupied).tolist()
-        for final in lattice.neighbour_indices[initial]
-        if not occupied[final]
+        for final in np.flatnonzero(~occupied).tolist()
+        for initial in lattice.neighbour_indices[final]
+        if occupied[initial]
     ]
 
 
@@ -72,7 +81,7 @@ def step(
 
     A jump is chosen with probability proportional to its relative probability. The time
     step is -ln(u) / (rate_prefactor * sum of relative probabilities), with u drawn
-    uniformly from (0, 1].
+    uniformly from (0, 1]. The state is left unchanged if an exception is raised.
 
     Args:
         lattice: The lattice, which defines the neighbours, positions and cell lengths.
@@ -84,20 +93,23 @@ def step(
 
     Raises:
         BlockedLatticeError: If no jump is possible, or no possible jump has a non-zero
-            probability. The state is left unchanged.
+            probability.
+        ValueError: If any relative probability is negative or not finite.
     """
     occupied = state.occupied
     jumps = possible_jumps(lattice, occupied)
     if not jumps:
-        raise BlockedLatticeError("No jumps are possible: every occupied site is blocked by its neighbours.")
+        raise BlockedLatticeError("No jumps are possible.")
     probabilities = np.array([probability(occupied, initial, final) for initial, final in jumps])
+    if not np.isfinite(probabilities).all():
+        raise ValueError("Jump probabilities must be finite.")
+    if (probabilities < 0.0).any():
+        raise ValueError("Jump probabilities must not be negative.")
     cumulative = np.cumsum(probabilities)
     total = float(cumulative[-1])
     if total <= 0.0:
         raise BlockedLatticeError("No jump has a non-zero probability.")
     chosen = int(np.searchsorted(cumulative, rng.random() * total, side="right"))
-    # Rounding could place the threshold beyond the last jump that can happen.
-    chosen = min(chosen, int(np.flatnonzero(probabilities)[-1]))
     delta_t = -math.log(1.0 - rng.random()) / (params.rate_prefactor * total)
     initial, final = jumps[chosen]
     state.apply_jump(initial, final, jump_vector(lattice, initial, final), delta_t)

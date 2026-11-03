@@ -58,6 +58,33 @@ def test_possible_jumps_repeats_a_neighbour_listed_twice() -> None:
     assert possible_jumps(lattice, occupation(2, [0])) == [(0, 1), (0, 1)]
 
 
+def test_possible_jumps_on_a_mostly_occupied_lattice() -> None:
+    lattice = lattice_from_positions(
+        [[float(x), 0.0, 0.0] for x in range(6)],
+        [[1, 5], [0, 2], [1, 3], [2, 4], [3, 5], [4, 0]],
+        [6.0, 0.0, 0.0],
+    )
+    assert sorted(possible_jumps(lattice, occupation(6, [0, 1, 2, 3, 4]))) == [(0, 5), (4, 5)]
+    assert sorted(possible_jumps(lattice, occupation(6, [0, 1, 3, 4, 5]))) == [(1, 2), (3, 2)]
+
+
+def test_possible_jumps_gives_the_same_jumps_whichever_way_they_are_found() -> None:
+    lattice = lattice_from_positions(
+        [[float(x), 0.0, 0.0] for x in range(6)],
+        [[1, 5], [0, 2], [1, 3], [2, 4], [3, 5], [4, 0]],
+        [6.0, 0.0, 0.0],
+    )
+    for occupied in ([0, 1, 3], [0, 1, 2, 4], [1, 2, 3, 4, 5]):
+        mask = occupation(6, occupied)
+        expected = sorted((i, f) for i in occupied for f in lattice.neighbour_indices[i] if not mask[f])
+        assert sorted(possible_jumps(lattice, mask)) == expected
+
+
+def test_possible_jumps_order_depends_only_on_the_occupation(ring: Lattice) -> None:
+    mask = occupation(4, [0, 1, 2])
+    assert possible_jumps(ring, mask) == possible_jumps(ring, mask.copy())
+
+
 def test_jump_vector_between_neighbours(ring: Lattice) -> None:
     assert jump_vector(ring, 0, 1).tolist() == [1.0, 0.0, 0.0]
 
@@ -65,6 +92,12 @@ def test_jump_vector_between_neighbours(ring: Lattice) -> None:
 def test_jump_vector_uses_the_minimum_image_across_the_boundary(ring: Lattice) -> None:
     assert jump_vector(ring, 3, 0).tolist() == [1.0, 0.0, 0.0]
     assert jump_vector(ring, 0, 3).tolist() == [-1.0, 0.0, 0.0]
+
+
+def test_jump_vector_keeps_a_displacement_of_exactly_half_the_cell() -> None:
+    lattice = lattice_from_positions([[0.0, 0.0, 0.0], [2.0, 0.0, 0.0]], [[1], [0]], [4.0, 0.0, 0.0])
+    assert jump_vector(lattice, 0, 1).tolist() == [2.0, 0.0, 0.0]
+    assert jump_vector(lattice, 1, 0).tolist() == [-2.0, 0.0, 0.0]
 
 
 def test_jump_vector_on_a_two_dimensional_lattice() -> None:
@@ -111,7 +144,7 @@ def test_step_with_the_same_seed_is_reproducible(ring: Lattice) -> None:
 
 def test_step_on_a_blocked_lattice_raises(ring: Lattice) -> None:
     state = SimulationState.from_occupied(4, [0, 1, 2, 3])
-    with pytest.raises(BlockedLatticeError):
+    with pytest.raises(BlockedLatticeError, match="No jumps are possible."):
         step(ring, state, lambda occupied, initial, final: 1.0, PARAMS, np.random.default_rng(0))
 
 
@@ -156,3 +189,36 @@ def test_step_chooses_jumps_in_proportion_to_their_probabilities(ring: Lattice) 
         n_to_site_1 += int(state.atom_site[0] == 1)
     # Expected fraction 0.8, with standard error sqrt(0.8 * 0.2 / n_steps), about 0.006.
     assert n_to_site_1 / n_steps == pytest.approx(0.8, abs=0.03)
+
+
+def test_step_chooses_among_three_jumps_with_a_zero_weight_in_the_middle() -> None:
+    star = lattice_from_positions(
+        [[float(x), 0.0, 0.0] for x in range(4)],
+        [[1, 2, 3], [0], [0], [0]],
+        [10.0, 0.0, 0.0],
+    )
+    weights = {1: 1.0, 2: 0.0, 3: 3.0}
+    rng = np.random.default_rng(11)
+    n_steps = 4000
+    counts = {1: 0, 2: 0, 3: 0}
+    for _ in range(n_steps):
+        state = SimulationState.from_occupied(4, [0])
+        step(star, state, lambda occupied, initial, final: weights[final], PARAMS, rng)
+        counts[int(state.atom_site[0])] += 1
+    # Standard error at most sqrt(0.75 * 0.25 / n_steps), about 0.007.
+    assert counts[2] == 0
+    assert counts[1] / n_steps == pytest.approx(0.25, abs=0.03)
+    assert counts[3] / n_steps == pytest.approx(0.75, abs=0.03)
+
+
+@pytest.mark.parametrize(
+    ("bad_value", "message"),
+    [(-0.5, "negative"), (float("nan"), "finite"), (float("inf"), "finite"), (float("-inf"), "finite")],
+)
+def test_step_rejects_negative_or_non_finite_probabilities(ring: Lattice, bad_value: float, message: str) -> None:
+    state = SimulationState.from_occupied(4, [0])
+    with pytest.raises(ValueError, match=message):
+        step(ring, state, lambda occupied, initial, final: 1.0 if final == 1 else bad_value, PARAMS, np.random.default_rng(0))
+    assert state.number_of_jumps == 0
+    assert state.time == 0.0
+    assert state.atom_site.tolist() == [0]
