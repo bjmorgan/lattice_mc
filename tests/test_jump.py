@@ -35,8 +35,10 @@ class TestJump:
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
             jump = Jump(
-                self.mock_initial_site, self.mock_final_site,
-                nearest_neighbour_energy=nearest_neighbour_energy, params=PARAMS,
+                self.mock_initial_site,
+                self.mock_final_site,
+                nearest_neighbour_energy=nearest_neighbour_energy,
+                params=PARAMS,
             )
         assert jump.initial_site == self.mock_initial_site
         assert jump.final_site == self.mock_final_site
@@ -49,8 +51,10 @@ class TestJump:
         with patch("lattice_mc.jump.Jump.boltzmann_factor") as mock_boltzmann_factor:
             mock_boltzmann_factor.return_value = 0.13
             jump = Jump(
-                self.mock_initial_site, self.mock_final_site,
-                coordination_number_energy=coordination_number_energy, params=PARAMS,
+                self.mock_initial_site,
+                self.mock_final_site,
+                coordination_number_energy=coordination_number_energy,
+                params=PARAMS,
             )
         assert jump.initial_site == self.mock_initial_site
         assert jump.final_site == self.mock_final_site
@@ -125,22 +129,6 @@ class TestJump:
         self.jump.nearest_neighbour_energy = 0.7
         assert self.jump.nearest_neighbour_delta_E() == -3 * 0.7
 
-    def test_coordination_number_delta_E(self):
-        self.jump.initial_site.cn_occupation_energy = Mock(return_value=1.5)
-        self.jump.initial_site.label = "A"
-        self.jump.final_site.cn_occupation_energy = Mock(return_value=0.2)
-        self.jump.final_site.label = "A"
-        occupied = [True, False, True, True, False]
-        cn_occupation_energy = [1.0, 2.0, 3.0, 4.0, 5.0]
-        mock_sites = [Mock(spec=Site, is_occupied=o) for o in occupied]
-        for m, e in zip(mock_sites, cn_occupation_energy):
-            m.cn_occupation_energy.return_value = e
-        self.jump.initial_site.p_neighbours = mock_sites[:2]
-        self.jump.final_site.p_neighbours = mock_sites[2:]
-        # The mocked neighbour energies do not depend on the occupation change, so only
-        # the initial and final sites contribute.
-        assert self.jump.coordination_number_delta_E() == pytest.approx(0.2 - 1.5)
-
     def test_dr(self):
         cell_lengths = np.array([10.0, 10.0, 10.0])
         self.jump.initial_site.r = np.array([3.0, 3.0, 3.0])
@@ -174,39 +162,74 @@ def total_cn_energy(sites):
     return sum(site.cn_occupation_energy() for site in sites if site.is_occupied)
 
 
-def test_coordination_number_delta_E_counts_a_site_next_to_both_ends_once():
-    # Sites i and f share the neighbour s, which also neighbours t:
-    #
-    #     i --- f
-    #      \   /
-    #        s --- t
-    #
-    # i, s and t are occupied, and the atom on i jumps to f. Afterwards s still
-    # has two occupied neighbours, so its energy does not change.
-    numbers = {"i": 1, "f": 2, "s": 3, "t": 4}
-    neighbours = {"i": ["f", "s"], "f": ["i", "s"], "s": ["i", "f", "t"], "t": ["s"]}
+def make_sites(neighbours, labels):
+    """Build connected Site objects from a neighbour map and a label for each site."""
+    numbers = {name: i for i, name in enumerate(neighbours, start=1)}
     sites = {
         name: Site(
             number=numbers[name],
             coordinates=np.zeros(3),
             neighbours=[numbers[n] for n in neighbours[name]],
             energy=0.0,
-            label="A",
+            label=labels[name],
         )
-        for name in numbers
+        for name in neighbours
     }
     for name, site in sites.items():
         site.p_neighbours = [sites[n] for n in neighbours[name]]
+    return sites
+
+
+def brute_force_cn_delta_E(initial_site, final_site, sites):
+    """Total coordination-number energy of the occupied sites after the jump minus before."""
+    before = total_cn_energy(sites)
+    initial_site.is_occupied, final_site.is_occupied = False, True
+    after = total_cn_energy(sites)
+    initial_site.is_occupied, final_site.is_occupied = True, False
+    return after - before
+
+
+def test_coordination_number_delta_E_counts_a_site_next_to_both_ends_once():
+    # Sites i and f share the neighbour s, which also neighbours t; u neighbours f:
+    #
+    #     i --- f --- u
+    #      \   /
+    #        s --- t
+    #
+    # i, s, t and u are occupied, and the atom on i jumps to f. s keeps two
+    # occupied neighbours, so its energy does not change; counting it twice
+    # would add E(1) + E(3) - 2 E(2) = 0.2 eV.
+    sites = make_sites(
+        {"i": ["f", "s"], "f": ["i", "s", "u"], "s": ["i", "f", "t"], "t": ["s"], "u": ["f"]},
+        {name: "A" for name in "ifstu"},
+    )
     cn = {"A": {0: 0.0, 1: 0.1, 2: 0.4, 3: 0.9}}
     for name, site in sites.items():
         site.set_cn_occupation_energies(cn)
-        site.is_occupied = name in ("i", "s", "t")
+        site.is_occupied = name in "istu"
     jump = Jump(sites["i"], sites["f"], coordination_number_energy={"A": cn}, params=PARAMS)
+    expected = brute_force_cn_delta_E(sites["i"], sites["f"], sites.values())
+    assert expected == pytest.approx(0.4)
+    assert jump.coordination_number_delta_E() == pytest.approx(expected)
 
-    before = total_cn_energy(sites.values())
-    sites["i"].is_occupied, sites["f"].is_occupied = False, True
-    after = total_cn_energy(sites.values())
-    sites["i"].is_occupied, sites["f"].is_occupied = True, False
 
-    assert after - before == pytest.approx(0.0)
-    assert jump.coordination_number_delta_E() == pytest.approx(after - before)
+def test_coordination_number_delta_E_matches_brute_force_on_a_triangular_lattice():
+    # Random occupations, labels and nonlinear energies on a periodic 4 x 4
+    # triangular lattice, where every bond is part of a triangle.
+    rng = np.random.default_rng(1)
+    n = 4
+    offsets = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, -1), (-1, 1)]
+    neighbours = {(x, y): [((x + dx) % n, (y + dy) % n) for dx, dy in offsets] for x in range(n) for y in range(n)}
+    for _ in range(5):
+        labels = {key: str(rng.choice(["A", "B"])) for key in neighbours}
+        sites = make_sites(neighbours, labels)
+        cn = {a: {b: {c: float(rng.uniform(-0.5, 0.5)) for c in range(7)} for b in "AB"} for a in "AB"}
+        for site in sites.values():
+            site.set_cn_occupation_energies(cn[site.label])
+            site.is_occupied = bool(rng.random() < 0.5)
+        for initial_site in sites.values():
+            for final_site in initial_site.p_neighbours:
+                if initial_site.is_occupied and not final_site.is_occupied:
+                    jump = Jump(initial_site, final_site, coordination_number_energy=cn, params=PARAMS)
+                    expected = brute_force_cn_delta_E(initial_site, final_site, sites.values())
+                    assert jump.coordination_number_delta_E() == pytest.approx(expected, abs=1e-12)
