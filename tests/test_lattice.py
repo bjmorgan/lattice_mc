@@ -271,6 +271,23 @@ class TestLattice:
         assert sites[0].energy == 0.2
         assert sites[1].energy == 0.4
 
+    def test_site_energies_by_label(self):
+        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
+        for site, label, energy in zip(sites, ["A", "B", "A"], [0.2, 0.4, 0.2]):
+            site.label = label
+            site.energy = energy
+        self.lattice.sites = sites
+        assert self.lattice.site_energies_by_label() == {"A": 0.2, "B": 0.4}
+
+    def test_site_energies_by_label_raises_ValueError_for_conflicting_energies(self):
+        sites = [Mock(spec=Site), Mock(spec=Site)]
+        for site, energy in zip(sites, [0.2, 0.3]):
+            site.label = "A"
+            site.energy = energy
+        self.lattice.sites = sites
+        with pytest.raises(ValueError, match="label A"):
+            self.lattice.site_energies_by_label()
+
     def test_set_nn_energy(self):
         self.lattice.set_nn_energy("foo")
         assert self.lattice.nn_energy == "foo"

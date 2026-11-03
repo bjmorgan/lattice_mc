@@ -71,9 +71,10 @@ each pair of occupied neighbouring sites. A positive energy is a repulsion.
 :meth:`~lattice_mc.simulation.Simulation.setup_lookup_table` is optional. It
 precalculates the probability of every possible jump, which speeds up simulations
 with nearest-neighbour interactions. Without a table, probabilities are calculated
-as they are needed. The table includes the energies set with
-:meth:`~lattice_mc.simulation.Simulation.set_site_energies` and the nearest-neighbour
-energy, as set when the table is created, so set those first. A lookup table supports
+as they are needed. The table includes the site energies, whether set with
+:meth:`~lattice_mc.simulation.Simulation.set_site_energies` or read from a sites file,
+and the nearest-neighbour energy, as they are when the table is created, so set those
+first. A lookup table supports
 nearest-neighbour interactions only, so do not use one with coordination-number
 energies.
 
