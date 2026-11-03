@@ -108,7 +108,7 @@ Running
       - ``simulation.is_blocked()``
 
 Repeated calls to ``run`` accumulate: ``run(n_jumps=300)`` then ``run(n_jumps=700)``
-gives the same results as ``run(n_jumps=1000)`` with the same seed.
+gives the same results as ``run(n_jumps=1000)`` with the same integer seed.
 
 Results
 -------

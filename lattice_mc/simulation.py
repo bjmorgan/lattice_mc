@@ -104,8 +104,10 @@ class Simulation:
                 numbers of occupied neighbours, instead of calculating each as it is needed.
                 The table supports site energies and `nn_energy` only. Defaults to False.
             seed: Seed, or random number generator, for all randomness in the simulation:
-                the initial placement of atoms and the choice and timing of jumps. Defaults to
-                None, for an unseeded generator.
+                the initial placement of atoms and the choice and timing of jumps. A generator
+                is used directly, not copied, so it is advanced in place as the simulation runs.
+                The same integer seed gives the same results. Defaults to None, for an
+                unseeded generator.
 
         Raises:
             ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
@@ -234,7 +236,7 @@ class Simulation:
         """
         Advance the simulation.
 
-        Results accumulate across runs, so with a fixed seed ``run(n_jumps=300)`` then
+        Results accumulate across runs, so with the same integer seed ``run(n_jumps=300)`` then
         ``run(n_jumps=700)`` gives the same results as ``run(n_jumps=1000)``.
 
         Args:

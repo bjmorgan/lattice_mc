@@ -14,8 +14,8 @@ class LookupTable:
     """
     Relative jump probabilities, looked up by site labels and numbers of occupied neighbours.
 
-    The table is built when it is created, so later changes to the energy model or the
-    lattice it was created from are not reflected. It holds the same probabilities as
+    The table is built when it is created, so later changes to the energy model are not
+    reflected. It holds the same probabilities as
     ``metropolis(energy_model.delta_E(...), kT)``, for models with site energies and an optional nearest-neighbour interaction.
     """
 
