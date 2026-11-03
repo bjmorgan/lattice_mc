@@ -59,6 +59,8 @@ class EnergyModel:
                 None, for no coordination-number dependence. The energy of an occupied site
                 is the sum, over the labels of its neighbours, of
                 ``cn_energies[site_label][neighbour_label][number of occupied neighbours with that label]``.
+                Any mapping given is validated and copied, so an empty mapping on a lattice
+                with sites raises `ValueError`; pass None to turn the term off.
 
         Raises:
             ValueError: If `cn_energies` has no entry for a site label in the lattice, for a
@@ -69,9 +71,14 @@ class EnergyModel:
         self._labels: tuple[str, ...] = tuple(site.label for site in lattice.sites)
         self._neighbours: tuple[tuple[int, ...], ...] = lattice.neighbour_indices
         self._nn_energy: float | None = nn_energy
-        self._cn_energies: CNEnergies | None = cn_energies
+        self._cn_energies: dict[str, dict[str, dict[int, float]]] | None = None
         if cn_energies is not None:
-            self._check_cn_energies(cn_energies)
+            copied = {
+                label: {neighbour_label: dict(by_count) for neighbour_label, by_count in by_neighbour.items()}
+                for label, by_neighbour in cn_energies.items()
+            }
+            self._check_cn_energies(copied)
+            self._cn_energies = copied
 
     def _check_cn_energies(self, cn_energies: CNEnergies) -> None:
         """
@@ -108,7 +115,9 @@ class EnergyModel:
         """
         The change in system energy if an atom jumped between two sites.
 
-        The occupation array is not modified.
+        The occupation array is not modified. If a site appears more than once in a neighbour
+        list (only possible in very small built-in lattices), the nearest-neighbour term counts
+        that neighbour once for each appearance.
 
         Args:
             occupied: Whether each site is occupied, before the jump.
@@ -120,16 +129,22 @@ class EnergyModel:
             The change in energy, in eV.
         """
         delta_E = float(self._site_energies[final] - self._site_energies[initial])
-        if self._nn_energy:
+        if self._nn_energy is not None:
             n_initial = sum(1 for j in self._neighbours[initial] if occupied[j])
             n_final = sum(1 for j in self._neighbours[final] if occupied[j])
             # -1 because the jumping atom is not counted in the final site occupation number
             delta_E += self._nn_energy * (n_final - n_initial - 1)
         if self._cn_energies is not None:
-            delta_E += self._coordination_number_delta_E(occupied, initial, final)
+            delta_E += self._coordination_number_delta_E(self._cn_energies, occupied, initial, final)
         return delta_E
 
-    def _coordination_number_delta_E(self, occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:
+    def _coordination_number_delta_E(
+        self,
+        cn_energies: CNEnergies,
+        occupied: npt.NDArray[np.bool_],
+        initial: int,
+        final: int,
+    ) -> float:
         """
         Coordination-number contribution to the change in energy for a jump.
 
@@ -137,6 +152,7 @@ class EnergyModel:
         so a site next to both ends gets both occupation changes at once.
 
         Args:
+            cn_energies: The coordination-number energies.
             occupied: Whether each site is occupied, before the jump.
             initial: Index of the site the atom jumps from.
             final: Index of the site the atom jumps to.
@@ -148,29 +164,36 @@ class EnergyModel:
         delta_E = 0.0
         for site in affected:
             if occupied[site]:
-                delta_E -= self._cn_energy(site, occupied, -1, -1)
+                delta_E -= self._cn_energy(site, cn_energies, occupied, None, None)
             if site == final or (occupied[site] and site != initial):
-                delta_E += self._cn_energy(site, occupied, initial, final)
+                delta_E += self._cn_energy(site, cn_energies, occupied, initial, final)
         return delta_E
 
-    def _cn_energy(self, site: int, occupied: npt.NDArray[np.bool_], vacated: int, filled: int) -> float:
+    def _cn_energy(
+        self,
+        site: int,
+        cn_energies: CNEnergies,
+        occupied: npt.NDArray[np.bool_],
+        vacated: int | None,
+        filled: int | None,
+    ) -> float:
         """
         Coordination-number energy of an occupied site.
 
         Args:
             site: Index of the site.
+            cn_energies: The coordination-number energies.
             occupied: Whether each site is occupied.
-            vacated: Index of a site to treat as vacant, or -1 for none.
-            filled: Index of a site to treat as occupied, or -1 for none.
+            vacated: Index of a site to treat as vacant, or None for none.
+            filled: Index of a site to treat as occupied, or None for none.
 
         Returns:
             The energy, in eV.
         """
-        assert self._cn_energies is not None
         counts: dict[str, int] = {}
         for neighbour in self._neighbours[site]:
             label = self._labels[neighbour]
             is_occupied = neighbour == filled or (neighbour != vacated and bool(occupied[neighbour]))
             counts[label] = counts.get(label, 0) + is_occupied
-        energies = self._cn_energies[self._labels[site]]
+        energies = cn_energies[self._labels[site]]
         return float(sum(energies[label][count] for label, count in counts.items()))

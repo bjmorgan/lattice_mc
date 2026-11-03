@@ -200,5 +200,31 @@ class TestCoordinationNumberValidation:
         with pytest.raises(ValueError, match="site label 'A'.*neighbour label 'B'.*count 3"):
             EnergyModel(self.lattice(), cn_energies=cn)
 
+    def test_largest_count_across_sites_of_a_label_is_required(self) -> None:
+        # Site a has one B neighbour but site c has two, so counts up to 2 are needed.
+        lattice = make_lattice(
+            {"a": ["b"], "b": ["a", "c"], "c": ["b", "d"], "d": ["c"]},
+            {"a": "A", "b": "B", "c": "A", "d": "B"},
+        )
+        by_a = {"B": {0: 0.0, 1: 0.1}}
+        by_b = {"A": {0: 0.0, 1: 0.1, 2: 0.2}}
+        with pytest.raises(ValueError, match="site label 'A'.*neighbour label 'B'.*count 2"):
+            EnergyModel(lattice, cn_energies={"A": by_a, "B": by_b})
+        EnergyModel(lattice, cn_energies={"A": {"B": {0: 0.0, 1: 0.1, 2: 0.2}}, "B": by_b})
+
+    def test_empty_cn_energies_raise(self) -> None:
+        with pytest.raises(ValueError, match="site label"):
+            EnergyModel(self.lattice(), cn_energies={})
+
+    def test_cn_energies_are_copied(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i", "x"], "x": ["f"]})
+        occupied = occupation(lattice, [0, 2])
+        cn: dict[str, dict[str, dict[int, float]]] = {"A": {"A": {0: 0.0, 1: 0.5, 2: 1.2}}}
+        model = EnergyModel(lattice, cn_energies=cn)
+        expected = model.delta_E(occupied, 0, 1)
+        assert expected != 0.0
+        del cn["A"]["A"][1]
+        assert model.delta_E(occupied, 0, 1) == pytest.approx(expected)
+
     def test_lattice_without_cn_energies_needs_no_checking(self) -> None:
         EnergyModel(self.lattice(), nn_energy=0.2)
