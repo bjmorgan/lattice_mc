@@ -1,279 +1,207 @@
-from unittest.mock import Mock, PropertyMock, patch
+"""Tests for lattice_mc.simulation.Simulation."""
 
-import numpy as np
+import pathlib
+
 import pytest
 
-from lattice_mc.atom import Atom
-from lattice_mc.lattice import Lattice
-from lattice_mc.simulation import Simulation, SimulationParameters
-from lattice_mc.species import Species
+from lattice_mc import (
+    BlockedLatticeError,
+    Results,
+    Simulation,
+    SimulationParameters,
+    cubic_lattice,
+    honeycomb_lattice,
+    lattice_from_sites_file,
+    square_lattice,
+)
 
-PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1e13)
+PARAMS = SimulationParameters(temperature=298.0, rate_prefactor=1.0)
+LLZO = pathlib.Path(__file__).resolve().parents[1] / "examples" / "llzo_lattice_site_list.dat"
 
 
-class TestSimulation:
-    """Tests for Simulation class"""
+def results_of(simulation: Simulation) -> Results:
+    """The results of a simulation that has made jumps."""
+    results = simulation.results
+    if results is None:
+        pytest.fail("Simulation.results is None after jumps were made")
+    return results
 
-    def test_simulation_is_initialised(self):
-        simulation = Simulation(PARAMS)
-        assert simulation.params is PARAMS
-        assert simulation.lattice is None
-        assert simulation.number_of_atoms is None
-        assert simulation.number_of_equilibration_jumps == 0
-        assert simulation.number_of_jumps is None
-        assert simulation.for_time is None
-        assert simulation.number_of_atoms is None
-        assert simulation.has_run is False
 
-    def test_reset(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.atoms = Mock(spec=Species)
-        simulation.atoms.atoms = [Mock(spec=Atom), Mock(spec=Atom)]
-        simulation.reset()
-        assert simulation.lattice.reset.call_count == 1
-        assert simulation.atoms.atoms[0].reset.call_count == 1
-        assert simulation.atoms.atoms[1].reset.call_count == 1
+class TestConstruction:
+    def test_needs_n_atoms_or_occupied_sites(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS)
 
-    def test_set_number_of_atoms(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        mock_atoms = [Mock(spec=Atom), Mock(spec=Atom)]
-        simulation.lattice.populate_sites = Mock(return_value=mock_atoms)
-        with patch("lattice_mc.species.Species") as mock_Species:
-            mock_Species.return_value = "some atoms"
-            simulation.set_number_of_atoms(3)
-            assert simulation.number_of_atoms == 3
-            assert simulation.atoms == "some atoms"
-            mock_Species.assert_called_with(mock_atoms)
+    def test_rejects_both_n_atoms_and_occupied_sites(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, occupied_sites=[1])
 
-    def test_set_number_of_atoms_with_specific_sites(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        mock_atoms = [Mock(spec=Atom), Mock(spec=Atom)]
-        simulation.lattice.populate_sites = Mock(return_value=mock_atoms)
-        with patch("lattice_mc.species.Species") as mock_Species:
-            mock_Species.return_value = "some atoms"
-            simulation.set_number_of_atoms(3, selected_sites=["A"])
-            assert simulation.lattice.populate_sites.call_args[1]["selected_sites"] == ["A"]
+    def test_rejects_zero_atoms(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=0)
 
-    def test_set_number_of_jumps(self):
-        simulation = Simulation(PARAMS)
-        simulation.set_number_of_jumps(32)
-        assert simulation.number_of_jumps == 32
+    def test_rejects_more_atoms_than_sites(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=17)
 
-    def test_set_number_of_equilibration_jumps(self):
-        simulation = Simulation(PARAMS)
-        simulation.set_number_of_equilibration_jumps(32)
-        assert simulation.number_of_equilibration_jumps == 32
+    def test_places_n_atoms(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=5, seed=0)
+        assert len(simulation.occupied_sites) == 5
 
-    def test_define_lattice_from_file(self):
-        with patch("lattice_mc.init_lattice.lattice_from_sites_file") as mock_lattice_from_file:
-            mock_lattice_from_file.return_value = "foo"
-            simulation = Simulation(PARAMS)
-            cell_lengths = np.array([1.0, 2.0, 3.0])
-            simulation.define_lattice_from_file("filename", cell_lengths)
-            assert simulation.lattice == "foo"
-            mock_lattice_from_file.assert_called_with("filename", cell_lengths=cell_lengths)
+    def test_selected_labels_restrict_placement(self):
+        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+        simulation = Simulation(lattice, PARAMS, n_atoms=8, selected_labels=["A"], seed=0)
+        a_sites = {site.number for site in lattice.sites if site.label == "A"}
+        assert set(simulation.occupied_sites) == a_sites
 
-    def test_set_nn_energy(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.set_nn_energy = Mock()
-        simulation.set_nn_energy("foo")
-        simulation.lattice.set_nn_energy.assert_called_with("foo")
+    def test_rejects_more_atoms_than_selected_sites(self):
+        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+        with pytest.raises(ValueError):
+            Simulation(lattice, PARAMS, n_atoms=9, selected_labels=["A"])
 
-    def test_set_cn_energies(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.set_cn_energies = Mock()
-        simulation.set_cn_energies("foo")
-        simulation.lattice.set_cn_energies.assert_called_with("foo")
+    def test_rejects_unknown_selected_labels(self):
+        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+        with pytest.raises(ValueError):
+            Simulation(lattice, PARAMS, n_atoms=1, selected_labels=["A", "C"])
 
-    def test_set_site_energies(self):
-        simulation = Simulation(PARAMS)
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.set_site_energies = Mock()
-        simulation.set_site_energies("foo")
-        simulation.lattice.set_site_energies.assert_called_with(by_label="foo")
+    def test_rejects_selected_labels_with_occupied_sites(self):
+        lattice = honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
+        with pytest.raises(ValueError):
+            Simulation(lattice, PARAMS, occupied_sites=[1], selected_labels=["A"])
 
-    def test_is_initialised_fails_with_no_lattice(self):
-        simulation = Simulation(PARAMS)
-        simulation.atoms = "foo"
-        simulation.number_of_jumps = "bar"
-        simulation.lattice = None
-        with pytest.raises(AttributeError):
-            simulation.is_initialised()
+    def test_occupied_sites_places_atoms_on_those_sites(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[7, 2])
+        assert sorted(simulation.occupied_sites) == [2, 7]
 
-    def test_is_initialised_fails_with_no_atoms(self):
-        simulation = Simulation(PARAMS)
-        simulation.atoms = None
-        simulation.number_of_jumps = "bar"
-        simulation.lattice = "foo"
-        with pytest.raises(AttributeError):
-            simulation.is_initialised()
+    def test_rejects_unknown_occupied_sites(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[1, 99])
 
-    def test_is_initilaised_fails_with_no_number_of_jumps(self):
-        simulation = Simulation(PARAMS)
-        simulation.atoms = "bar"
-        simulation.number_of_jumps = None
-        simulation.lattice = "foo"
-        with pytest.raises(AttributeError):
-            simulation.is_initialised()
+    def test_rejects_empty_occupied_sites(self):
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, occupied_sites=[])
 
-    def test_run_raises_error_if_not_initialised(self):
-        simulation = Simulation(PARAMS)
-        simulation.is_initialised = Mock(side_effect=AttributeError("test"))
-        with pytest.raises(AttributeError):
+    def test_rejects_incomplete_cn_energies(self):
+        cn_energies = {"L": {"L": {count: 0.0 for count in range(4)}}}
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies)
+
+    def test_lookup_table_rejects_cn_energies(self):
+        cn_energies = {"L": {"L": {count: 0.0 for count in range(5)}}}
+        with pytest.raises(ValueError):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies, lookup_table=True)
+
+    def test_lookup_table_rejects_different_energies_for_one_label(self):
+        lattice = square_lattice(4, 4, 1.0)
+        lattice.set_site_energies(by_site={1: 0.1})
+        with pytest.raises(ValueError):
+            Simulation(lattice, PARAMS, n_atoms=1, lookup_table=True)
+
+
+class TestRun:
+    @pytest.fixture
+    def simulation(self) -> Simulation:
+        return Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=0)
+
+    def test_results_are_none_before_any_run(self, simulation):
+        assert simulation.results is None
+
+    def test_run_n_jumps_makes_that_many_jumps(self, simulation):
+        simulation.run(n_jumps=10)
+        assert results_of(simulation).number_of_jumps == 10
+
+    def test_run_needs_an_argument(self, simulation):
+        with pytest.raises(ValueError):
             simulation.run()
 
-    def test_run_without_equilibration_steps(self):
-        simulation = Simulation(PARAMS)
-        simulation.is_initialised = Mock(return_value=(True, None))
-        simulation.atoms = "a"
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.jump = Mock()
-        simulation.number_of_jumps = 10
-        simulation.run()
-        assert simulation.lattice.jump.call_count == 10
-
-    def test_run_for_time(self):
-        simulation = Simulation(PARAMS)
-        simulation.is_initialised = Mock(return_value=(True, None))
-        simulation.atoms = "a"
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.time = 0.0
-
-        def fake_jump_method():
-            simulation.lattice.time += 1.0
-
-        simulation.lattice.jump = fake_jump_method
-        simulation.run(for_time=10.0)
-        assert simulation.lattice.time == 10.0
-        assert simulation.number_of_jumps == 10
-
-    def test_run_with_equilibration_steps(self):
-        simulation = Simulation(PARAMS)
-        simulation.is_initialised = Mock(return_value=(True, None))
-        simulation.atoms = "a"
-        simulation.lattice = Mock(spec=Lattice)
-        simulation.lattice.jump = Mock()
-        simulation.reset = Mock()
-        simulation.number_of_equilibration_jumps = 20
-        simulation.number_of_jumps = 30
-        simulation.run()
-        assert simulation.lattice.jump.call_count == 20 + 30
-        assert simulation.reset.call_count == 1
-
-
-class TestSimulationResults:
-    @pytest.fixture(autouse=True)
-    def set_up(self):
-        self.simulation = Simulation(PARAMS)
-        self.simulation.has_run = True
-
-    def test_tracer_correlation(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.tracer_correlation = Mock(return_value=3.3)
-        assert s.tracer_correlation == 3.3
-
-    def test_tracer_diffusion_coefficient(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.sum_dr_squared = Mock(return_value=15.0)
-        s.number_of_atoms = 5
-        s.lattice = Mock(spec=Lattice)
-        s.lattice.time = 12.0
-        s.lattice.dimensionality = 3
-        assert s.tracer_diffusion_coefficient == 15.0 / (6.0 * 5.0 * 12.0)
-
-    def test_tracer_diffusion_coefficient_in_two_dimensions(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.sum_dr_squared = Mock(return_value=15.0)
-        s.number_of_atoms = 5
-        s.lattice = Mock(spec=Lattice)
-        s.lattice.time = 12.0
-        s.lattice.dimensionality = 2
-        assert s.tracer_diffusion_coefficient == 15.0 / (4.0 * 5.0 * 12.0)
-
-    def test_collective_correlation(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.collective_correlation = Mock(return_value=3.0)
-        assert s.collective_correlation == 3.0
-
-    def test_collective_diffusion_coefficient(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.collective_dr_squared = Mock(return_value=36.0)
-        s.lattice = Mock(spec=Lattice)
-        s.lattice.time = 2.0
-        s.lattice.dimensionality = 3
-        assert s.collective_diffusion_coefficient == 3.0
-
-    def test_collective_diffusion_coefficient_in_two_dimensions(self):
-        s = self.simulation
-        s.atoms = Mock(spec=Species)
-        s.atoms.collective_dr_squared = Mock(return_value=36.0)
-        s.lattice = Mock(spec=Lattice)
-        s.lattice.time = 2.0
-        s.lattice.dimensionality = 2
-        assert s.collective_diffusion_coefficient == 4.5
-
-    def test_collective_diffusion_coefficient_per_atom(self):
-        s = self.simulation
-        with patch(
-            "lattice_mc.simulation.Simulation.collective_diffusion_coefficient", new_callable=PropertyMock
-        ) as mock_cdc:
-            mock_cdc.return_value = 8.0
-            s.number_of_atoms = 2
-            assert s.collective_diffusion_coefficient_per_atom == 4.0
-
-    def test_average_site_occupations(self):
-        s = self.simulation
-        s.lattice = Mock(spec=Lattice)
-        s.lattice.site_occupation_statistics = Mock(return_value="foo")
-        assert s.average_site_occupations == "foo"
-
-    def test_setup_lookup_table(self):
-        s = self.simulation
-        s.lattice = Mock(spec=Lattice)
-        with patch("lattice_mc.lookup_table.LookupTable") as mock_lookup_table:
-            mock_lookup_table.return_value = "foo"
-            s.setup_lookup_table()
-            assert s.lattice.jump_lookup_table == "foo"
-            mock_lookup_table.assert_called_with(s.lattice, "nearest-neighbour")
-
-    def test_setup_lookup_table_with_unsupported_hamiltonian(self):
-        s = self.simulation
+    def test_run_rejects_both_arguments(self, simulation):
         with pytest.raises(ValueError):
-            s.setup_lookup_table(hamiltonian="coordination_number")
+            simulation.run(n_jumps=10, for_time=1.0)
 
-    def test_setup_lookup_table_with_invalid_hamiltonian(self):
-        s = self.simulation
-        with pytest.raises(ValueError):
-            s.setup_lookup_table(hamiltonian="bar")
+    def test_run_for_time_reaches_that_time(self, simulation):
+        simulation.run(for_time=5.0)
+        assert results_of(simulation).time >= 5.0
+
+    def test_second_run_for_the_same_time_makes_no_jumps(self, simulation):
+        simulation.run(for_time=5.0)
+        number_of_jumps = results_of(simulation).number_of_jumps
+        simulation.run(for_time=5.0)
+        assert results_of(simulation).number_of_jumps == number_of_jumps
+
+    def test_reset_clears_results(self, simulation):
+        simulation.run(n_jumps=10)
+        simulation.reset()
+        assert simulation.results is None
+
+    def test_reset_keeps_atom_positions(self, simulation):
+        simulation.run(n_jumps=10)
+        occupied_sites = simulation.occupied_sites
+        simulation.reset()
+        assert simulation.occupied_sites == occupied_sites
+
+    def test_same_seed_gives_the_same_results(self):
+        simulations = [Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=3) for _ in range(2)]
+        for simulation in simulations:
+            simulation.run(n_jumps=100)
+        assert results_of(simulations[0]) == results_of(simulations[1])
+
+    def test_split_run_equals_one_run(self):
+        split = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=3)
+        split.run(n_jumps=300)
+        split.run(n_jumps=700)
+        whole = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=3)
+        whole.run(n_jumps=1000)
+        assert results_of(split) == results_of(whole)
 
 
-class TestSimulationNoResults:
-    def test_tracer_correlation(self):
-        s = Simulation(PARAMS)
-        assert s.tracer_correlation is None
+class TestBlocked:
+    def test_partly_occupied_lattice_is_not_blocked(self):
+        assert Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4).is_blocked() is False
 
-    def test_tracer_diffusion_coefficient(self):
-        s = Simulation(PARAMS)
-        assert s.tracer_diffusion_coefficient is None
+    def test_fully_occupied_lattice_is_blocked_before_any_run(self):
+        assert Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=16).is_blocked() is True
 
-    def test_collective_correlation(self):
-        s = Simulation(PARAMS)
-        assert s.collective_correlation is None
+    def test_run_on_a_blocked_lattice_raises_and_leaves_no_results(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=16)
+        with pytest.raises(BlockedLatticeError):
+            simulation.run(n_jumps=1)
+        assert simulation.results is None
 
-    def test_collective_diffusion_coefficient(self):
-        s = Simulation(PARAMS)
-        assert s.collective_diffusion_coefficient is None
 
-    def test_collective_diffusion_coefficient_per_atom(self):
-        s = Simulation(PARAMS)
-        assert s.collective_diffusion_coefficient_per_atom is None
+class TestLatticeCopy:
+    def test_later_changes_to_the_callers_lattice_do_not_change_results(self):
+        reference = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
+        reference.run(n_jumps=100)
+        lattice = square_lattice(4, 4, 1.0)
+        simulation = Simulation(lattice, PARAMS, n_atoms=4, seed=5)
+        lattice.set_site_energies(by_site={number: 0.5 * (number % 2) for number in range(1, 17)})
+        simulation.run(n_jumps=100)
+        assert results_of(simulation) == results_of(reference)
+
+    def test_lattice_is_a_copy(self):
+        lattice = square_lattice(4, 4, 1.0)
+        simulation = Simulation(lattice, PARAMS, n_atoms=4)
+        assert simulation.lattice is not lattice
+        assert simulation.lattice.number_of_sites == lattice.number_of_sites
+
+
+class TestLattices:
+    def test_sites_file_with_negative_unsorted_numbers_runs(self):
+        lattice = lattice_from_sites_file(str(LLZO), cell_lengths=[49.0672361] * 3)
+        simulation = Simulation(lattice, PARAMS, n_atoms=50, seed=0)
+        simulation.run(n_jumps=20)
+        site_numbers = {site.number for site in lattice.sites}
+        assert len(set(simulation.occupied_sites)) == 50
+        assert set(simulation.occupied_sites) <= site_numbers
+
+    def test_two_dimensional_lattice_gives_results(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=0)
+        simulation.run(n_jumps=10)
+        assert simulation.lattice.dimensionality == 2
+        assert isinstance(simulation.results, Results)
+
+    def test_cn_energies_run_on_the_fly(self):
+        cn_energies = {"L": {"L": {count: -0.01 * count for count in range(7)}}}
+        simulation = Simulation(cubic_lattice(3, 3, 3, 1.0), PARAMS, n_atoms=5, cn_energies=cn_energies, seed=0)
+        simulation.run(n_jumps=10)
+        assert results_of(simulation).number_of_jumps == 10

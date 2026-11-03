@@ -9,6 +9,7 @@ import numpy as np
 import numpy.typing as npt
 
 if TYPE_CHECKING:
+    from lattice_mc.lattice import Lattice
     from lattice_mc.lattice_site import Site
 
 
@@ -17,18 +18,19 @@ class Cluster:
     Clusters are sets of sites.
     """
 
-    def __init__(self, sites: Iterable[Site]) -> None:
+    def __init__(self, sites: Iterable[Site], lattice: Lattice) -> None:
         """
         Initialise a Cluster instance.
 
         Args:
             sites: The sites that make up the cluster.
+            lattice: The lattice the sites belong to, which defines their neighbours.
         """
         self.sites: set[Site] = set(sites)
+        self.lattice: Lattice = lattice
         self.neighbours: set[Site] = set()
         for s in self.sites:
-            assert s.p_neighbours is not None
-            self.neighbours.update(s.p_neighbours)
+            self.neighbours.update(lattice.neighbours_of(s))
         self.neighbours = self.neighbours.difference(self.sites)
 
     def merge(self, other_cluster: Cluster) -> Cluster:
@@ -41,7 +43,7 @@ class Cluster:
         Returns:
             The combination of both clusters.
         """
-        new_cluster = Cluster(self.sites | other_cluster.sites)
+        new_cluster = Cluster(self.sites | other_cluster.sites, self.lattice)
         new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
         return new_cluster
 
@@ -105,8 +107,7 @@ class Cluster:
         winds = np.zeros(3, dtype=bool)
         while stack:
             site = stack.pop()
-            assert site.p_neighbours is not None
-            for neighbour in site.p_neighbours:
+            for neighbour in self.lattice.neighbours_of(site):
                 if neighbour not in self.sites:
                     continue
                 bond_wrap = np.round(
