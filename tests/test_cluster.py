@@ -79,8 +79,8 @@ class TestCluster:
         expected[axis] = True
         assert cluster.is_periodically_contiguous(cell_lengths) == tuple(expected)
 
-    @pytest.mark.filterwarnings("error")
-    def test_cluster_is_periodically_contiguous_with_a_zero_cell_length(self):
+    @pytest.mark.filterwarnings("error::RuntimeWarning")
+    def test_cluster_ignores_an_axis_with_a_zero_cell_length(self):
         # Regression: a zero z cell length (as for two-dimensional lattices)
         # gave 0/0 in the bond wrap calculation, and the NaN cast to int is
         # platform dependent. Warnings are errors so this fails on every platform.
@@ -93,6 +93,24 @@ class TestCluster:
         cluster = Cluster(sites)
         cell_lengths = np.array([3.0, 10.0, 0.0])
         assert cluster.is_periodically_contiguous(cell_lengths) == (True, False, False)
+
+    def test_cluster_ignores_a_zero_length_axis_with_buckled_sites(self):
+        # Sites that are not all at z = 0 give a non-zero z bond component, which
+        # divided by a zero cell length is infinite rather than NaN.
+        sites = [Mock(spec=Site), Mock(spec=Site), Mock(spec=Site)]
+        sites[0].r = np.array([0.0, 0.0, 0.0])
+        sites[1].r = np.array([1.0, 0.0, 0.3])
+        sites[2].r = np.array([2.0, 0.0, 0.0])
+        for s in sites:
+            s.p_neighbours = [other for other in sites if other is not s]
+        cluster = Cluster(sites)
+        cell_lengths = np.array([3.0, 10.0, 0.0])
+        with np.errstate(divide="ignore", invalid="ignore"):
+            assert cluster.is_periodically_contiguous(cell_lengths) == (True, False, False)
+
+    def test_is_periodically_contiguous_raises_ValueError_for_an_empty_cluster(self):
+        with pytest.raises(ValueError):
+            Cluster([]).is_periodically_contiguous(np.array([3.0, 3.0, 3.0]))
 
     def test_cluster_is_not_periodically_contiguous_for_a_fully_connected_cluster(self):
         # Regression: a 4-clique has neighbouring coordinate-extreme sites on

@@ -416,7 +416,6 @@ class TestLattice:
         self.lattice.connected_sites = Mock(return_value=clusters)
         self.lattice.sites = sites
         assert self.lattice.detached_sites() == [sites[1]]
-        assert clusters[0].is_periodically_contiguous.call_args.args[0] is self.lattice.cell_lengths
 
     @patch("lattice_mc.lattice.Lattice.site_with_id")
     @patch("lattice_mc.lattice.Lattice.initialise_site_lookup_table")

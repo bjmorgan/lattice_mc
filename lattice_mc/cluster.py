@@ -83,14 +83,22 @@ class Cluster:
                 lattice) is not periodic, and is never reported as contiguous.
 
         Returns:
-            Contiguity along the x, y, and z axes.
+            Contiguity along the x, y, and z axes. A cluster that winds diagonally, for
+            example once along x and once along y in the same loop, is contiguous along
+            both axes.
+
+        Raises:
+            ValueError: If the cluster has no sites.
 
         Notes:
-            Assumes the minimum-image convention: every bond must span less
-            than half the cell length along each axis. In practice this means
-            winding can only be detected along an axis where the cluster is at
-            least three sites across the cell.
+            Assumes the minimum-image convention: every bond must span less than half
+            the cell length along each axis. A bond of half the cell length or more is
+            read as its shorter periodic image, and winding through it is missed. For
+            a lattice with one site per repeat unit along an axis, this needs at least
+            three repeat units along that axis.
         """
+        if not self.sites:
+            raise ValueError("Cannot check the periodic contiguity of an empty cluster.")
         root = next(iter(self.sites))
         images: dict[Site, npt.NDArray[np.int_]] = {root: np.zeros(3, dtype=int)}
         stack = [root]

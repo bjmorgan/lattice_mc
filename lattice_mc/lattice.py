@@ -490,6 +490,11 @@ class Lattice:
 
         Returns:
             List of sites not in a periodic percolating network.
+
+        Notes:
+            Every bond must span less than half the cell length along each axis
+            (see `Cluster.is_periodically_contiguous`). In smaller cells, clusters
+            that wind round the cell can be reported as detached.
         """
         clusters = self.connected_sites(site_labels=site_labels)
         island_clusters = [c for c in clusters if not any(c.is_periodically_contiguous(self.cell_lengths))]

@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
+from lattice_mc.init_lattice import honeycomb_lattice, square_lattice
 from lattice_mc.lattice import Lattice
 from lattice_mc.lattice_site import Site
 
@@ -78,16 +79,7 @@ class TestLatticeIntegration:
 
 
 class TestDetachedSitesIntegration:
-    """Regression tests for Lattice.detached_sites using real Site objects.
-
-    The old coordinate-extremes heuristic in Cluster.is_periodically_contiguous
-    reported fully connected 4-site clusters as periodically contiguous on all
-    axes, so a lattice of disconnected cliques wrongly reported no detached
-    sites.
-
-    The winding-ring test guards the complementary direction: genuinely
-    winding clusters must not be reported as detached.
-    """
+    """Tests for Lattice.detached_sites using real Site and Lattice objects."""
 
     def test_disconnected_cliques_are_all_detached(self):
         clique_coordinates = [
@@ -113,3 +105,53 @@ class TestDetachedSitesIntegration:
         ]
         lattice = Lattice(sites, cell_lengths=np.array([3.0, 10.0, 10.0]))
         assert lattice.detached_sites() == []
+
+    def test_cluster_closed_only_through_another_label_is_detached(self):
+        # The ring 1-2-3 winds along x, but only through the B site 3, so the
+        # A cluster {1, 2} does not wind.
+        sites = [
+            Site(number=1, coordinates=np.array([0.0, 0.0, 0.0]), neighbours=[2, 3], energy=0.0, label="A"),
+            Site(number=2, coordinates=np.array([1.0, 0.0, 0.0]), neighbours=[1, 3], energy=0.0, label="A"),
+            Site(number=3, coordinates=np.array([2.0, 0.0, 0.0]), neighbours=[1, 2], energy=0.0, label="B"),
+        ]
+        lattice = Lattice(sites, cell_lengths=np.array([3.0, 10.0, 10.0]))
+        assert {s.number for s in lattice.detached_sites("A")} == {1, 2}
+
+    @pytest.mark.parametrize(
+        "lattice", [square_lattice(3, 3, 1.0), honeycomb_lattice(2, 2, 1.0)], ids=["square", "honeycomb"]
+    )
+    def test_fully_occupied_two_dimensional_lattice_winds_along_x_and_y(self, lattice):
+        (cluster,) = lattice.connected_sites()
+        assert cluster.is_periodically_contiguous(lattice.cell_lengths) == (True, True, False)
+        assert lattice.detached_sites() == []
+
+    def test_dimer_on_a_square_lattice_is_detached(self):
+        lattice = square_lattice(4, 4, 1.0)
+        relabel(lattice, {square_site(0, 0, 4), square_site(1, 0, 4)})
+        assert {s.number for s in lattice.detached_sites("A")} == {square_site(0, 0, 4), square_site(1, 0, 4)}
+
+    def test_block_straddling_the_boundary_is_detached(self):
+        lattice = square_lattice(4, 4, 1.0)
+        block = {square_site(3, 3, 4), square_site(0, 3, 4), square_site(3, 0, 4), square_site(0, 0, 4)}
+        relabel(lattice, block)
+        assert {s.number for s in lattice.detached_sites("A")} == block
+
+    def test_diagonal_winding_is_reported_along_both_axes(self):
+        # (0,0)-(1,0)-(1,1)-(2,1)-(2,2), then across the x boundary to (0,2) and
+        # across the y boundary back to (0,0): one winding along x and y together.
+        lattice = square_lattice(3, 3, 1.0)
+        relabel(lattice, {square_site(x, y, 3) for x, y in [(0, 0), (1, 0), (1, 1), (2, 1), (2, 2), (0, 2)]})
+        (cluster,) = lattice.connected_sites("A")
+        assert cluster.is_periodically_contiguous(lattice.cell_lengths) == (True, True, False)
+
+
+def square_site(x, y, a):
+    """Number of the site at (x, y) in square_lattice(a, b, spacing)."""
+    return x + a * y + 1
+
+
+def relabel(lattice, a_site_numbers):
+    """Label the given sites 'A' and every other site 'B'."""
+    for site in lattice.sites:
+        site.label = "A" if site.number in a_site_numbers else "B"
+    lattice.site_labels = {site.label for site in lattice.sites}

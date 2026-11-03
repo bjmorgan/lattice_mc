@@ -144,9 +144,14 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
 
         Site numbers are arbitrary integers. The energy line is optional, and
         defaults to 0.0. Energies must be plain decimals with a single space after
-        the colon (see https://github.com/bjmorgan/lattice_mc/issues/31). Lines within a block can be in any order. Both
-        centre/center and neighbours/neighbors are accepted. A full example is
+        the colon (see https://github.com/bjmorgan/lattice_mc/issues/31). Lines
+        within a block can be in any order. Both centre/center and
+        neighbours/neighbors are accepted. A full example is
         ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
+
+        For `Lattice.detached_sites`, every bond must span less than half the cell
+        length along each axis, so a cell of a single conventional unit cell is
+        usually too small.
     """
     sites: list[lattice_site.Site] = []
     site_re = re.compile(r"site:\s+([-+]?\d+)")
