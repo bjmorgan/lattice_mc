@@ -13,11 +13,11 @@
   "identifier": "",
   "codeRepository": "https://github.com/bjmorgan/lattice_mc",
   "datePublished": "2017-04-14",
-  "dateModified": "2017-04-14",
+  "dateModified": "2026-11-03",
   "dateCreated": "2017-04-14",
   "description": "Lattice-gas (kinetic) Monte Carlo implemented in Python",
   "keywords": "monte-carlo, lattice-gas, correlation-factors",
   "license": "MIT",
   "title": "lattice_mc",
-  "version": "1.0.4"
+  "version": "2.0.0"
 }

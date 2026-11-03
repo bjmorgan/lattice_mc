@@ -11,4 +11,4 @@ from lattice_mc.results import Results as Results
 from lattice_mc.simulation import Simulation as Simulation
 from lattice_mc.simulation import SimulationParameters as SimulationParameters
 
-__version__ = "1.0.4"
+__version__ = "2.0.0"
