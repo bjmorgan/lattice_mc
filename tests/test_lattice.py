@@ -271,6 +271,21 @@ class TestLattice:
         assert sites[0].energy == 0.2
         assert sites[1].energy == 0.4
 
+    def test_site_energies_by_label(self):
+        self.lattice.sites = [
+            Site(number=i, coordinates=np.zeros(3), neighbours=[], energy=energy, label=label)
+            for i, (label, energy) in enumerate([("A", 0.2), ("B", 0.4), ("A", 0.2)], start=1)
+        ]
+        assert self.lattice.site_energies_by_label() == {"A": 0.2, "B": 0.4}
+
+    def test_site_energies_by_label_raises_ValueError_for_conflicting_energies(self):
+        self.lattice.sites = [
+            Site(number=i, coordinates=np.zeros(3), neighbours=[], energy=energy, label="A")
+            for i, energy in enumerate([0.2, 0.3], start=1)
+        ]
+        with pytest.raises(ValueError, match="label A"):
+            self.lattice.site_energies_by_label()
+
     def test_set_nn_energy(self):
         self.lattice.set_nn_energy("foo")
         assert self.lattice.nn_energy == "foo"

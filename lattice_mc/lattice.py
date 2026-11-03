@@ -46,7 +46,6 @@ class Lattice:
         self.params: SimulationParameters | None = None
         self.nn_energy: float | None = None
         self.cn_energies: dict[str, dict[str, dict[int, float]]] | None = None
-        self.site_energies: dict[str, float] | None = None
         self.jump_lookup_table: LookupTable | None = None
         self.number_of_occupied_sites: int = 0
         for site in self.sites:
@@ -298,11 +297,33 @@ class Lattice:
             energies: Occupation energy, in eV, for each site label, for example
                 ``{'A': 1.0, 'B': 0.0}``.
         """
-        self.site_energies = energies
         for site_label in energies:
             for site in self.sites:
                 if site.label == site_label:
                     site.energy = energies[site_label]
+
+    def site_energies_by_label(self) -> dict[str, float]:
+        """
+        The occupation energy of the sites with each label.
+
+        Sites with the same label can have different energies, but the lookup table
+        is keyed by label, so it needs every site with a given label to have the same
+        energy.
+
+        Returns:
+            The occupation energy, in eV, for each site label.
+
+        Raises:
+            ValueError: If sites with the same label have different energies.
+        """
+        energies: dict[str, float] = {}
+        for site in self.sites:
+            if energies.setdefault(site.label, site.energy) != site.energy:
+                raise ValueError(
+                    f"Sites with label {site.label} have different energies, "
+                    f"{energies[site.label]} and {site.energy}."
+                )
+        return energies
 
     def set_nn_energy(self, delta_E: float) -> None:
         """

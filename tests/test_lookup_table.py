@@ -3,6 +3,7 @@ from unittest.mock import Mock, call, patch
 
 import pytest
 
+from lattice_mc.init_lattice import lattice_from_sites_file
 from lattice_mc.lattice import Lattice
 from lattice_mc.lookup_table import LookupTable, metropolis
 from lattice_mc.simulation import SimulationParameters
@@ -27,7 +28,7 @@ class TestLookupTable:
     def set_up(self, mock_generate_nearest_neighbour_lookup_table):
         self.lattice = Mock(spec=Lattice)
         self.lattice.params = PARAMS
-        self.lattice.site_energies = "foo"
+        self.lattice.site_energies_by_label = Mock(return_value="foo")
         self.lattice.nn_energy = "bar"
         self.lattice.cn_energies = "baz"
         self.lattice.connected_site_pairs = Mock(return_value="qux")
@@ -61,7 +62,7 @@ class TestLookupTable:
 
     @patch("lattice_mc.lookup_table.metropolis")
     def test_relative_probability_with_coordination_numbers(self, mock_metropolis):
-        self.table.site_energies = None
+        self.table.site_energies = {"A": 0.0, "B": 0.0}
         self.table.nn_energy = 1.0
         self.table.relative_probability("A", "B", 3, 1)
         mock_metropolis.assert_called_with(-3.0, PARAMS.kT)
@@ -87,3 +88,36 @@ class TestLookupTable:
             call("A", "B", 1, 2),
             call("A", "B", 1, 3),
         ]
+
+
+SITES_WITH_ENERGIES = """2
+
+site: 1
+centre: 0.0 0.0 0.0
+neighbours: 2
+label: A
+
+site: 2
+centre: 1.0 0.0 0.0
+neighbours: 1
+label: B
+energy: 0.1
+"""
+
+
+def test_lookup_table_includes_site_energies_from_a_sites_file(tmp_path):
+    path = tmp_path / "sites.dat"
+    path.write_text(SITES_WITH_ENERGIES)
+    lattice = lattice_from_sites_file(str(path), cell_lengths=[10.0, 10.0, 10.0])
+    lattice.params = PARAMS
+    table = LookupTable(lattice, "nearest-neighbour")
+    assert table.relative_probability("A", "B", 0, 1) == pytest.approx(metropolis(0.1, PARAMS.kT))
+
+
+def test_lookup_table_raises_ValueError_for_one_label_with_different_energies(tmp_path):
+    path = tmp_path / "sites.dat"
+    path.write_text(SITES_WITH_ENERGIES.replace("label: B", "label: A"))
+    lattice = lattice_from_sites_file(str(path), cell_lengths=[10.0, 10.0, 10.0])
+    lattice.params = PARAMS
+    with pytest.raises(ValueError, match="label A"):
+        LookupTable(lattice, "nearest-neighbour")

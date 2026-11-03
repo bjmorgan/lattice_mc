@@ -52,7 +52,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
             )
         assert lattice.params is not None
         self.kT: float = lattice.params.kT
-        self.site_energies: dict[str, float] | None = lattice.site_energies
+        self.site_energies: dict[str, float] = lattice.site_energies_by_label()
         self.nn_energy: float | None = lattice.nn_energy
         self.cn_energy: dict[str, dict[str, dict[int, float]]] | None = lattice.cn_energies
         self.connected_site_pairs: dict[str, list[str]] = lattice.connected_site_pairs()
@@ -74,10 +74,7 @@ class LookupTable:  # TODO if nearest-neighbour and coordination number dependen
         Returns:
             The relative probability of this jump occurring.
         """
-        if self.site_energies:
-            site_delta_E = self.site_energies[l2] - self.site_energies[l1]
-        else:
-            site_delta_E = 0.0
+        site_delta_E = self.site_energies[l2] - self.site_energies[l1]
         if self.nn_energy:
             delta_nn = c2 - c1 - 1  # -1 because the hopping ion is not counted in the final site occupation number
             site_delta_E += delta_nn * self.nn_energy
