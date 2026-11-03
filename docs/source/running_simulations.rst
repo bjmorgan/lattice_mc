@@ -59,7 +59,7 @@ labels. The atoms can then jump to any neighbouring vacant site, whatever its la
 
     honeycomb = lmc.honeycomb_lattice(2, 2, 1.0, alternating_sites=True)
     on_a = lmc.Simulation(honeycomb, params, n_atoms=4, selected_labels="A", seed=1)
-    print({on_a.lattice.site_with_id(number).label for number in on_a.occupied_sites})
+    print({honeycomb.site_with_id(number).label for number in on_a.occupied_sites})
 
 .. testoutput::
 
@@ -71,8 +71,9 @@ when the simulation is created (see :doc:`interaction_models`).
 
 The simulation takes its own copy of the lattice, so later changes to the lattice
 passed in have no effect on it.
-:attr:`Simulation.lattice <lattice_mc.simulation.Simulation.lattice>` is that copy,
-for read-only use.
+:attr:`Simulation.lattice <lattice_mc.simulation.Simulation.lattice>` returns a new
+copy of the simulation's lattice on each access, so changes to it have no effect on the
+simulation.
 
 Random numbers
 --------------

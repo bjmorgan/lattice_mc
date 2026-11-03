@@ -88,7 +88,9 @@ in one call, in place of the 1.0.4 setters:
 
 ``seed`` (an integer or a ``numpy.random.Generator``) controls the initial placement
 of atoms and the choice and timing of jumps. The simulation takes its own copy of the
-lattice when it is created. An incomplete ``cn_energies`` mapping raises a
+lattice when it is created, and ``simulation.lattice`` returns a new copy of it on each
+access, so changes to either lattice have no effect on the simulation. An incomplete
+``cn_energies`` mapping raises a
 ``ValueError`` when the simulation is created.
 
 Running

@@ -201,13 +201,11 @@ class Simulation:
     @property
     def lattice(self) -> Lattice:
         """
-        The simulation's own copy of the lattice, for read-only use.
+        A copy of the simulation's lattice.
 
-        Do not change it: the energies were read when the simulation was created, and
-        changing the lattice, for example its site positions or labels, would make the
-        simulation inconsistent.
+        Each access returns a new copy, so changes to it have no effect on the simulation.
         """
-        return self._lattice
+        return copy.deepcopy(self._lattice)
 
     @property
     def occupied_sites(self) -> tuple[int, ...]:

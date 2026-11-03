@@ -208,6 +208,22 @@ class TestLatticeCopy:
         assert simulation.lattice is not lattice
         assert simulation.lattice.number_of_sites == lattice.number_of_sites
 
+    def test_lattice_is_a_new_copy_on_each_access(self):
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4)
+        assert simulation.lattice is not simulation.lattice
+
+    def test_changes_to_the_returned_lattice_do_not_change_results(self):
+        reference = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
+        reference.run(n_jumps=100)
+        simulation = Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=4, seed=5)
+        lattice = simulation.lattice
+        lattice.transmute_sites("L", "M", 8, seed=0)
+        lattice.set_site_energies(by_label={"M": 0.5})
+        for site in lattice.sites:
+            site.r = site.r * 0.5
+        simulation.run(n_jumps=100)
+        assert results_of(simulation) == results_of(reference)
+
 
 class TestLattices:
     def test_sites_file_with_negative_unsorted_numbers_runs(self):
