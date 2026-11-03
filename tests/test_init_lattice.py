@@ -1,6 +1,8 @@
-from unittest.mock import mock_open, patch
+import pathlib
+from unittest.mock import patch
 
 import numpy as np
+import pytest
 
 from lattice_mc import init_lattice
 
@@ -138,51 +140,109 @@ class TestInitLattice:
         assert lattice == "bar"
         np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], np.array([a, b, c]))
 
-    @patch("lattice_mc.lattice_site.Site")
-    @patch("lattice_mc.lattice.Lattice")
-    def test_lattice_from_file(self, mock_lattice, mock_site):
-        cell_lengths = np.array([2.0, 3.0, 4.0])
-        example_file = """1\n
-                          site: 2
-                          centre: 21.4669 -1.37 6.1334
-                          vertices: 1 315 435 649
-                          neighbours: 4 5 6
-                          label: H"""
-        mock_site.return_value = "site"
-        mock_lattice.return_value = "lattice"
-        with patch("builtins.open", mock_open(read_data=example_file), create=True):
-            lattice = init_lattice.lattice_from_sites_file("filename", cell_lengths)
-        site_calls = mock_site.mock_calls[0][1]
-        assert site_calls[0] == 2  # site number
-        np.testing.assert_array_equal(site_calls[1], np.array([21.4669, -1.37, 6.1334]))  # r
-        assert site_calls[2] == [4, 5, 6]  # neighbour list
-        assert site_calls[3] == 0.0  # ?
-        assert site_calls[4] == "H"  # site label
-        assert mock_lattice.mock_calls[0][1][0] == ["site"]
-        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths)
-        assert lattice == "lattice"
 
-    @patch("lattice_mc.lattice_site.Site")
-    @patch("lattice_mc.lattice.Lattice")
-    def test_lattice_from_file_with_energy(self, mock_lattice, mock_site):
-        cell_lengths = np.array([2.0, 3.0, 4.0])
-        example_file = """1\n
-                          site: 2
-                          centre: 21.4669 -1.37 6.1334
-                          vertices: 1 315 435 649
-                          neighbours: 4 5 6
-                          energy: -1.0
-                          label: H"""
-        mock_site.return_value = "site"
-        mock_lattice.return_value = "lattice"
-        with patch("builtins.open", mock_open(read_data=example_file), create=True):
-            lattice = init_lattice.lattice_from_sites_file("filename", cell_lengths)
-        site_calls = mock_site.mock_calls[0][1]
-        assert site_calls[0] == 2  # site number
-        np.testing.assert_array_equal(site_calls[1], np.array([21.4669, -1.37, 6.1334]))  # r
-        assert site_calls[2] == [4, 5, 6]  # neighbour list
-        assert site_calls[3] == -1.0  # site energy
-        assert site_calls[4] == "H"  # site label
-        assert mock_lattice.mock_calls[0][1][0] == ["site"]
-        np.testing.assert_array_equal(mock_lattice.mock_calls[0][2]["cell_lengths"], cell_lengths)
-        assert lattice == "lattice"
+RING = """3
+
+site: 1
+centre: 0.0 0.0 0.0
+neighbours: 2 3
+label: A
+
+site: 2
+centre: 1.0 0.0 0.0
+neighbours: 1 3
+label: A
+
+site: 3
+centre: 2.0 0.0 0.0
+neighbours: 1 2
+label: A
+"""
+
+
+def write_sites_file(tmp_path, text):
+    path = tmp_path / "sites.dat"
+    path.write_text(text)
+    return str(path)
+
+
+def load(tmp_path, text):
+    return init_lattice.lattice_from_sites_file(write_sites_file(tmp_path, text), cell_lengths=[3.0, 10.0, 10.0])
+
+
+class TestLatticeFromSitesFile:
+    def test_reads_sites(self, tmp_path):
+        lattice = load(tmp_path, RING)
+        site = lattice.site_with_id(2)
+        np.testing.assert_array_equal(site.r, [1.0, 0.0, 0.0])
+        assert site.neighbours == [1, 3]
+        assert site.label == "A"
+        assert site.energy == 0.0
+        np.testing.assert_array_equal(lattice.cell_lengths, [3.0, 10.0, 10.0])
+
+    def test_reads_energy(self, tmp_path):
+        lattice = load(tmp_path, RING.replace("label: A\n", "label: A\nenergy: -0.5\n"))
+        assert {site.energy for site in lattice.sites} == {-0.5}
+
+    def test_reads_energy_in_exponent_notation(self, tmp_path):
+        lattice = load(tmp_path, RING.replace("label: A\n", "label: A\nenergy: 1e-3\n"))
+        assert {site.energy for site in lattice.sites} == {1e-3}
+
+    def test_allows_extra_whitespace_after_a_key(self, tmp_path):
+        lattice = load(tmp_path, RING.replace("label: A\n", "label:   A\nenergy:  0.1\n"))
+        assert {(site.label, site.energy) for site in lattice.sites} == {("A", 0.1)}
+
+    def test_allows_blank_lines_containing_whitespace(self, tmp_path):
+        lattice = load(tmp_path, RING.replace("\n\n", "\n   \n"))
+        assert lattice.number_of_sites == 3
+
+    def test_accepts_american_spellings_and_any_line_order(self, tmp_path):
+        text = RING.replace("centre:", "center:").replace("neighbours:", "neighbors:")
+        text = text.replace(
+            "site: 1\ncenter: 0.0 0.0 0.0\nneighbors: 2 3\nlabel: A",
+            "label: A\nneighbors: 2 3\ncenter: 0.0 0.0 0.0\nsite: 1",
+        )
+        lattice = load(tmp_path, text)
+        assert lattice.site_with_id(1).neighbours == [2, 3]
+
+    def test_ignores_legacy_vertices_lines(self, tmp_path):
+        lattice = load(tmp_path, RING.replace("label: A\n", "label: A\nvertices: 1 315 435 649\n"))
+        assert lattice.number_of_sites == 3
+
+    @pytest.mark.parametrize(
+        ("old", "new", "message"),
+        [
+            ("3\n", "4\n", "4 sites"),
+            ("site: 3", "site: 2", "site 2"),
+            ("label: A\n\nsite: 2", "colour: red\nlabel: A\n\nsite: 2", "colour"),
+            ("neighbours: 1 3\nlabel: A\n", "neighbours: 1 3\n", "label"),
+            ("neighbours: 1 2\n", "neighbours: 1 2 4\n", "site 4"),
+            ("neighbours: 2 3\n", "neighbours: 2\n", "site 3"),
+        ],
+        ids=[
+            "count does not match",
+            "duplicate site number",
+            "unknown key",
+            "missing label",
+            "neighbour does not exist",
+            "one-way neighbours",
+        ],
+    )
+    def test_raises_ValueError_for_invalid_file(self, tmp_path, old, new, message):
+        assert old in RING
+        with pytest.raises(ValueError, match=message):
+            load(tmp_path, RING.replace(old, new, 1))
+
+    def test_raises_ValueError_for_sites_with_one_label_and_different_energies(self, tmp_path):
+        text = RING.replace(
+            "site: 1\ncentre: 0.0 0.0 0.0\nneighbours: 2 3\nlabel: A\n",
+            "site: 1\ncentre: 0.0 0.0 0.0\nneighbours: 2 3\nlabel: A\nenergy: 0.2\n",
+        )
+        with pytest.raises(ValueError, match="label A"):
+            load(tmp_path, text)
+
+    def test_reads_the_example_llzo_sites_file(self):
+        path = str(pathlib.Path(__file__).resolve().parents[1] / "examples" / "llzo_lattice_site_list.dat")
+        lattice = init_lattice.lattice_from_sites_file(path, cell_lengths=[49.0672361] * 3)
+        assert lattice.number_of_sites == 576
+        assert lattice.site_labels == {"O", "T"}
