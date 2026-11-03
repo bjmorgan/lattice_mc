@@ -247,3 +247,18 @@ class TestReadOnlyProperties:
         lattice = make_lattice({"i": ["f"], "f": ["i"]})
         cn = {"A": {"A": {0: 0.0, 1: 0.1}}}
         assert EnergyModel(lattice, cn_energies=cn).has_cn_energies
+
+    def test_site_energies_is_a_copy_of_the_energies_when_the_model_was_built(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]}, energies={"i": 1.5, "f": 2.1})
+        model = EnergyModel(lattice)
+        lattice.set_site_energies(by_label={"A": 0.0})
+        model.site_energies[0] = 9.0
+        assert model.site_energies.tolist() == [1.5, 2.1]
+
+    def test_labels_are_the_site_labels_in_site_order(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]}, labels={"i": "A", "f": "B"})
+        assert EnergyModel(lattice).labels == ("A", "B")
+
+    def test_neighbour_indices_are_those_of_the_lattice(self) -> None:
+        lattice = make_lattice({"i": ["f"], "f": ["i"]})
+        assert EnergyModel(lattice).neighbour_indices == ((1,), (0,))

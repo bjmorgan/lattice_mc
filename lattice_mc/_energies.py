@@ -90,6 +90,21 @@ class EnergyModel:
         """Whether the model includes coordination-number dependent energies."""
         return self._cn_energies is not None
 
+    @property
+    def site_energies(self) -> npt.NDArray[np.float64]:
+        """A copy of the occupation energy, in eV, of each site when the model was created."""
+        return self._site_energies.copy()
+
+    @property
+    def labels(self) -> tuple[str, ...]:
+        """The label of each site, in the order of `Lattice.sites`."""
+        return self._labels
+
+    @property
+    def neighbour_indices(self) -> tuple[tuple[int, ...], ...]:
+        """The indices of the neighbours of each site."""
+        return self._neighbours
+
     def _check_cn_energies(self, cn_energies: CNEnergies) -> None:
         """
         Check that `cn_energies` covers every site label, neighbour label and occupied count.

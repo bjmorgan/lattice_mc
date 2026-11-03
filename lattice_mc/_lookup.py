@@ -28,22 +28,30 @@ class LookupTable:
         Initialise a LookupTable.
 
         Args:
-            lattice: The lattice, which defines the site labels, energies and neighbours.
+            lattice: The lattice. The table reads its site energies, labels and neighbours from
+                `energy_model`, so that it always agrees with the model.
             energy_model: The energy model. It must not have coordination-number energies.
             kT: Thermal energy kT in eV.
 
         Raises:
-            ValueError: If `energy_model` has coordination-number energies, which depend on
-                more than the numbers of occupied neighbours of the two sites, or if sites
-                with the same label have different energies.
+            ValueError: If `kT` is not positive, if `energy_model` has coordination-number
+                energies, which depend on more than the numbers of occupied neighbours of the
+                two sites, or if sites with the same label have different energies.
         """
+        if kT <= 0.0:
+            raise ValueError(f"kT must be positive, not {kT}.")
         if energy_model.has_cn_energies:
             raise ValueError("A LookupTable cannot be used with coordination-number energies.")
-        site_energies = lattice.site_energies_by_label()
         nn_energy = energy_model.nn_energy
-        self._labels: tuple[str, ...] = tuple(site.label for site in lattice.sites)
+        self._labels: tuple[str, ...] = energy_model.labels
+        site_energies: dict[str, float] = {}
+        for label, energy in zip(self._labels, energy_model.site_energies, strict=True):
+            if site_energies.setdefault(label, float(energy)) != energy:
+                raise ValueError(
+                    f"Sites with label {label} have different energies, {site_energies[label]} and {energy}."
+                )
         self._neighbours: tuple[npt.NDArray[np.intp], ...] = tuple(
-            np.array(neighbours, dtype=np.intp) for neighbours in lattice.neighbour_indices
+            np.array(neighbours, dtype=np.intp) for neighbours in energy_model.neighbour_indices
         )
         max_coordination: dict[str, int] = {}
         for label, neighbours in zip(self._labels, self._neighbours, strict=True):
