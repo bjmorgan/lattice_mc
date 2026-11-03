@@ -520,16 +520,21 @@ class TestLatticeSiteEnergies:
             lattice.set_site_energies()
 
     def test_set_site_energies_unknown_label(self, lattice):
-        with pytest.raises(ValueError, match="C"):
+        with pytest.raises(ValueError, match="Unknown site labels"):
             lattice.set_site_energies(by_label={"C": 0.2})
 
     def test_set_site_energies_unknown_site(self, lattice):
-        with pytest.raises(ValueError, match="4"):
+        with pytest.raises(ValueError, match="Unknown site numbers"):
             lattice.set_site_energies(by_site={4: 0.2})
 
     def test_set_site_energies_unknown_key_leaves_energies_unchanged(self, lattice):
         with pytest.raises(ValueError):
             lattice.set_site_energies(by_label={"A": 0.2}, by_site={4: 0.5})
+        assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
+
+    def test_set_site_energies_unknown_label_with_valid_site_leaves_energies_unchanged(self, lattice):
+        with pytest.raises(ValueError):
+            lattice.set_site_energies(by_label={"C": 0.2}, by_site={5: 0.5})
         assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
 
     def test_site_energies_array(self):
