@@ -138,9 +138,8 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
         ValueError: If the file is malformed or inconsistent: the site count does
             not match the number of site blocks, a key is unknown, repeated or
             missing, a site number is repeated, a site lists itself or the same
-            neighbour twice, a neighbour does not exist, two sites do not list each
-            other as neighbours, or sites with the same label have different
-            energies.
+            neighbour twice, a neighbour does not exist, or two sites do not list
+            each other as neighbours.
 
     Notes:
         The file starts with the number of sites, followed by one block per site.
@@ -153,7 +152,8 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
             energy: <site occupation energy>
 
         Site numbers are arbitrary integers. The energy line is optional, and
-        defaults to 0.0. Lines within a block can be in any order. Both
+        defaults to 0.0; sites with the same label can have different energies. Lines
+        within a block can be in any order. Both
         centre/center and neighbours/neighbors are accepted, and legacy vertices
         lines are ignored. A full example is
         ``examples/llzo_lattice_site_list.dat`` in the lattice_mc repository.
@@ -263,8 +263,7 @@ def _check_site_records(records: list[_SiteRecord]) -> None:
 
     Raises:
         ValueError: If a site number is repeated, a site lists itself or the same
-            neighbour twice, a neighbour does not exist, a neighbour pair is one-way,
-            or sites with the same label have different energies.
+            neighbour twice, a neighbour does not exist, or a neighbour pair is one-way.
     """
     neighbours: dict[int, set[int]] = {}
     for record in records:
@@ -284,12 +283,3 @@ def _check_site_records(records: list[_SiteRecord]) -> None:
                 raise ValueError(
                     f"Site {number} lists site {other} as a neighbour, but site {other} does not list site {number}."
                 )
-    energies: dict[str, set[float]] = {}
-    for record in records:
-        energies.setdefault(record.label, set()).add(record.energy)
-    for label, label_energies in energies.items():
-        if len(label_energies) > 1:
-            raise ValueError(
-                f"Sites with label {label} have different energies, {sorted(label_energies)}. "
-                "Sites with different energies need different labels."
-            )

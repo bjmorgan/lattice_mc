@@ -88,13 +88,12 @@ Each block gives:
     A label for the site type.
 ``energy``
     The occupation energy of the site, in eV. This line is optional, and defaults to
-    0.0.
+    0.0. Sites with the same label can have different energies.
 
 Lines within a block can be in any order. Site numbers must be unique. Each listed
 neighbour must exist, be listed only once, and not be the site itself, and neighbours
-must be listed both ways: if site 1 lists site 2, site 2 must list site 1. Sites with
-the same label must have the same energy; sites with different energies need different
-labels. A file that breaks any of these rules raises a ``ValueError``.
+must be listed both ways: if site 1 lists site 2, site 2 must list site 1. A file that
+breaks any of these rules raises a ``ValueError``.
 
 The cell lengths are given separately, and must match the periodicity built into the
 neighbour lists. Set the z cell length to 0 for a two-dimensional lattice. In this
