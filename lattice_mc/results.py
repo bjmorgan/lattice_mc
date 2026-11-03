@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -35,7 +37,7 @@ class Results:
             Defined as the squared length of the summed displacement of all atoms divided by
             the sum of the squared jump lengths.
         average_site_occupations: Time-averaged number of atoms on the sites with each label,
-            keyed by site label.
+            keyed by site label, in sorted label order. The mapping is read-only.
         time: Simulation time elapsed since the last reset, in s.
         number_of_jumps: Number of jumps made since the last reset.
     """
@@ -45,7 +47,7 @@ class Results:
     reduced_ionic_conductivity: float
     tracer_correlation: float
     collective_correlation: float
-    average_site_occupations: dict[str, float]
+    average_site_occupations: Mapping[str, float]
     time: float
     number_of_jumps: int
 
@@ -81,7 +83,9 @@ class Results:
             reduced_ionic_conductivity=collective_diffusion_coefficient * n_atoms / lattice.number_of_sites,
             tracer_correlation=sum_squared_displacement / state.summed_jump_length_squared,
             collective_correlation=squared_summed_displacement / state.summed_jump_length_squared,
-            average_site_occupations=dict(zip(labels.tolist(), (occupation_time / state.time).tolist(), strict=True)),
+            average_site_occupations=MappingProxyType(
+                dict(zip(labels.tolist(), (occupation_time / state.time).tolist(), strict=True))
+            ),
             time=state.time,
             number_of_jumps=state.number_of_jumps,
         )

@@ -12,9 +12,8 @@ from lattice_mc.lattice_site import Site
 from lattice_mc.results import Results
 
 
-def labelled_ring() -> Lattice:
-    """A periodic one-dimensional ring of four sites labelled A, B, A, B."""
-    labels = ["A", "B", "A", "B"]
+def labelled_ring(labels: tuple[str, ...] = ("A", "B", "A", "B")) -> Lattice:
+    """A periodic one-dimensional ring of four sites with the given labels."""
     neighbours = [[2, 4], [1, 3], [2, 4], [3, 1]]
     sites = [
         Site(number + 1, np.array([float(number), 0.0, 0.0]), neighbours[number], 0.0, labels[number])
@@ -89,20 +88,32 @@ def test_time_and_number_of_jumps_are_copied_from_the_state(results: Results) ->
 
 
 @pytest.mark.parametrize(
-    ("lattice", "dimensionality"),
+    ("lattice", "tracer", "collective", "conductivity"),
     [
-        (init_lattice.square_lattice(2, 2, 1.0), 2),
-        (init_lattice.cubic_lattice(2, 2, 2, 1.0), 3),
+        (init_lattice.square_lattice(2, 2, 1.0), 0.375, 0.5, 0.25),
+        (init_lattice.cubic_lattice(2, 2, 2, 1.0), 0.25, 1.0 / 3.0, 1.0 / 12.0),
     ],
     ids=["square", "cubic"],
 )
-def test_diffusion_coefficients_depend_on_the_dimensionality(lattice: Lattice, dimensionality: int) -> None:
+def test_diffusion_coefficients_depend_on_the_dimensionality(
+    lattice: Lattice, tracer: float, collective: float, conductivity: float
+) -> None:
     result = results_from(moved_state(lattice.number_of_sites), lattice)
-    assert result.tracer_diffusion_coefficient == pytest.approx(6.0 / (2 * dimensionality * 2 * 2.0))
-    assert result.collective_diffusion_coefficient == pytest.approx(8.0 / (2 * dimensionality * 2 * 2.0))
-    assert result.reduced_ionic_conductivity == pytest.approx(
-        result.collective_diffusion_coefficient * 2 / lattice.number_of_sites
-    )
+    assert result.tracer_diffusion_coefficient == pytest.approx(tracer)
+    assert result.collective_diffusion_coefficient == pytest.approx(collective)
+    assert result.reduced_ionic_conductivity == pytest.approx(conductivity)
+
+
+def test_average_site_occupations_with_unequal_numbers_of_sites_per_label() -> None:
+    lattice = labelled_ring(("A", "A", "A", "B"))
+    result = results_from(moved_state(4), lattice)
+    # A: (2.0 + 1.0 + 0.5) / 2 s, B: 0.0 / 2 s
+    assert result.average_site_occupations == pytest.approx({"A": 1.75, "B": 0.0})
+
+
+def test_average_site_occupations_are_read_only(results: Results) -> None:
+    with pytest.raises(TypeError):
+        results.average_site_occupations["A"] = 0.0  # type: ignore[index]
 
 
 def test_results_are_frozen(results: Results) -> None:
