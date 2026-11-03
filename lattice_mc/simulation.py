@@ -109,7 +109,8 @@ class Simulation:
             ValueError: If not exactly one of `n_atoms` and `occupied_sites` is given; if there
                 are no atoms, or more atoms than (selected) sites; if `selected_labels` is given
                 with `occupied_sites`, is empty, or names a label not in the lattice; if `occupied_sites`
-                has a duplicate or unknown site number; if `cn_energies` is incomplete; or if
+                has a duplicate or unknown site number; if `nn_energy` or an energy in
+                `cn_energies` is not finite; if `cn_energies` is incomplete; or if
                 `lookup_table` is True with `cn_energies`, or with sites of one label that have
                 different energies.
         """

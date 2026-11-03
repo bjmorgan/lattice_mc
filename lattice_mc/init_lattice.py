@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from math import sqrt
+from math import isfinite, sqrt
 
 import numpy as np
 import numpy.typing as npt
@@ -168,9 +168,9 @@ def lattice_from_sites_file(site_file: str, cell_lengths: list[float]) -> lattic
     Raises:
         ValueError: If the file is malformed or inconsistent: the site count does
             not match the number of site blocks, a key is unknown, repeated or
-            missing, a site number is repeated, a site lists itself or the same
-            neighbour twice, a neighbour does not exist, or two sites do not list
-            each other as neighbours.
+            missing, an energy is not finite, a site number is repeated, a site lists
+            itself or the same neighbour twice, a neighbour does not exist, or two
+            sites do not list each other as neighbours.
 
     Notes:
         The file starts with the number of sites, followed by one block per site.
@@ -252,7 +252,8 @@ def _parse_site_block(block: str, index: int) -> _SiteRecord:
         The parsed site.
 
     Raises:
-        ValueError: If a line is malformed, a key is unknown or repeated, or a required key is missing.
+        ValueError: If a line is malformed, a key is unknown or repeated, a required key is missing,
+            or the energy is not finite.
     """
     fields: dict[str, str] = {}
     for line in block.splitlines():
@@ -278,6 +279,8 @@ def _parse_site_block(block: str, index: int) -> _SiteRecord:
         energy = float(fields.get("energy", "0.0"))
     except ValueError as error:
         raise ValueError(f"Could not read the block for {name}: {error}") from None
+    if not isfinite(energy):
+        raise ValueError(f"The energy of {name} must be finite; got {energy!r}.")
     if centre.shape != (3,):
         raise ValueError(f"The centre of {name} must have three coordinates.")
     if len(fields["label"].split()) != 1:

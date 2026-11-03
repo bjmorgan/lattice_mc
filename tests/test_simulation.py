@@ -91,6 +91,15 @@ class TestConstruction:
         with pytest.raises(ValueError):
             Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies)
 
+    def test_rejects_a_non_finite_nn_energy(self):
+        with pytest.raises(ValueError, match="nn_energy must be finite"):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, nn_energy=float("nan"))
+
+    def test_rejects_non_finite_cn_energies(self):
+        cn_energies = {"L": {"L": {count: float("inf") for count in range(5)}}}
+        with pytest.raises(ValueError, match="must be finite"):
+            Simulation(square_lattice(4, 4, 1.0), PARAMS, n_atoms=1, cn_energies=cn_energies)
+
     def test_lookup_table_rejects_cn_energies(self):
         cn_energies = {"L": {"L": {count: 0.0 for count in range(5)}}}
         with pytest.raises(ValueError):

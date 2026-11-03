@@ -63,10 +63,13 @@ class EnergyModel:
                 with sites raises `ValueError`; pass None to turn the term off.
 
         Raises:
-            ValueError: If `cn_energies` has no entry for a site label in the lattice, for a
-                label of a neighbour of a site with that label, or for every count of occupied
-                neighbours of that label from 0 up to the number of such neighbours.
+            ValueError: If `nn_energy` is not finite; if `cn_energies` has no entry for a site
+                label in the lattice, for a label of a neighbour of a site with that label, or
+                for every count of occupied neighbours of that label from 0 up to the number of
+                such neighbours; or if any energy in `cn_energies` is not finite.
         """
+        if nn_energy is not None and not math.isfinite(nn_energy):
+            raise ValueError(f"nn_energy must be finite; got {nn_energy!r}.")
         self._site_energies: npt.NDArray[np.float64] = lattice.site_energies()
         self._labels: tuple[str, ...] = tuple(site.label for site in lattice.sites)
         self._neighbours: tuple[tuple[int, ...], ...] = lattice.neighbour_indices
@@ -107,13 +110,13 @@ class EnergyModel:
 
     def _check_cn_energies(self, cn_energies: CNEnergies) -> None:
         """
-        Check that `cn_energies` covers every site label, neighbour label and occupied count.
+        Check that `cn_energies` covers every site label, neighbour label and occupied count, with finite energies.
 
         Args:
             cn_energies: The coordination-number energies to check.
 
         Raises:
-            ValueError: If an entry is missing.
+            ValueError: If an entry is missing, or an energy is not finite.
         """
         max_counts: dict[str, dict[str, int]] = {label: {} for label in self._labels}
         for index, label in enumerate(self._labels):
@@ -134,6 +137,14 @@ class EnergyModel:
                         raise ValueError(
                             f"cn_energies for site label {label!r} and neighbour label {neighbour_label!r} "
                             f"has no entry for count {count}"
+                        )
+        for label, energies_by_neighbour in cn_energies.items():
+            for neighbour_label, energies_by_count in energies_by_neighbour.items():
+                for count, energy in energies_by_count.items():
+                    if not math.isfinite(energy):
+                        raise ValueError(
+                            f"cn_energies for site label {label!r}, neighbour label {neighbour_label!r} "
+                            f"and count {count} must be finite; got {energy!r}."
                         )
 
     def delta_E(self, occupied: npt.NDArray[np.bool_], initial: int, final: int) -> float:

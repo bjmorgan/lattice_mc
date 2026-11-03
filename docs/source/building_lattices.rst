@@ -92,8 +92,8 @@ Each block gives:
 ``label``
     A label for the site type.
 ``energy``
-    The occupation energy of the site, in eV. This line is optional, and defaults to
-    0.0. Sites with the same label can have different energies, but a lookup table
+    The occupation energy of the site, in eV, which must be finite. This line is
+    optional, and defaults to 0.0. Sites with the same label can have different energies, but a lookup table
     then cannot be used (see :doc:`interaction_models`).
 
 Lines within a block can be in any order. Site numbers must be unique. Each listed
@@ -130,8 +130,8 @@ in eV, of the sites in a lattice. ``by_label`` gives an energy to every site wit
 label, and ``by_site`` gives energies to individual sites, keyed by site number.
 Energies given by label are applied first, so an energy given by site number
 overrides the energy for that site's label. Both arguments are keyword-only. Giving
-neither raises a ``ValueError``. An unknown label or site number raises a
-``ValueError``, and leaves the lattice unchanged.
+neither raises a ``ValueError``. An unknown label or site number, or an energy that is
+not finite, raises a ``ValueError``, and leaves the lattice unchanged.
 
 .. testcode::
 

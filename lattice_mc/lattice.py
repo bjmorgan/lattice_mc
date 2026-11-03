@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import math
 from collections import Counter
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
@@ -152,8 +153,8 @@ class Lattice:
                 Defaults to None.
 
         Raises:
-            ValueError: If neither `by_label` nor `by_site` is given, or if a label
-                or site number is not in the lattice.
+            ValueError: If neither `by_label` nor `by_site` is given, if a label
+                or site number is not in the lattice, or if an energy is not finite.
         """
         if by_label is None and by_site is None:
             raise ValueError("One of by_label or by_site must be given.")
@@ -165,6 +166,12 @@ class Lattice:
         unknown_numbers = set(by_site) - self._site_indices.keys()
         if unknown_numbers:
             raise ValueError(f"Unknown site numbers: {sorted(unknown_numbers)}.")
+        for label, energy in by_label.items():
+            if not math.isfinite(energy):
+                raise ValueError(f"The energy for label {label!r} must be finite; got {energy!r}.")
+        for number, energy in by_site.items():
+            if not math.isfinite(energy):
+                raise ValueError(f"The energy for site {number} must be finite; got {energy!r}.")
         for site in self.sites:
             if site.label in by_label:
                 site.energy = by_label[site.label]

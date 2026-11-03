@@ -175,6 +175,18 @@ class TestLatticeSiteEnergies:
             lattice.set_site_energies(by_label={"C": 0.2}, by_site={3: 0.5})
         assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
 
+    @pytest.mark.parametrize("energy", [float("nan"), float("inf"), float("-inf")])
+    def test_set_site_energies_rejects_a_non_finite_energy_by_label(self, lattice, energy):
+        with pytest.raises(ValueError, match="label 'B' must be finite"):
+            lattice.set_site_energies(by_label={"A": 0.2, "B": energy})
+        assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
+
+    @pytest.mark.parametrize("energy", [float("nan"), float("inf"), float("-inf")])
+    def test_set_site_energies_rejects_a_non_finite_energy_by_site(self, lattice, energy):
+        with pytest.raises(ValueError, match="site 5 must be finite"):
+            lattice.set_site_energies(by_label={"A": 0.2}, by_site={5: energy})
+        assert [site.energy for site in lattice.sites] == [0.0, 0.0, 0.0]
+
     def test_site_energies_array(self):
         lattice = make_lattice([-2, 5, 3], energies=[0.1, 0.2, 0.3])
         energies = lattice.site_energies()

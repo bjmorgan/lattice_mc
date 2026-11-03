@@ -279,6 +279,7 @@ class TestLatticeFromSitesFile:
             ("neighbours: 2 3\n", "neighbours: 2\n", "site 3"),
             ("neighbours: 2 3\n", "neighbours: 1 2 3\n", "itself"),
             ("neighbours: 2 3\n", "neighbours: 2 2 3\n", "site 2 more than once"),
+            ("neighbours: 1 3\nlabel: A\n", "neighbours: 1 3\nlabel: A\nenergy: nan\n", "site 2 must be finite"),
         ],
         ids=[
             "count does not match",
@@ -295,6 +296,7 @@ class TestLatticeFromSitesFile:
             "one-way neighbours",
             "self-neighbour",
             "repeated neighbour",
+            "non-finite energy",
         ],
     )
     def test_raises_ValueError_for_invalid_file(self, tmp_path, old, new, message):
