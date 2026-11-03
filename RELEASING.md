@@ -42,7 +42,10 @@ workflow fails:
 
 - If nothing reached PyPI (the `check` or `build` job failed, or the `publish`
   job was rejected before uploading), delete the GitHub release and its tag,
-  fix the problem on `main`, and publish the release again.
+  fix the problem on `main`, and publish the release again. Deleting a GitHub
+  release does not delete its Zenodo record, so republishing may create a
+  second Zenodo version with its own DOI. Check Zenodo afterwards and remove or
+  annotate the orphaned record if needed.
 - If anything reached PyPI, the version cannot be reused, because PyPI never
   allows a file to be uploaded again under a version that has been published or
   yanked. Bump the version (for example `2.0.1`) and make a new release.
