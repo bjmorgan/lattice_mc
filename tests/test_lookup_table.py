@@ -112,3 +112,12 @@ def test_lookup_table_includes_site_energies_from_a_sites_file(tmp_path):
     lattice.params = PARAMS
     table = LookupTable(lattice, "nearest-neighbour")
     assert table.relative_probability("A", "B", 0, 1) == pytest.approx(metropolis(0.1, PARAMS.kT))
+
+
+def test_lookup_table_raises_ValueError_for_one_label_with_different_energies(tmp_path):
+    path = tmp_path / "sites.dat"
+    path.write_text(SITES_WITH_ENERGIES.replace("label: B", "label: A"))
+    lattice = lattice_from_sites_file(str(path), cell_lengths=[10.0, 10.0, 10.0])
+    lattice.params = PARAMS
+    with pytest.raises(ValueError, match="label A"):
+        LookupTable(lattice, "nearest-neighbour")

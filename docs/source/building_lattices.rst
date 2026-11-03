@@ -88,7 +88,8 @@ Each block gives:
     A label for the site type.
 ``energy``
     The occupation energy of the site, in eV. This line is optional, and defaults to
-    0.0. Sites with the same label can have different energies.
+    0.0. Sites with the same label can have different energies, but a lookup table
+    then cannot be used (see :doc:`interaction_models`).
 
 Lines within a block can be in any order. Site numbers must be unique. Each listed
 neighbour must exist, be listed only once, and not be the site itself, and neighbours

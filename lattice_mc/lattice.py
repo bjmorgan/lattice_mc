@@ -306,8 +306,9 @@ class Lattice:
         """
         The occupation energy of the sites with each label.
 
-        A label identifies a site type, so every site with the same label has the
-        same energy.
+        Sites with the same label can have different energies, but the lookup table
+        is keyed by label, so it needs every site with a given label to have the same
+        energy.
 
         Returns:
             The occupation energy, in eV, for each site label.
