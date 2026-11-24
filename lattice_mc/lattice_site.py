@@ -19,7 +19,8 @@ class Site:
 
         Args:
             number: An identifying number for this site.
-            coordinates: The coordinates of this site.
+            coordinates: The coordinates of this site. A float copy is stored, so later
+                changes to the array passed in do not move the site.
             neighbours: A list of the id numbers of the neighbouring sites.
             energy: On-site occupation energy, in eV.
             label: Label for classifying this as a specific site type.
@@ -28,7 +29,7 @@ class Site:
             There should be a 1:1 mapping between sites and site numbers.
         """
         self.number: int = number
-        self.r: npt.NDArray[np.float64] = coordinates
+        self.r: npt.NDArray[np.float64] = np.array(coordinates, dtype=np.float64)
         self.neighbours: list[int] = neighbours
         self.energy: float = energy
         self.label: str = label

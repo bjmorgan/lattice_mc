@@ -46,6 +46,33 @@ class TestLattice:
         np.testing.assert_array_equal(lattice.sites[0].r, [9.0, 1.0, 3.0])
         np.testing.assert_array_equal(lattice.sites[1].r, [2.0, 7.0, 2.0])
 
+    def test_sites_several_cells_away_are_wrapped_into_the_cell(self):
+        sites = [Site(n, np.array([x, 0.0, 0.0]), [], 0.0, "A") for n, x in enumerate([4.0, 17.0, 30.0, -11.0])]
+        lattice = Lattice(sites, np.array([4.0, 0.0, 0.0]))
+        assert [site.r[0] for site in lattice.sites] == [0.0, 1.0, 2.0, 1.0]
+
+    def test_a_site_on_the_upper_cell_boundary_is_wrapped_to_zero(self):
+        lattice = Lattice([Site(1, np.array([10.0, 5.0, 10.0]), [], 0.0, "A")], np.array([10.0, 10.0, 10.0]))
+        np.testing.assert_array_equal(lattice.sites[0].r, [0.0, 5.0, 0.0])
+
+    def test_a_tiny_negative_coordinate_is_wrapped_to_zero(self):
+        lattice = Lattice([Site(1, np.array([-1e-20, 0.0, 0.0]), [], 0.0, "A")], np.array([10.0, 10.0, 10.0]))
+        assert lattice.sites[0].r[0] == 0.0
+
+    def test_coordinates_along_axes_with_zero_cell_length_are_unchanged(self):
+        sites = [Site(1, np.array([1.0, 2.0, -0.3]), [], 0.0, "A"), Site(2, np.array([1.0, 2.0, 0.4]), [], 0.0, "A")]
+        lattice = Lattice(sites, np.array([10.0, 10.0, 0.0]))
+        assert [site.r[2] for site in lattice.sites] == [-0.3, 0.4]
+
+    def test_the_callers_coordinates_are_not_modified(self):
+        coordinates = np.array([-1.0, 11.0, 3.0])
+        Lattice([Site(1, coordinates, [], 0.0, "A")], np.array([10.0, 10.0, 10.0]))
+        np.testing.assert_array_equal(coordinates, [-1.0, 11.0, 3.0])
+
+    def test_integer_coordinates_are_wrapped_without_truncation(self):
+        lattice = Lattice([Site(1, np.array([-1, 0, 0]), [], 0.0, "A")], np.array([10.5, 10.5, 10.5]))
+        np.testing.assert_array_equal(lattice.sites[0].r, [9.5, 0.0, 0.0])
+
     def test_rejects_a_site_that_lists_itself_as_a_neighbour(self):
         with pytest.raises(ValueError, match="Site 5 lists itself as a neighbour"):
             make_lattice([-2, 5], neighbours=[[5], [-2, 5]])
@@ -103,9 +130,15 @@ class TestLattice:
         assert lattice.select_sites("AA") == [lattice.sites[1]]
         assert lattice.select_sites(["A", "B"]) == [lattice.sites[0], lattice.sites[2]]
 
-    def test_select_sites_raises_ValueError_for_other_types(self, lattice):
-        with pytest.raises(ValueError):
-            lattice.select_sites(("A",))
+    def test_select_sites_accepts_any_iterable_of_labels(self):
+        lattice = make_lattice([1, 2, 3], labels=["A", "AA", "B"])
+        assert lattice.select_sites(("A", "B")) == [lattice.sites[0], lattice.sites[2]]
+        assert lattice.select_sites(label for label in ["AA"]) == [lattice.sites[1]]
+
+    @pytest.mark.parametrize("site_labels", [5, None])
+    def test_select_sites_raises_TypeError_for_a_non_iterable(self, lattice, site_labels):
+        with pytest.raises(TypeError, match="site_labels must be a label or an iterable of labels"):
+            lattice.select_sites(site_labels)
 
     def test_site_energies_by_label(self):
         lattice = make_lattice([1, 2, 3], labels=["A", "B", "A"], energies=[0.2, 0.4, 0.2])
