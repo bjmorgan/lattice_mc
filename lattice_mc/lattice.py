@@ -314,25 +314,30 @@ class Lattice:
         """
         # A single label is wrapped, because set("Li") would be {"L", "i"}.
         labels = {site_labels} if isinstance(site_labels, str) and site_labels else set(site_labels or ())
-        if labels:
-            selected_sites = self.select_sites(labels)
-        else:
-            selected_sites = self.sites
-        initial_clusters = [cluster.Cluster([site], self) for site in selected_sites]
-        if labels:
-            blocking_sites = self.site_labels - labels
-            for c in initial_clusters:
-                c.remove_sites_from_neighbours(blocking_sites)
-        final_clusters = []
-        while initial_clusters:  # loop until initial_clusters is empty
-            this_cluster = initial_clusters.pop(0)
-            while this_cluster.neighbours:
-                neighbouring_clusters = [c for c in initial_clusters if this_cluster.is_neighbouring(c)]
-                for nc in neighbouring_clusters:
-                    initial_clusters.remove(nc)
-                    this_cluster = this_cluster.merge(nc)
-            final_clusters.append(this_cluster)
-        return final_clusters
+        selected = [index for index, site in enumerate(self.sites) if not labels or site.label in labels]
+        is_selected = set(selected)
+        visited: set[int] = set()
+        clusters = []
+        # Each unvisited selected site seeds a depth-first search over selected sites only,
+        # so sites with other labels block connectivity.
+        for seed in selected:
+            if seed in visited:
+                continue
+            visited.add(seed)
+            members = [seed]
+            stack = [seed]
+            while stack:
+                for neighbour in self.neighbour_indices[stack.pop()]:
+                    if neighbour in is_selected and neighbour not in visited:
+                        visited.add(neighbour)
+                        members.append(neighbour)
+                        stack.append(neighbour)
+            # Every selected neighbour of a complete cluster is inside it, so once neighbours
+            # with other labels are excluded, the cluster has no neighbours.
+            clusters.append(
+                cluster.Cluster._from_sites_and_neighbours({self.sites[index] for index in members}, set(), self)
+            )
+        return clusters
 
     def select_sites(self, site_labels: list[str] | set[str] | str) -> list[Site]:
         """
