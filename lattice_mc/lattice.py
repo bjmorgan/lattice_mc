@@ -373,8 +373,9 @@ class Lattice:
         specific labels.
 
         Args:
-            site_labels: Labels of the sites to consider. If None, all sites are considered.
-                An empty list or set selects no sites. Defaults to None.
+            site_labels: Labels of the sites to consider: an iterable of labels, such as the
+                list ``['A', 'B']`` or a set, or a single label, such as ``'A'``. If None, all
+                sites are considered. An empty iterable selects no sites. Defaults to None.
 
         Returns:
             List of sites not in a periodic percolating network.
