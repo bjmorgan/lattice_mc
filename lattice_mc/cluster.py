@@ -33,9 +33,31 @@ class Cluster:
             self.neighbours.update(lattice.neighbours_of(s))
         self.neighbours = self.neighbours.difference(self.sites)
 
+    @classmethod
+    def _from_sites_and_neighbours(cls, sites: set[Site], neighbours: set[Site], lattice: Lattice) -> Cluster:
+        """
+        Create a cluster whose neighbours are already known, without looking them up.
+
+        Args:
+            sites: The sites that make up the cluster.
+            neighbours: The neighbouring sites outside the cluster.
+            lattice: The lattice the sites belong to.
+
+        Returns:
+            The new cluster.
+        """
+        new_cluster = cls.__new__(cls)
+        new_cluster.sites = sites
+        new_cluster.lattice = lattice
+        new_cluster.neighbours = neighbours
+        return new_cluster
+
     def merge(self, other_cluster: Cluster) -> Cluster:
         """
         Combine two clusters into a single cluster.
+
+        The neighbours of the combined cluster are those of either cluster that lie
+        outside both, so neighbours removed from either cluster stay removed.
 
         Args:
             other_cluster: The second cluster to combine.
@@ -43,9 +65,9 @@ class Cluster:
         Returns:
             The combination of both clusters.
         """
-        new_cluster = Cluster(self.sites | other_cluster.sites, self.lattice)
-        new_cluster.neighbours = (self.neighbours | other_cluster.neighbours).difference(new_cluster.sites)
-        return new_cluster
+        sites = self.sites | other_cluster.sites
+        neighbours = (self.neighbours | other_cluster.neighbours) - sites
+        return Cluster._from_sites_and_neighbours(sites, neighbours, self.lattice)
 
     def is_neighbouring(self, other_cluster: Cluster) -> bool:
         """
