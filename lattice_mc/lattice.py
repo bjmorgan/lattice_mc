@@ -5,7 +5,7 @@ from __future__ import annotations
 import itertools
 import math
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -303,16 +303,17 @@ class Lattice:
         for index in rng.choice(len(selected_sites), size=n_sites_to_change, replace=False):
             selected_sites[index].label = new_site_label
 
-    def connected_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[cluster.Cluster]:
+    def connected_sites(self, site_labels: Iterable[str] | str | None = None) -> list[cluster.Cluster]:
         """
         Searches the lattice to find sets of sites that are contiguously neighbouring.
 
         Mutually exclusive sets of contiguous sites are returned as Cluster objects.
 
         Args:
-            site_labels: Labels of the sites to consider in the search: a list or set of labels,
-                such as ``['A', 'B']``, or a single label, such as ``'A'``. If None, all sites
-                are considered. An empty list or set selects no sites. Defaults to None.
+            site_labels: Labels of the sites to consider in the search: an iterable of labels,
+                such as the list ``['A', 'B']`` or a set, or a single label, such as ``'A'``.
+                If None, all sites are considered. An empty iterable selects no sites.
+                Defaults to None.
 
         Returns:
             The clusters of contiguous sites.
@@ -341,29 +342,29 @@ class Lattice:
             final_clusters.append(this_cluster)
         return final_clusters
 
-    def select_sites(self, site_labels: list[str] | set[str] | str) -> list[Site]:
+    def select_sites(self, site_labels: Iterable[str] | str) -> list[Site]:
         """
         Selects sites in the lattice with specified labels.
 
         Args:
-            site_labels: Labels of the sites to select: a list or set of labels, such as
-                ``['A', 'B']``, or a single label, such as ``'A'``.
+            site_labels: Labels of the sites to select: an iterable of labels, such as the
+                list ``['A', 'B']`` or a set, or a single label, such as ``'A'``.
 
         Returns:
             The sites with labels given by `site_labels`.
 
         Raises:
-            ValueError: If `site_labels` is not a list, set or string.
+            TypeError: If `site_labels` is neither a string nor an iterable.
         """
-        if isinstance(site_labels, (list, set)):
-            selected_sites = [s for s in self.sites if s.label in site_labels]
-        elif isinstance(site_labels, str):
-            selected_sites = [s for s in self.sites if s.label == site_labels]
+        if isinstance(site_labels, str):
+            labels = {site_labels}
+        elif isinstance(site_labels, Iterable):
+            labels = set(site_labels)
         else:
-            raise ValueError(str(site_labels))
-        return selected_sites
+            raise TypeError(f"site_labels must be a label or an iterable of labels, not {type(site_labels).__name__}.")
+        return [s for s in self.sites if s.label in labels]
 
-    def detached_sites(self, site_labels: list[str] | set[str] | str | None = None) -> list[Site]:
+    def detached_sites(self, site_labels: Iterable[str] | str | None = None) -> list[Site]:
         """
         Returns all sites in the lattice that are not part of a percolating network.
 

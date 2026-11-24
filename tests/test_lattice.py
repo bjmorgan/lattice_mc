@@ -130,9 +130,15 @@ class TestLattice:
         assert lattice.select_sites("AA") == [lattice.sites[1]]
         assert lattice.select_sites(["A", "B"]) == [lattice.sites[0], lattice.sites[2]]
 
-    def test_select_sites_raises_ValueError_for_other_types(self, lattice):
-        with pytest.raises(ValueError):
-            lattice.select_sites(("A",))
+    def test_select_sites_accepts_any_iterable_of_labels(self):
+        lattice = make_lattice([1, 2, 3], labels=["A", "AA", "B"])
+        assert lattice.select_sites(("A", "B")) == [lattice.sites[0], lattice.sites[2]]
+        assert lattice.select_sites(label for label in ["AA"]) == [lattice.sites[1]]
+
+    @pytest.mark.parametrize("site_labels", [5, None])
+    def test_select_sites_raises_TypeError_for_a_non_iterable(self, lattice, site_labels):
+        with pytest.raises(TypeError, match="site_labels must be a label or an iterable of labels"):
+            lattice.select_sites(site_labels)
 
     def test_site_energies_by_label(self):
         lattice = make_lattice([1, 2, 3], labels=["A", "B", "A"], energies=[0.2, 0.4, 0.2])
