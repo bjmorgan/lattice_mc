@@ -48,6 +48,11 @@ class TestConnectedSites:
         assert [c.sites for c in by_string] == [c.sites for c in lattice.connected_sites(["Li"])]
         assert len(by_string) == 1
 
+    @pytest.mark.parametrize("site_labels", [[], set()], ids=["list", "set"])
+    def test_an_empty_collection_of_labels_selects_no_sites(self, site_labels):
+        lattice = lattice_with_neighbours([[1], [0]])
+        assert lattice.connected_sites(site_labels) == []
+
 
 class TestDetachedSitesIntegration:
     """Tests for Lattice.detached_sites using real Site and Lattice objects."""
@@ -87,6 +92,11 @@ class TestDetachedSitesIntegration:
         ]
         lattice = Lattice(sites, cell_lengths=np.array([3.0, 10.0, 10.0]))
         assert {s.number for s in lattice.detached_sites("A")} == {1, 2}
+
+    @pytest.mark.parametrize("site_labels", [[], set()], ids=["list", "set"])
+    def test_an_empty_collection_of_labels_selects_no_sites(self, site_labels):
+        lattice = lattice_with_neighbours([[], []])
+        assert lattice.detached_sites(site_labels) == []
 
     @pytest.mark.parametrize(
         "build_lattice",

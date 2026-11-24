@@ -312,13 +312,15 @@ class Lattice:
         Args:
             site_labels: Labels of the sites to consider in the search: a list or set of labels,
                 such as ``['A', 'B']``, or a single label, such as ``'A'``. If None, all sites
-                are considered. Defaults to None.
+                are considered. An empty list or set selects no sites. Defaults to None.
 
         Returns:
             The clusters of contiguous sites.
         """
         # A single label is wrapped, because set("Li") would be {"L", "i"}.
-        labels = {site_labels} if isinstance(site_labels, str) and site_labels else set(site_labels or ())
+        labels = {site_labels} if isinstance(site_labels, str) else set(site_labels or ())
+        if site_labels is not None and not labels:
+            return []
         if labels:
             selected_sites = self.select_sites(labels)
         else:
@@ -371,7 +373,7 @@ class Lattice:
 
         Args:
             site_labels: Labels of the sites to consider. If None, all sites are considered.
-                Defaults to None.
+                An empty list or set selects no sites. Defaults to None.
 
         Returns:
             List of sites not in a periodic percolating network.
