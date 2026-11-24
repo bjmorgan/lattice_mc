@@ -77,14 +77,19 @@ class Lattice:
         """
         Ensure that all lattice sites are within the central periodic image of the simulation cell.
 
-        Sites that are outside the central simulation cell are mapped back into this cell.
+        Each coordinate along an axis with a non-zero cell length L is mapped into [0, L),
+        however many cells away it starts. Coordinates along axes with a cell length of zero
+        are left unchanged.
         """
-        for s in self.sites:
-            for i in range(3):
-                if s.r[i] < 0.0:
-                    s.r[i] += self.cell_lengths[i]
-                if s.r[i] > self.cell_lengths[i]:
-                    s.r[i] -= self.cell_lengths[i]
+        if not self.sites:
+            return
+        positions = np.array([site.r for site in self.sites])
+        periodic = self.cell_lengths != 0.0
+        np.mod(positions, self.cell_lengths, out=positions, where=periodic)
+        # A tiny negative coordinate is rounded up to L by np.mod, which is the same point as 0.
+        positions[periodic & (positions >= self.cell_lengths)] = 0.0
+        for site, position in zip(self.sites, positions):
+            site.r[:] = position
 
     def site_with_id(self, number: int) -> Site:
         """

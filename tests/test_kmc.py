@@ -105,6 +105,15 @@ def test_jump_vector_on_a_two_dimensional_lattice() -> None:
     assert jump_vector(lattice, 0, 2).tolist() == [0.0, 1.0, 0.0]
 
 
+def test_jump_vector_on_a_ring_with_sites_several_cells_away() -> None:
+    lattice = lattice_from_positions(
+        [[4.0, 0.0, 0.0], [17.0, 0.0, 0.0], [30.0, 0.0, 0.0], [43.0, 0.0, 0.0]],
+        [[1, 3], [0, 2], [1, 3], [2, 0]],
+        [4.0, 0.0, 0.0],
+    )
+    assert [jump_vector(lattice, i, (i + 1) % 4).tolist() for i in range(4)] == [[1.0, 0.0, 0.0]] * 4
+
+
 def test_jump_vector_is_zero_along_an_axis_with_zero_cell_length() -> None:
     lattice = lattice_from_positions(
         [[0.0, 0.0, 0.0], [1.0, 0.0, 0.5]],
